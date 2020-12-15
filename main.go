@@ -28,7 +28,7 @@ func main() {
 
 	sysType := runtime.GOOS
 
-	//支持平滑重启
+	//支持平滑重启，kill -1 pid
 	if sysType == "linux" {
 		// LINUX系统
 
