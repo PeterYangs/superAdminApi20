@@ -2,9 +2,11 @@ package main
 
 import (
 	"gin-web/routes"
+	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"os"
+	"runtime"
 )
 
 func main() {
@@ -22,7 +24,24 @@ func main() {
 		port = "8887"
 	}
 
-	r.Run(":" + port)
+	//r.Run(":" + port)
+
+	sysType := runtime.GOOS
+
+	//支持平滑重启
+	if sysType == "linux" {
+		// LINUX系统
+
+		endless.ListenAndServe(":"+port, r)
+	}
+
+	//windows只做开发测试
+	if sysType == "windows" {
+		// windows系统
+
+		r.Run(":" + port)
+
+	}
 
 }
 
