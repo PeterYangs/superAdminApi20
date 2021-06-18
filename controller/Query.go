@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Query(c *gin.Context) gin.H {
+func Query(c *gin.Context) interface{} {
 
 	var test model.Test
 

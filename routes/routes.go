@@ -18,7 +18,7 @@ func Load(rr *gin.Engine) {
 }
 
 //路由注册
-func actionRegistered(method string, url string, f func(c *gin.Context) gin.H) {
+func actionRegistered(method string, url string, f func(c *gin.Context) interface{}) {
 
 	switch method {
 
@@ -28,10 +28,29 @@ func actionRegistered(method string, url string, f func(c *gin.Context) gin.H) {
 
 			data := f(c)
 
-			c.JSON(200, data)
+			getDataType(data, c)
 
 		})
 
 	}
 
+}
+
+func getDataType(data interface{}, c *gin.Context) {
+
+	switch item := data.(type) {
+
+	case map[string]interface{}:
+
+		c.JSON(200, item)
+
+	case string:
+
+		c.String(200, item)
+	case gin.H:
+
+		//fmt.Println(1111)
+		c.JSON(200, item)
+
+	}
 }

@@ -2,8 +2,8 @@ package controller
 
 import "github.com/gin-gonic/gin"
 
-//主页
-func Index(c *gin.Context) gin.H {
+// Index 主页
+func Index(c *gin.Context) interface{} {
 
 	return gin.H{"code": 1, "msg": "hello world"}
 }
