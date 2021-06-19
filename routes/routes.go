@@ -2,35 +2,59 @@ package routes
 
 import (
 	"gin-web/controller"
+	"gin-web/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 var r *gin.Engine
+
+const (
+	GET    int = 0x000000
+	POST   int = 0x000001
+	PUT    int = 0x000002
+	DELETE int = 0x000003
+)
 
 func Load(rr *gin.Engine) {
 
 	//绑定到全局变量
 	r = rr
 
-	actionRegistered("get", "/", controller.Index)
-	actionRegistered("get", "/query", controller.Query)
+	actionRegistered(GET, "/", controller.Index, middleware.GoOn)
+	actionRegistered(GET, "/query", controller.Query)
 
 }
 
 //路由注册
-func actionRegistered(method string, url string, f func(c *gin.Context) interface{}) {
+func actionRegistered(method int, url string, f func(c *gin.Context) interface{}, middlewares ...gin.HandlerFunc) {
+
+	ff := func(c *gin.Context) {
+
+		data := f(c)
+
+		getDataType(data, c)
+
+	}
+
+	middlewares = append(middlewares, ff)
 
 	switch method {
 
-	case "get":
+	case GET:
 
-		r.GET(url, func(c *gin.Context) {
+		r.GET(url, middlewares...)
 
-			data := f(c)
+	case POST:
 
-			getDataType(data, c)
+		r.POST(url, middlewares...)
 
-		})
+	case PUT:
+
+		r.PUT(url, middlewares...)
+
+	case DELETE:
+
+		r.DELETE(url, middlewares...)
 
 	}
 
