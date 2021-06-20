@@ -21,18 +21,18 @@ func Load(rr *gin.Engine) {
 	r = rr
 
 	actionRegistered(GET, "/", controller.Index, middleware.GoOn)
-	actionRegistered(GET, "/query", controller.Query)
+	//actionRegistered(GET, "/query", controller.Query)
 
 }
 
 //路由注册
-func actionRegistered(method int, url string, f func(c *gin.Context) interface{}, middlewares ...gin.HandlerFunc) {
+func actionRegistered(method int, url string, f func(c *controller.Contexts) interface{}, middlewares ...gin.HandlerFunc) {
 
 	ff := func(c *gin.Context) {
 
-		data := f(c)
+		data := f(&controller.Contexts{c})
 
-		getDataType(data, c)
+		getDataType(data, &controller.Contexts{c})
 
 	}
 
@@ -60,7 +60,7 @@ func actionRegistered(method int, url string, f func(c *gin.Context) interface{}
 
 }
 
-func getDataType(data interface{}, c *gin.Context) {
+func getDataType(data interface{}, c *controller.Contexts) {
 
 	switch item := data.(type) {
 

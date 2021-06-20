@@ -1,7 +1,6 @@
 package main
 
 import (
-	"gin-web/middleware/session"
 	"gin-web/routes"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -14,7 +13,7 @@ func main() {
 	r := gin.Default()
 
 	//开启session
-	r.Use(session.StartSession)
+	//r.Use(session.StartSession)
 
 	//加载路由
 	routes.Load(r)

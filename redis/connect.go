@@ -11,7 +11,7 @@ var client *redis.Client
 
 var once = sync.Once{}
 
-func Connect() {
+func connect() {
 
 	cxt, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 
@@ -42,7 +42,7 @@ func GetClient() *redis.Client {
 
 		once.Do(func() {
 
-			Connect()
+			connect()
 		})
 
 	}
