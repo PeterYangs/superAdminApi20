@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"gin-web/conf"
 	"gin-web/redis"
 	"sync"
 	"time"
@@ -39,7 +40,7 @@ func (c *Context) Session() *Session {
 
 	var session Session
 
-	cookie_, ex := c.Get("cookie_key")
+	cookie_, ex := c.Get(conf.Get("cookie_key").(string))
 
 	if ex {
 

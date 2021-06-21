@@ -8,9 +8,15 @@ import (
 	"time"
 )
 
-var client *redis.Client
+//var client *redis.Client
 
 var once = sync.Once{}
+
+type _connect struct {
+	connect *redis.Client
+}
+
+var Client *_connect
 
 func connect() {
 
@@ -26,6 +32,8 @@ func connect() {
 		conf.Password = os.Getenv("REDIS_PASSWORD")
 	}
 
+	//c := redis.NewClient(conf)
+
 	c := redis.NewClient(conf)
 
 	re := c.Ping(cxt)
@@ -40,13 +48,21 @@ func connect() {
 
 	}
 
-	client = c
+	//client = c
+
+	//cc.Connect=c
+
+	Client = &_connect{
+		connect: c,
+	}
 
 }
 
-func GetClient() *redis.Client {
+func GetClient() *_connect {
 
-	if client == nil {
+	//fmt.Println(Client)
+
+	if Client == nil {
 
 		once.Do(func() {
 
@@ -55,6 +71,16 @@ func GetClient() *redis.Client {
 
 	}
 
-	return client
+	return Client
 
+}
+
+func (cc *_connect) Get(cxt context.Context, key string) *redis.StringCmd {
+
+	return cc.connect.Get(cxt, key)
+}
+
+func (cc *_connect) Set(cxt context.Context, key string, value interface{}, expiration time.Duration) *redis.StatusCmd {
+
+	return cc.connect.Set(cxt, key, value, expiration)
 }

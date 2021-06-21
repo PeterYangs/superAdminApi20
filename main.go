@@ -2,6 +2,7 @@ package main
 
 import (
 	"gin-web/common"
+	"gin-web/conf"
 	"gin-web/middleware/session"
 	"gin-web/routes"
 	"github.com/gin-gonic/gin"
@@ -13,6 +14,13 @@ import (
 func main() {
 
 	r := gin.Default()
+
+	//加载配置
+	conf.Load()
+
+	//redis.GetClient()
+	//
+	//return
 
 	//开启session(全局中间件)
 	common.GlobalMiddleware(r, session.StartSession)

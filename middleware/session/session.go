@@ -3,6 +3,7 @@ package session
 import (
 	"context"
 	"encoding/json"
+	"gin-web/conf"
 	"gin-web/contextPlus"
 	"gin-web/redis"
 	"github.com/PeterYangs/tools"
@@ -12,17 +13,11 @@ import (
 	"time"
 )
 
-//type Session struct {
-//	Cookie      string                 `json:"cookie"`
-//	ExpireTime  int64                  `json:"expire_time"`
-//	SessionList map[string]interface{} `json:"session_list"`
-//}
-
 func StartSession(c *contextPlus.Context) {
 
 	defer c.Next()
 
-	cookie, err := c.Cookie(os.Getenv("APP_NAME") + "_session")
+	cookie, err := c.Cookie(conf.Get("cookie_name").(string))
 
 	if err == nil {
 
@@ -30,15 +25,11 @@ func StartSession(c *contextPlus.Context) {
 
 		if err == nil {
 
-			//fmt.Println("find")
-
-			//c.CookieKey=cookie
-
 			var session contextPlus.Session
 
 			json.Unmarshal([]byte(cookies), &session)
 
-			c.Set("cookie_key", session)
+			c.Set(conf.Get("cookie_key").(string), session)
 
 			return
 		}
@@ -49,7 +40,7 @@ func StartSession(c *contextPlus.Context) {
 
 	life, _ := strconv.Atoi(os.Getenv("SESSION_LIFETIME"))
 
-	c.SetCookie(os.Getenv("APP_NAME")+"_session", u, life, "/", c.Domain(), false, true)
+	c.SetCookie(conf.Get("cookie_name").(string), u, life, "/", c.Domain(), false, true)
 
 	sessionLifetime_, _ := strconv.Atoi(os.Getenv("SESSION_LIFETIME"))
 
@@ -63,7 +54,7 @@ func StartSession(c *contextPlus.Context) {
 
 	s, err := json.Marshal(session)
 
-	c.Set("cookie_key", session)
+	c.Set(conf.Get("cookie_key").(string), session)
 
 	if err != nil {
 
