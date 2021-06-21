@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"github.com/go-redis/redis/v8"
+	"os"
 	"sync"
 	"time"
 )
@@ -15,10 +16,17 @@ func connect() {
 
 	cxt, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 
-	c := redis.NewClient(&redis.Options{
-		Addr: "127.0.0.1:6379",
+	conf := &redis.Options{
+		Addr: os.Getenv("REDIS_HOST") + ":" + os.Getenv("REDIS_PORT"),
 		DB:   0,
-	})
+	}
+
+	if os.Getenv("REDIS_PASSWORD") != "null" {
+
+		conf.Password = os.Getenv("REDIS_PASSWORD")
+	}
+
+	c := redis.NewClient(conf)
 
 	re := c.Ping(cxt)
 

@@ -2,10 +2,10 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
+	"gin-web/contextPlus"
 )
 
-func GoOn(c *gin.Context) {
+func GoOn(c *contextPlus.Context) {
 
 	fmt.Println("after")
 
@@ -16,7 +16,7 @@ func GoOn(c *gin.Context) {
 
 }
 
-func Stop(c *gin.Context) {
+func Stop(c *contextPlus.Context) {
 
 	c.Abort()
 }

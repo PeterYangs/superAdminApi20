@@ -1,9 +1,10 @@
 package routes
 
 import (
+	"gin-web/contextPlus"
 	"gin-web/controller"
-	"gin-web/middleware"
 	"github.com/gin-gonic/gin"
+	"sync"
 )
 
 var r *gin.Engine
@@ -20,47 +21,59 @@ func Load(rr *gin.Engine) {
 	//绑定到全局变量
 	r = rr
 
-	actionRegistered(GET, "/", controller.Index, middleware.GoOn)
+	actionRegistered(GET, "/", controller.Index)
 	//actionRegistered(GET, "/query", controller.Query)
 
 }
 
 //路由注册
-func actionRegistered(method int, url string, f func(c *controller.Contexts) interface{}, middlewares ...gin.HandlerFunc) {
+func actionRegistered(method int, url string, f func(c *contextPlus.Context) interface{}, middlewares ...contextPlus.HandlerFunc) {
 
-	ff := func(c *gin.Context) {
+	ff := func(c *contextPlus.Context) {
 
-		data := f(&controller.Contexts{c})
+		data := f(c)
 
-		getDataType(data, &controller.Contexts{c})
+		getDataType(data, c)
 
 	}
 
 	middlewares = append(middlewares, ff)
 
+	var temp = make([]gin.HandlerFunc, len(middlewares))
+
+	for i, funcs := range middlewares {
+
+		temp[i] = func(context *gin.Context) {
+
+			funcs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
+
+		}
+
+	}
+
 	switch method {
 
 	case GET:
 
-		r.GET(url, middlewares...)
+		r.GET(url, temp...)
 
 	case POST:
 
-		r.POST(url, middlewares...)
+		r.POST(url, temp...)
 
 	case PUT:
 
-		r.PUT(url, middlewares...)
+		r.PUT(url, temp...)
 
 	case DELETE:
 
-		r.DELETE(url, middlewares...)
+		r.DELETE(url, temp...)
 
 	}
 
 }
 
-func getDataType(data interface{}, c *controller.Contexts) {
+func getDataType(data interface{}, c *contextPlus.Context) {
 
 	switch item := data.(type) {
 

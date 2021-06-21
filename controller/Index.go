@@ -1,45 +1,34 @@
 package controller
 
 import (
-	"context"
 	"fmt"
-	"gin-web/redis"
+	"gin-web/contextPlus"
 	"github.com/gin-gonic/gin"
-	"time"
+	"strconv"
 )
 
-type Contexts struct {
-	*gin.Context
-}
-
-type HandlerFuncs struct {
-	gin.HandlerFunc
-}
-
-func (c *Contexts) Domain() string {
-	//return nameOfFunction(c.handlers.Last())
-
-	return "11111111111111111111"
-}
-
 // Index 主页
-func Index(c *Contexts) interface{} {
+func Index(c *contextPlus.Context) interface{} {
 
-	//fmt.Println("index")
+	fmt.Println(c.Session().Get("test3"))
 
-	//s, err := c.Cookie("gin_web")
+	return gin.H{"code": 1, "msg": "hello world"}
+}
 
-	//fmt.Println(s)
-	//fmt.Println(err)
+// SessionSet 并发写入demo
+func SessionSet(c *contextPlus.Context) interface{} {
 
-	//c.Domain()
-	//c.Request
+	s := c.Session()
 
-	fmt.Println(c.Domain())
+	for i := 0; i < 100; i++ {
 
-	//fmt.Println(c.Request.)
+		go func(ii int, ss *contextPlus.Session) {
 
-	redis.GetClient().Set(context.TODO(), "gg", "yy", time.Second*1000)
+			ss.Set("test"+strconv.Itoa(ii), ii)
+
+			//fmt.Println(e)
+		}(i, s)
+	}
 
 	return gin.H{"code": 1, "msg": "hello world"}
 }
