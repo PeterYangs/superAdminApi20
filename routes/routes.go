@@ -224,6 +224,10 @@ func getDataType(data interface{}, c *contextPlus.Context) {
 	case string:
 
 		c.String(200, item)
+
+	case []byte:
+
+		c.String(200, string(item))
 	case gin.H:
 
 		//fmt.Println(1111)

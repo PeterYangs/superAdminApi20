@@ -26,4 +26,6 @@ func Load(rr *gin.Engine) {
 	//单路由
 	_r.Registered(GET, "/", controller.Index)
 
+	_r.Registered(GET, "/c", controller.Captcha)
+
 }

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"gin-web/component/captcha"
 	"gin-web/contextPlus"
 	"github.com/gin-gonic/gin"
 	"strconv"
@@ -29,4 +30,13 @@ func SessionSet(c *contextPlus.Context) interface{} {
 	}
 
 	return gin.H{"code": 1, "msg": "hello world"}
+}
+
+func Captcha(c *contextPlus.Context) interface{} {
+
+	b, _ := captcha.GetCaptcha()
+
+	c.Header("content-type", "image/png")
+
+	return b
 }
