@@ -61,6 +61,6 @@ func StartSession(c *contextPlus.Context) {
 		return
 	}
 
-	redis.GetClient().Set(context.TODO(), "session:"+u, s, time.Second*time.Duration(sessionLifetime))
+	redis.GetClient().Set(context.TODO(), contextPlus.GetRedisSessionKey(u), s, time.Second*time.Duration(sessionLifetime))
 
 }
