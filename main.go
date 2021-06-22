@@ -3,20 +3,38 @@ package main
 import (
 	"gin-web/common"
 	"gin-web/conf"
+	"gin-web/middleware/exception"
 	"gin-web/middleware/session"
 	"gin-web/routes"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"io"
 	"os"
 	"runtime"
 )
 
 func main() {
 
+	os.Mkdir("log", 755)
+
+	f, err := os.OpenFile("log/log.log", os.O_RDWR|os.O_APPEND|os.O_CREATE, 644)
+
+	if err != nil {
+
+		panic(err)
+
+		return
+	}
+
+	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
+
 	r := gin.Default()
 
 	//加载配置
 	conf.Load()
+
+	//异常捕获
+	common.GlobalMiddleware(r, exception.Exception)
 
 	//开启session(全局中间件)
 	common.GlobalMiddleware(r, session.StartSession)

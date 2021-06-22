@@ -14,6 +14,15 @@ func Index(c *contextPlus.Context) interface{} {
 
 	//c.Session().Set("test3", "123")
 
+	panic("模拟错误")
+
+	//go func() {
+	//
+	//	panic("模拟错误")
+	//}()
+
+	//fmt.Println(i)
+
 	fmt.Println(c.Session().Get("test3"))
 
 	return gin.H{"code": 1, "msg": "hello world"}
@@ -30,7 +39,6 @@ func SessionSet(c *contextPlus.Context) interface{} {
 
 			ss.Set("test"+strconv.Itoa(ii), ii)
 
-			//fmt.Println(e)
 		}(i, s)
 	}
 
