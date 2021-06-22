@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	"gin-web/conf"
 	"github.com/go-redis/redis/v8"
 	"os"
 	"sync"
@@ -22,19 +23,17 @@ func connect() {
 
 	cxt, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 
-	conf := &redis.Options{
+	conf_ := &redis.Options{
 		Addr: os.Getenv("REDIS_HOST") + ":" + os.Getenv("REDIS_PORT"),
 		DB:   0,
 	}
 
 	if os.Getenv("REDIS_PASSWORD") != "null" {
 
-		conf.Password = os.Getenv("REDIS_PASSWORD")
+		conf_.Password = os.Getenv("REDIS_PASSWORD")
 	}
 
-	//c := redis.NewClient(conf)
-
-	c := redis.NewClient(conf)
+	c := redis.NewClient(conf_)
 
 	re := c.Ping(cxt)
 
@@ -42,15 +41,9 @@ func connect() {
 
 	if re.Err() != nil {
 
-		//cancel()
-
 		panic(re.Err())
 
 	}
-
-	//client = c
-
-	//cc.Connect=c
 
 	Client = &_connect{
 		connect: c,
@@ -59,8 +52,6 @@ func connect() {
 }
 
 func GetClient() *_connect {
-
-	//fmt.Println(Client)
 
 	if Client == nil {
 
@@ -77,10 +68,10 @@ func GetClient() *_connect {
 
 func (cc *_connect) Get(cxt context.Context, key string) *redis.StringCmd {
 
-	return cc.connect.Get(cxt, key)
+	return cc.connect.Get(cxt, conf.Get("redis_prefix").(string)+key)
 }
 
 func (cc *_connect) Set(cxt context.Context, key string, value interface{}, expiration time.Duration) *redis.StatusCmd {
 
-	return cc.connect.Set(cxt, key, value, expiration)
+	return cc.connect.Set(cxt, conf.Get("redis_prefix").(string)+key, value, expiration)
 }

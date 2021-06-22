@@ -7,12 +7,12 @@ import (
 
 func GoOn(c *contextPlus.Context) {
 
-	fmt.Println("after")
+	fmt.Println("before")
 
 	c.Next()
 
 	//这里为请求后处理
-	fmt.Println("last")
+	fmt.Println("after")
 
 }
 

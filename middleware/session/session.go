@@ -21,7 +21,7 @@ func StartSession(c *contextPlus.Context) {
 
 	if err == nil {
 
-		cookies, err := redis.GetClient().Get(context.TODO(), "session:"+cookie).Result()
+		cookies, err := redis.GetClient().Get(context.TODO(), contextPlus.GetRedisSessionKey(cookie)).Result()
 
 		if err == nil {
 

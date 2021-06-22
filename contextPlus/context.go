@@ -6,6 +6,7 @@ import (
 	"errors"
 	"gin-web/conf"
 	"gin-web/redis"
+	"strings"
 	"sync"
 	"time"
 
@@ -58,7 +59,7 @@ func (s *Session) Set(key string, value interface{}) error {
 
 	defer s.Lock.Unlock()
 
-	sessionString, err := redis.GetClient().Get(context.TODO(), "session:"+s.Cookie).Result()
+	sessionString, err := redis.GetClient().Get(context.TODO(), GetRedisSessionKey(s.Cookie)).Result()
 
 	if err != nil {
 
@@ -80,7 +81,7 @@ func (s *Session) Set(key string, value interface{}) error {
 
 	sessionStringNew, err := json.Marshal(session)
 
-	redis.GetClient().Set(context.TODO(), "session:"+s.Cookie, sessionStringNew, time.Duration(s.ExpireTime-time.Now().Unix())*time.Second)
+	redis.GetClient().Set(context.TODO(), GetRedisSessionKey(s.Cookie), sessionStringNew, time.Duration(s.ExpireTime-time.Now().Unix())*time.Second)
 
 	return nil
 }
@@ -91,7 +92,7 @@ func (s *Session) Get(key string) (interface{}, error) {
 
 	defer s.Lock.Unlock()
 
-	sessionString, err := redis.GetClient().Get(context.TODO(), "session:"+s.Cookie).Result()
+	sessionString, err := redis.GetClient().Get(context.TODO(), GetRedisSessionKey(s.Cookie)).Result()
 
 	if err != nil {
 
@@ -111,4 +112,9 @@ func (s *Session) Get(key string) (interface{}, error) {
 
 	return nil, errors.New("not found key is " + key)
 
+}
+
+func GetRedisSessionKey(cookie string) string {
+
+	return strings.Replace(conf.Get("redis_session_key").(string), "{cookie}", cookie, 1)
 }

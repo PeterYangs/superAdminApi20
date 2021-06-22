@@ -18,10 +18,6 @@ func main() {
 	//加载配置
 	conf.Load()
 
-	//redis.GetClient()
-	//
-	//return
-
 	//开启session(全局中间件)
 	common.GlobalMiddleware(r, session.StartSession)
 
@@ -35,8 +31,6 @@ func main() {
 
 		port = "8887"
 	}
-
-	//r.Run(":" + port)
 
 	sysType := runtime.GOOS
 

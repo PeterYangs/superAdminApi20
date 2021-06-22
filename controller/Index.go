@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"gin-web/contextPlus"
 	"github.com/gin-gonic/gin"
 	"strconv"
@@ -11,7 +12,9 @@ func Index(c *contextPlus.Context) interface{} {
 
 	//fmt.Println(c.Session().Get("test3"))
 
-	c.Session().Set("test3", "123")
+	//c.Session().Set("test3", "123")
+
+	fmt.Println(c.Session().Get("test3"))
 
 	return gin.H{"code": 1, "msg": "hello world"}
 }
