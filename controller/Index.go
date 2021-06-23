@@ -13,6 +13,8 @@ func Index(c *contextPlus.Context) interface{} {
 
 	//fmt.Println(c.Get("test"))
 
+	//panic("123")
+
 	return gin.H{"code": 1, "msg": "hello world"}
 }
 

@@ -14,6 +14,7 @@ func Load() {
 	Middleware = []contextPlus.HandlerFunc{
 		exception.Exception,
 		session.StartSession,
+		//middleware.GoOn,
 		//routeRegex.RouteRegex,
 	}
 

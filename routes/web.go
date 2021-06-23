@@ -16,15 +16,15 @@ func _init(_r *group) {
 		g.Registered(GET, "/", controller.Index).Bind()
 		g.Registered(GET, "/gg", controller.Index).Bind()
 
-		g.Group("login", func(g2 *group) {
+		g.Group("/login", func(g2 *group) {
 
-			g2.Registered(GET, "/", controller.Index).Bind()
+			//g2.Registered(GET, "/", controller.Index).Bind()
 		})
 
 	}, middleware.GoOn)
 
 	//单路由
-	_r.Registered(GET, "/", controller.Index).Bind()
+	_r.Registered(GET, "/", controller.Index).Regex(map[string]string{"name": "123"}).Bind()
 
 	_r.Registered(GET, "/c", controller.Captcha).Bind()
 

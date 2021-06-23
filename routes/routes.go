@@ -18,18 +18,25 @@ const (
 type router struct {
 	engine *gin.Engine
 	//regex  map[string]string //路由正则表达式
+	//path string
 }
 
 type group struct {
-	group *gin.RouterGroup
+	engine *gin.Engine
 	//regex map[string]string //路由正则表达式
+	middlewares []contextPlus.HandlerFunc
+
+	path string
 }
 
 type handler struct {
-	handlerFunc []gin.HandlerFunc
-	group       *gin.RouterGroup
+	handlerFunc func(*contextPlus.Context) interface{}
+	middlewares []contextPlus.HandlerFunc
+	engine      *gin.Engine
 	url         string
 	method      int
+	regex       map[string]string //路由正则表达式
+
 }
 
 func newRouter(engine *gin.Engine) *router {
@@ -41,36 +48,39 @@ func newRouter(engine *gin.Engine) *router {
 
 func (rr *router) Group(path string, callback func(group2 *group), middlewares ...contextPlus.HandlerFunc) {
 
-	var temp = make([]gin.HandlerFunc, len(middlewares))
+	//var temp = make([]gin.HandlerFunc, len(middlewares))
+	//
+	////fmt.Println(middlewares)
+	//
+	//for i, funcs := range middlewares {
+	//
+	//	//fmt.Println(funcs)
+	//
+	//	tempFuncs := funcs
+	//
+	//	temp[i] = func(context *gin.Context) {
+	//
+	//		tempFuncs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
+	//
+	//	}
 
-	//fmt.Println(middlewares)
+	//f := func(context *gin.Context) {
+	//
+	//	tempFuncs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
+	//
+	//}
 
-	for i, funcs := range middlewares {
+	//temp = append(temp, f)
 
-		//fmt.Println(funcs)
-
-		tempFuncs := funcs
-
-		temp[i] = func(context *gin.Context) {
-
-			tempFuncs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
-
-		}
-
-		//f := func(context *gin.Context) {
-		//
-		//	tempFuncs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
-		//
-		//}
-
-		//temp = append(temp, f)
-
-	}
+	//}
 
 	//fmt.Println(temp)
 
 	g := group{
-		group: rr.engine.Group(path, temp...),
+		//group: rr.engine.Group(path, temp...),
+		engine:      rr.engine,
+		middlewares: middlewares,
+		path:        path,
 	}
 
 	callback(&g)
@@ -79,25 +89,30 @@ func (rr *router) Group(path string, callback func(group2 *group), middlewares .
 
 func (gg *group) Group(path string, callback func(group2 *group), middlewares ...contextPlus.HandlerFunc) {
 
-	var temp = make([]gin.HandlerFunc, len(middlewares))
+	//var temp = make([]gin.HandlerFunc, len(middlewares))
 
-	for i, funcs := range middlewares {
+	for _, funcs := range middlewares {
 
 		tempFuncs := funcs
 
-		temp[i] = func(context *gin.Context) {
+		//temp[i] = func(context *gin.Context) {
+		//
+		//	tempFuncs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
+		//
+		//}
 
-			tempFuncs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
-
-		}
+		gg.middlewares = append(gg.middlewares, tempFuncs)
 
 	}
 
-	g := group{
-		group: gg.group.Group(path, temp...),
-	}
+	gg.path += path
 
-	callback(&g)
+	//g := group{
+	//	//group: gg.group.Group(path, temp...),
+	//
+	//}
+
+	callback(gg)
 
 }
 
@@ -165,58 +180,75 @@ func (rr *router) Registered(method int, url string, f func(c *contextPlus.Conte
 
 func (gg *group) Registered(method int, url string, f func(c *contextPlus.Context) interface{}, middlewares ...contextPlus.HandlerFunc) *handler {
 
+	//middlewares.
+
+	for _, middleware := range middlewares {
+
+		tempFuncs := middleware
+
+		gg.middlewares = append(gg.middlewares, tempFuncs)
+	}
+
+	return &handler{
+		handlerFunc: f,
+		engine:      gg.engine,
+		url:         gg.path + url,
+		method:      method,
+		middlewares: gg.middlewares,
+	}
+
+}
+
+func (h *handler) Regex(reg map[string]string) *handler {
+
+	h.regex = reg
+
+	return h
+}
+
+func (h *handler) Bind() {
+
 	ff := func(c *contextPlus.Context) {
 
-		data := f(c)
+		data := h.handlerFunc(c)
 
 		getDataType(data, c)
 
 	}
 
-	middlewares = append(middlewares, ff)
+	h.middlewares = append(h.middlewares, ff)
 
-	var temp = make([]gin.HandlerFunc, len(middlewares))
+	var temp = make([]gin.HandlerFunc, len(h.middlewares))
 
-	for i, funcs := range middlewares {
+	for i, funcs := range h.middlewares {
 
 		tempFuncs := funcs
 
 		temp[i] = func(context *gin.Context) {
 
-			tempFuncs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
+			tempFuncs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}, Regex: h.regex})
 
 		}
 
 	}
 
-	return &handler{
-		handlerFunc: temp,
-		group:       gg.group,
-		url:         url,
-		method:      method,
-	}
-
-}
-
-func (h *handler) Bind() {
-
 	switch h.method {
 
 	case GET:
 
-		h.group.GET(h.url, h.handlerFunc...)
+		h.engine.GET(h.url, temp...)
 
 	case POST:
 
-		h.group.POST(h.url, h.handlerFunc...)
+		h.engine.POST(h.url, temp...)
 
 	case PUT:
 
-		h.group.PUT(h.url, h.handlerFunc...)
+		h.engine.PUT(h.url, temp...)
 
 	case DELETE:
 
-		h.group.DELETE(h.url, h.handlerFunc...)
+		h.engine.DELETE(h.url, temp...)
 	}
 
 }

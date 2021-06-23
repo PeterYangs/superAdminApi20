@@ -18,7 +18,8 @@ import (
 type Context struct {
 	*gin.Context
 	Lock *sync.Mutex
-	//Regex  map[string]string
+	//Regex string
+	Regex map[string]string
 	//Jj *map[string]string
 
 }

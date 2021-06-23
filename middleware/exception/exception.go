@@ -25,6 +25,7 @@ func Exception(c *contextPlus.Context) {
 
 			if err != nil {
 
+				//c.Abort()
 				return
 			}
 
@@ -42,6 +43,8 @@ func Exception(c *contextPlus.Context) {
 
 				c.JSON(500, gin.H{"code": 500})
 			}
+
+			//c.Abort()
 
 		}
 

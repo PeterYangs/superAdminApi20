@@ -19,6 +19,8 @@ func StartSession(c *contextPlus.Context) {
 
 	//fmt.Println(c.Jj,1111)
 
+	//fmt.Println(c.Regex)
+
 	defer c.Next()
 
 	cookie, err := c.Cookie(conf.Get("cookie_name").(string))

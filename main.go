@@ -18,6 +18,8 @@ func main() {
 
 	r := gin.Default()
 
+	//r.GET()
+
 	//加载配置
 	conf.Load()
 
