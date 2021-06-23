@@ -46,7 +46,7 @@ func newRouter(engine *gin.Engine) *router {
 	}
 }
 
-func (rr *router) Group(path string, callback func(group2 *group), middlewares ...contextPlus.HandlerFunc) {
+func (rr *router) Group(path string, callback func(group2 group), middlewares ...contextPlus.HandlerFunc) {
 
 	//var temp = make([]gin.HandlerFunc, len(middlewares))
 	//
@@ -83,11 +83,11 @@ func (rr *router) Group(path string, callback func(group2 *group), middlewares .
 		path:        path,
 	}
 
-	callback(&g)
+	callback(g)
 
 }
 
-func (gg *group) Group(path string, callback func(group2 *group), middlewares ...contextPlus.HandlerFunc) {
+func (gg group) Group(path string, callback func(group2 group), middlewares ...contextPlus.HandlerFunc) {
 
 	//var temp = make([]gin.HandlerFunc, len(middlewares))
 
@@ -178,7 +178,7 @@ func (rr *router) Registered(method int, url string, f func(c *contextPlus.Conte
 
 }
 
-func (gg *group) Registered(method int, url string, f func(c *contextPlus.Context) interface{}, middlewares ...contextPlus.HandlerFunc) *handler {
+func (gg group) Registered(method int, url string, f func(c *contextPlus.Context) interface{}, middlewares ...contextPlus.HandlerFunc) *handler {
 
 	//middlewares.
 

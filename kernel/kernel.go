@@ -3,6 +3,7 @@ package kernel
 import (
 	"gin-web/contextPlus"
 	"gin-web/middleware/exception"
+	"gin-web/middleware/routeRegex"
 	"gin-web/middleware/session"
 )
 
@@ -15,7 +16,7 @@ func Load() {
 		exception.Exception,
 		session.StartSession,
 		//middleware.GoOn,
-		//routeRegex.RouteRegex,
+		routeRegex.RouterRegex,
 	}
 
 }
