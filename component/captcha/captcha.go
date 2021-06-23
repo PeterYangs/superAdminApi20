@@ -41,18 +41,6 @@ func ImgText(width, height int, text string) (b []byte) {
 	dc.SetRGBA255(bgR, bgG, bgB, bgA)
 	dc.Clear()
 
-	// 干扰线
-	for i := 0; i < 30; i++ {
-		x1, y1 := getRandPos(width, height)
-		x2, y2 := getRandPos(width, height)
-		r, g, b, a := getRandColor(255)
-		w := float64(rand.Intn(3) + 1)
-		dc.SetRGBA255(r, g, b, a)
-		dc.SetLineWidth(w)
-		dc.DrawLine(x1, y1, x2, y2)
-		dc.Stroke()
-	}
-
 	fontSize := float64(height/2) + 5
 	face := loadFontFace(fontSize)
 	dc.SetFontFace(face)
@@ -63,6 +51,18 @@ func ImgText(width, height int, text string) (b []byte) {
 		fontPosX := float64(width/textLen*i) + fontSize*0.6
 
 		writeText(dc, text[i:i+1], float64(fontPosX), float64(height/2))
+	}
+
+	// 干扰线
+	for i := 0; i < 30; i++ {
+		x1, y1 := getRandPos(width, height)
+		x2, y2 := getRandPos(width, height)
+		r, g, b, a := getRandColor(255)
+		w := float64(rand.Intn(3) + 1)
+		dc.SetRGBA255(r, g, b, a)
+		dc.SetLineWidth(w)
+		dc.DrawLine(x1, y1, x2, y2)
+		dc.Stroke()
 	}
 
 	buffer := bytes.NewBuffer(nil)
