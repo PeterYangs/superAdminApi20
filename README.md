@@ -92,8 +92,8 @@ func Captcha(c *contextPlus.Context) interface{} {
 func CheckCaptcha(c *contextPlus.Context) interface{} {
 
     code := c.Query("code")
-
-	bool:=c.CheckCaptcha(code)
+    
+    bool:=c.CheckCaptcha(code)
     
     return gin.H{"data":bool }
 
