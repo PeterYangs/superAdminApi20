@@ -6,7 +6,7 @@ import (
 	"sync"
 )
 
-var r *gin.Engine
+//var r *gin.Engine
 
 const (
 	GET    int = 0x000000
@@ -17,10 +17,19 @@ const (
 
 type router struct {
 	engine *gin.Engine
+	//regex  map[string]string //路由正则表达式
 }
 
 type group struct {
 	group *gin.RouterGroup
+	//regex map[string]string //路由正则表达式
+}
+
+type handler struct {
+	handlerFunc []gin.HandlerFunc
+	group       *gin.RouterGroup
+	url         string
+	method      int
 }
 
 func newRouter(engine *gin.Engine) *router {
@@ -34,15 +43,31 @@ func (rr *router) Group(path string, callback func(group2 *group), middlewares .
 
 	var temp = make([]gin.HandlerFunc, len(middlewares))
 
+	//fmt.Println(middlewares)
+
 	for i, funcs := range middlewares {
+
+		//fmt.Println(funcs)
+
+		tempFuncs := funcs
 
 		temp[i] = func(context *gin.Context) {
 
-			funcs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
+			tempFuncs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
 
 		}
 
+		//f := func(context *gin.Context) {
+		//
+		//	tempFuncs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
+		//
+		//}
+
+		//temp = append(temp, f)
+
 	}
+
+	//fmt.Println(temp)
 
 	g := group{
 		group: rr.engine.Group(path, temp...),
@@ -58,9 +83,11 @@ func (gg *group) Group(path string, callback func(group2 *group), middlewares ..
 
 	for i, funcs := range middlewares {
 
+		tempFuncs := funcs
+
 		temp[i] = func(context *gin.Context) {
 
-			funcs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
+			tempFuncs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
 
 		}
 
@@ -73,6 +100,20 @@ func (gg *group) Group(path string, callback func(group2 *group), middlewares ..
 	callback(&g)
 
 }
+
+//func (rr *router) Regex(r map[string]string) *router {
+//
+//	rr.regex = r
+//
+//	return rr
+//}
+//
+//func (gg *group) Regex(r map[string]string) *group {
+//
+//	gg.regex = r
+//
+//	return gg
+//}
 
 func (rr *router) Registered(method int, url string, f func(c *contextPlus.Context) interface{}, middlewares ...contextPlus.HandlerFunc) {
 
@@ -90,9 +131,11 @@ func (rr *router) Registered(method int, url string, f func(c *contextPlus.Conte
 
 	for i, funcs := range middlewares {
 
+		tempFuncs := funcs
+
 		temp[i] = func(context *gin.Context) {
 
-			funcs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
+			tempFuncs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
 
 		}
 
@@ -120,7 +163,7 @@ func (rr *router) Registered(method int, url string, f func(c *contextPlus.Conte
 
 }
 
-func (gg *group) Registered(method int, url string, f func(c *contextPlus.Context) interface{}, middlewares ...contextPlus.HandlerFunc) {
+func (gg *group) Registered(method int, url string, f func(c *contextPlus.Context) interface{}, middlewares ...contextPlus.HandlerFunc) *handler {
 
 	ff := func(c *contextPlus.Context) {
 
@@ -136,79 +179,44 @@ func (gg *group) Registered(method int, url string, f func(c *contextPlus.Contex
 
 	for i, funcs := range middlewares {
 
+		tempFuncs := funcs
+
 		temp[i] = func(context *gin.Context) {
 
-			funcs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
+			tempFuncs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
 
 		}
 
 	}
 
-	switch method {
-
-	case GET:
-
-		gg.group.GET(url, temp...)
-
-	case POST:
-
-		gg.group.POST(url, temp...)
-
-	case PUT:
-
-		gg.group.PUT(url, temp...)
-
-	case DELETE:
-
-		gg.group.DELETE(url, temp...)
-
+	return &handler{
+		handlerFunc: temp,
+		group:       gg.group,
+		url:         url,
+		method:      method,
 	}
 
 }
 
-//路由注册
-func actionRegistered(method int, url string, f func(c *contextPlus.Context) interface{}, middlewares ...contextPlus.HandlerFunc) {
+func (h *handler) Bind() {
 
-	ff := func(c *contextPlus.Context) {
-
-		data := f(c)
-
-		getDataType(data, c)
-
-	}
-
-	middlewares = append(middlewares, ff)
-
-	var temp = make([]gin.HandlerFunc, len(middlewares))
-
-	for i, funcs := range middlewares {
-
-		temp[i] = func(context *gin.Context) {
-
-			funcs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
-
-		}
-
-	}
-
-	switch method {
+	switch h.method {
 
 	case GET:
 
-		r.GET(url, temp...)
+		h.group.GET(h.url, h.handlerFunc...)
 
 	case POST:
 
-		r.POST(url, temp...)
+		h.group.POST(h.url, h.handlerFunc...)
 
 	case PUT:
 
-		r.PUT(url, temp...)
+		h.group.PUT(h.url, h.handlerFunc...)
 
 	case DELETE:
 
-		r.DELETE(url, temp...)
-
+		h.group.DELETE(h.url, h.handlerFunc...)
 	}
 
 }

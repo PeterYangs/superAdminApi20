@@ -9,7 +9,9 @@ import (
 // Index 主页
 func Index(c *contextPlus.Context) interface{} {
 
-	//c.Session().
+	//fmt.Println(c.Jj)
+
+	//fmt.Println(c.Get("test"))
 
 	return gin.H{"code": 1, "msg": "hello world"}
 }

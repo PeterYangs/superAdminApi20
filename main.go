@@ -22,7 +22,7 @@ func main() {
 	conf.Load()
 
 	//加载全局中间件
-	kernel.Load(r)
+	kernel.Load()
 
 	//加载路由
 	routes.Load(r)

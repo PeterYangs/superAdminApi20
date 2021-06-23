@@ -17,8 +17,10 @@ import (
 
 type Context struct {
 	*gin.Context
-	//CookieKey string
 	Lock *sync.Mutex
+	//Regex  map[string]string
+	//Jj *map[string]string
+
 }
 
 type HandlerFunc func(*Context)
