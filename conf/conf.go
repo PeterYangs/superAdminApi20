@@ -17,6 +17,8 @@ func Load() {
 		"cookie_key":        "cookie_key",                       //context中cookie的值的name
 		"redis_prefix":      os.Getenv("APP_NAME") + ":",        //redis前缀
 		"redis_session_key": "session:{cookie}",                 //session在redis中的key(带redis前缀)
+		"captcha_key":       "_captcha",                         //验证码的key
+		"captcha_lifetime":  os.Getenv("CAPTCHA_LIFETIME"),      //验证码过期时间
 	}
 
 }

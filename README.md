@@ -63,12 +63,38 @@ func Load(rr *gin.Engine) {
 **session**
 ```go
 func Session(c *contextPlus.Context) interface{} {
+	
+    c.Session.Set("key","value")
+	
+    c.Session.Get("key")
+	
+    return nil
+}
+```
 
-	c.Session.Set("key","value")
+**验证码**
+
+获取验证码
+
+```go
+func Captcha(c *contextPlus.Context) interface{} {
 	
-	c.Session.Get("key")
-	
-	return nil
+    b:=c.GetCaptcha()
+
+    c.Header("content-type", "image/png")
+
+    return b
+}
+```
+
+检查验证码
+```go
+func CheckCaptcha(c *contextPlus.Context) interface{} {
+
+    code := c.Query("code")
+
+    return gin.H{"data": c.CheckCaptcha(code)}
+
 }
 ```
 

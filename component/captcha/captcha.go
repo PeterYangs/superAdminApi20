@@ -9,15 +9,17 @@ import (
 	"time"
 )
 
-// GetCaptcha 获取验证码
-func GetCaptcha() ([]byte, string) {
+//// GetCaptcha 获取验证码
+//func GetCaptcha() ([]byte) {
+//
+//	text := getRandStr(4)
+//
+//
+//
+//	return imgText(150, 60, text)
+//}
 
-	text := getRandStr(4)
-
-	return imgText(150, 60, text), text
-}
-
-func getRandStr(n int) (randStr string) {
+func GetRandStr(n int) (randStr string) {
 	chars := "ABCDEFGHIJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789"
 	charsLen := len(chars)
 	if n > 10 {
@@ -32,7 +34,7 @@ func getRandStr(n int) (randStr string) {
 	return randStr
 }
 
-func imgText(width, height int, text string) (b []byte) {
+func ImgText(width, height int, text string) (b []byte) {
 	textLen := len(text)
 	dc := gg.NewContext(width, height)
 	bgR, bgG, bgB, bgA := getRandColorRange(240, 255)

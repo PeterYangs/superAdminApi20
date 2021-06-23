@@ -68,6 +68,8 @@ func GetClient() *_connect {
 
 func (cc *_connect) Get(cxt context.Context, key string) *redis.StringCmd {
 
+	//cc.connect.Del()
+
 	return cc.connect.Get(cxt, conf.Get("redis_prefix").(string)+key)
 }
 

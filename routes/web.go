@@ -28,4 +28,6 @@ func Load(rr *gin.Engine) {
 
 	_r.Registered(GET, "/c", controller.Captcha)
 
+	_r.Registered(GET, "/check", controller.CheckCaptcha)
+
 }
