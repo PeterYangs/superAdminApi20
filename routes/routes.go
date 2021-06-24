@@ -6,8 +6,6 @@ import (
 	"sync"
 )
 
-//var r *gin.Engine
-
 const (
 	GET    int = 0x000000
 	POST   int = 0x000001
@@ -17,16 +15,12 @@ const (
 
 type router struct {
 	engine *gin.Engine
-	//regex  map[string]string //路由正则表达式
-	//path string
 }
 
 type group struct {
-	engine *gin.Engine
-	//regex map[string]string //路由正则表达式
+	engine      *gin.Engine
 	middlewares []contextPlus.HandlerFunc
-
-	path string
+	path        string
 }
 
 type handler struct {
@@ -36,7 +30,6 @@ type handler struct {
 	url         string
 	method      int
 	regex       map[string]string //路由正则表达式
-
 }
 
 func newRouter(engine *gin.Engine) *router {
@@ -48,36 +41,7 @@ func newRouter(engine *gin.Engine) *router {
 
 func (rr *router) Group(path string, callback func(group2 group), middlewares ...contextPlus.HandlerFunc) {
 
-	//var temp = make([]gin.HandlerFunc, len(middlewares))
-	//
-	////fmt.Println(middlewares)
-	//
-	//for i, funcs := range middlewares {
-	//
-	//	//fmt.Println(funcs)
-	//
-	//	tempFuncs := funcs
-	//
-	//	temp[i] = func(context *gin.Context) {
-	//
-	//		tempFuncs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
-	//
-	//	}
-
-	//f := func(context *gin.Context) {
-	//
-	//	tempFuncs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
-	//
-	//}
-
-	//temp = append(temp, f)
-
-	//}
-
-	//fmt.Println(temp)
-
 	g := group{
-		//group: rr.engine.Group(path, temp...),
 		engine:      rr.engine,
 		middlewares: middlewares,
 		path:        path,
@@ -89,17 +53,9 @@ func (rr *router) Group(path string, callback func(group2 group), middlewares ..
 
 func (gg group) Group(path string, callback func(group2 group), middlewares ...contextPlus.HandlerFunc) {
 
-	//var temp = make([]gin.HandlerFunc, len(middlewares))
-
 	for _, funcs := range middlewares {
 
 		tempFuncs := funcs
-
-		//temp[i] = func(context *gin.Context) {
-		//
-		//	tempFuncs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
-		//
-		//}
 
 		gg.middlewares = append(gg.middlewares, tempFuncs)
 
@@ -107,28 +63,9 @@ func (gg group) Group(path string, callback func(group2 group), middlewares ...c
 
 	gg.path += path
 
-	//g := group{
-	//	//group: gg.group.Group(path, temp...),
-	//
-	//}
-
 	callback(gg)
 
 }
-
-//func (rr *router) Regex(r map[string]string) *router {
-//
-//	rr.regex = r
-//
-//	return rr
-//}
-//
-//func (gg *group) Regex(r map[string]string) *group {
-//
-//	gg.regex = r
-//
-//	return gg
-//}
 
 func (rr *router) Registered(method int, url string, f func(c *contextPlus.Context) interface{}, middlewares ...contextPlus.HandlerFunc) {
 
@@ -180,8 +117,6 @@ func (rr *router) Registered(method int, url string, f func(c *contextPlus.Conte
 
 func (gg group) Registered(method int, url string, f func(c *contextPlus.Context) interface{}, middlewares ...contextPlus.HandlerFunc) *handler {
 
-	//middlewares.
-
 	for _, middleware := range middlewares {
 
 		tempFuncs := middleware
@@ -226,7 +161,17 @@ func (h *handler) Bind() {
 
 		temp[i] = func(context *gin.Context) {
 
-			tempFuncs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}, Regex: h.regex})
+			tempFuncs(&contextPlus.Context{
+				Context: context,
+				Lock:    &sync.Mutex{},
+				Handler: &contextPlus.Handler{
+					HandlerFunc: h.handlerFunc,
+					Engine:      h.engine,
+					Url:         h.url,
+					Method:      h.method,
+					Regex:       h.regex,
+				},
+			})
 
 		}
 
@@ -270,7 +215,6 @@ func getDataType(data interface{}, c *contextPlus.Context) {
 		c.String(200, string(item))
 	case gin.H:
 
-		//fmt.Println(1111)
 		c.JSON(200, item)
 
 	}

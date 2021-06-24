@@ -10,6 +10,8 @@ import (
 	"github.com/PeterYangs/tools"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
+	"reflect"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -17,11 +19,17 @@ import (
 
 type Context struct {
 	*gin.Context
-	Lock *sync.Mutex
-	//Regex string
-	Regex map[string]string
-	//Jj *map[string]string
+	Lock    *sync.Mutex
+	Handler *Handler
+}
 
+type Handler struct {
+	HandlerFunc func(*Context) interface{}
+	//Middlewares []HandlerFunc
+	Engine *gin.Engine
+	Url    string
+	Method int
+	Regex  map[string]string //路由正则表达式
 }
 
 type HandlerFunc func(*Context)
@@ -88,6 +96,79 @@ func (c *Context) CheckCaptcha(code string) bool {
 	}
 
 	return false
+}
+
+func (c *Context) ShouldBindPlus(obj interface{}) error {
+
+	err := c.ShouldBind(obj)
+
+	if err != nil {
+
+		return err
+	}
+
+	err = c.ShouldBindUri(obj)
+
+	if err != nil {
+
+		return err
+	}
+
+	s := reflect.TypeOf(obj).Elem() //通过反射获取type定义
+	for i := 0; i < s.NumField(); i++ {
+
+		regex := s.Field(i).Tag.Get("regex")
+
+		if regex == "" {
+
+			continue
+		}
+
+		switch s.Field(i).Type.String() {
+
+		case "[]string":
+
+			arr := reflect.ValueOf(obj).Elem().Field(i).Interface().([]string)
+
+			for _, item := range arr {
+
+				re, err := regexp.MatchString(`^`+regex+`$`, item)
+
+				if err != nil {
+
+					return err
+				}
+
+				if !re {
+
+					return errors.New("field:" + s.Field(i).Name + ",regex error")
+				}
+
+			}
+
+			break
+
+		case "string":
+
+			str := reflect.ValueOf(obj).Elem().Field(i).Interface().(string)
+
+			re, err := regexp.MatchString(`^`+regex+`$`, str)
+
+			if err != nil {
+
+				return err
+			}
+
+			if !re {
+
+				return errors.New("field:" + s.Field(i).Name + ",regex error")
+			}
+
+		}
+
+	}
+
+	return nil
 }
 
 type Session struct {

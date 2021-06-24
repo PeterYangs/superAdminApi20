@@ -3,6 +3,7 @@ package routes
 import (
 	"gin-web/controller"
 	"gin-web/controller/file"
+	"gin-web/controller/regex"
 	"gin-web/kernel"
 	"gin-web/middleware"
 	"github.com/gin-gonic/gin"
@@ -24,7 +25,7 @@ func _init(_r group) {
 	}, middleware.GoOn)
 
 	//单路由
-	_r.Registered(GET, "/", controller.Index).Regex(map[string]string{"name": "123"}).Bind()
+	_r.Registered(GET, "/", controller.Index).Bind()
 
 	_r.Registered(GET, "/c", controller.Captcha).Bind()
 
@@ -33,7 +34,7 @@ func _init(_r group) {
 	//文件上传
 	_r.Registered(POST, "/file", file.File).Bind()
 
-	_r.Registered(GET, "/regex", controller.Index).Bind()
+	_r.Registered(GET, "/regex/:name", regex.Regex).Bind()
 
 }
 
@@ -41,7 +42,7 @@ func Load(rr *gin.Engine) {
 
 	_r := newRouter(rr)
 
-	_r.Group("/", func(global group) {
+	_r.Group("", func(global group) {
 
 		_init(global)
 

@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"gin-web/contextPlus"
 )
 
@@ -16,7 +15,7 @@ func GoOn(c *contextPlus.Context) {
 
 	//fmt.Println(c.Test)
 
-	fmt.Println(c.Regex)
+	//fmt.Println(c.Regex)
 
 }
 
