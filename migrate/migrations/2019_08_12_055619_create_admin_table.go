@@ -1,0 +1,5 @@
+package migrations
+
+func Up() {
+
+}
