@@ -4,9 +4,7 @@ import (
 	"gin-web/controller"
 	"gin-web/controller/file"
 	"gin-web/controller/regex"
-	"gin-web/kernel"
 	"gin-web/middleware"
-	"github.com/gin-gonic/gin"
 )
 
 func _init(_r group) {
@@ -35,17 +33,5 @@ func _init(_r group) {
 	_r.Registered(POST, "/file", file.File).Bind()
 
 	_r.Registered(GET, "/regex/:name", regex.Regex).Bind()
-
-}
-
-func Load(rr *gin.Engine) {
-
-	_r := newRouter(rr)
-
-	_r.Group("", func(global group) {
-
-		_init(global)
-
-	}, kernel.Middleware...)
 
 }
