@@ -2,6 +2,7 @@ package routes
 
 import (
 	"gin-web/contextPlus"
+	"gin-web/kernel"
 	"github.com/gin-gonic/gin"
 	"sync"
 )
@@ -218,4 +219,16 @@ func getDataType(data interface{}, c *contextPlus.Context) {
 		c.JSON(200, item)
 
 	}
+}
+
+func Load(rr *gin.Engine) {
+
+	_r := newRouter(rr)
+
+	_r.Group("", func(global group) {
+
+		_init(global)
+
+	}, kernel.Middleware...)
+
 }
