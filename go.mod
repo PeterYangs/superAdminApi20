@@ -3,6 +3,7 @@ module gin-web
 go 1.15
 
 require (
+	github.com/PeterYangs/gcmd v0.0.4 // indirect
 	github.com/PeterYangs/tools v0.2.31
 	github.com/fogleman/gg v1.3.0
 	github.com/gin-gonic/gin v1.6.3

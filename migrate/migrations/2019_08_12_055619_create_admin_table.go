@@ -1,5 +1,0 @@
-package migrations
-
-func Up() {
-
-}
