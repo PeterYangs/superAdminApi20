@@ -1,11 +1,18 @@
 package main
 
 import (
+	"github.com/PeterYangs/gcmd"
 	"io/ioutil"
 	"os"
 )
 
 func main() {
+
+	Up()
+
+}
+
+func Up() {
 
 	fileInfo, _ := ioutil.ReadDir("./migrate/migrations")
 
@@ -44,7 +51,7 @@ func main() {
 
 	//}
 
-	//gcmd.Command("go run migrate/bin/X.go").Start()
+	gcmd.Command("go run migrate/bin/X.go").Start()
 
 }
 

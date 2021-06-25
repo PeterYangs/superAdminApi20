@@ -4,8 +4,32 @@ import (
 	"fmt"
 	"gin-web/database"
 	"gin-web/model"
+	"github.com/joho/godotenv"
 	"github.com/spf13/cast"
 )
+
+var batch = 1
+
+func init() {
+
+	//加载配置文件
+	err := godotenv.Load("./.env")
+	if err != nil {
+		panic("配置文件加载失败")
+	}
+
+	var migrations model.Migrations
+
+	re := database.GetDb().Order("id desc").First(&migrations)
+
+	if re.Error == nil {
+
+		batch = migrations.Batch + 1
+
+		//batch=1
+	}
+
+}
 
 type Tag int
 
@@ -59,6 +83,12 @@ func Create(table string, callback func(*Migrate)) {
 
 }
 
+func DropIfExists(table string) {
+
+	database.GetDb().Exec("drop table if exists " + table)
+
+}
+
 // BigIncrements 主键字段
 func (c *Migrate) BigIncrements(column string) {
 
@@ -104,16 +134,7 @@ func run(m *Migrate) {
 
 	checkMigrationsTable()
 
-	batch := 1
-
-	var migrations model.Migrations
-
-	re := database.GetDb().Order("id desc").First(&migrations)
-
-	if re.Error == nil {
-
-		batch = migrations.Batch + 1
-	}
+	//batch := 1
 
 	if m.Tag == CREATE {
 

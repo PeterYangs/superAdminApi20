@@ -15,3 +15,9 @@ func Up() {
 	})
 
 }
+
+func Down() {
+
+	migrate.DropIfExists("admin")
+
+}
