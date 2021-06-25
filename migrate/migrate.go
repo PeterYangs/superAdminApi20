@@ -17,8 +17,8 @@ const (
 type Types string
 
 const (
-	Int    Types = "int"
-	String Types = "string"
+	Int     Types = "int"
+	Varchar Types = "varchar"
 )
 
 func (t Types) ToString() string {
