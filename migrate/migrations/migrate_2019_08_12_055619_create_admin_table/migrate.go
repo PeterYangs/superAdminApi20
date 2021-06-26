@@ -10,7 +10,7 @@ func Up() {
 
 		createMigrate.BigIncrements("id")
 
-		createMigrate.Integer("user_id").Unsigned().Nullable()
+		createMigrate.Integer("user_id").Unsigned().Nullable().Default(0).Comment("用户id")
 
 	})
 

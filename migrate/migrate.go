@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gin-web/database"
 	"gin-web/model"
+	"github.com/PeterYangs/tools"
 	"github.com/joho/godotenv"
 	"github.com/spf13/cast"
 )
@@ -41,8 +42,8 @@ const (
 type Types string
 
 const (
-	Int     Types = "int"
-	Varchar Types = "varchar"
+	Int    Types = "int"
+	String Types = "varchar"
 )
 
 func (t Types) ToString() string {
@@ -63,14 +64,35 @@ type field struct {
 	isUnsigned   bool   //无符号
 	isNullable   bool
 	types        Types //数据类型
-	length       int
+	length       int   //长度
+	tag          Tag
+	defaultValue interface{}
+	comment      string
 }
 
+// Create 创建表
 func Create(table string, callback func(*Migrate)) {
 
 	m := &Migrate{
 		Table: table,
 		Tag:   CREATE,
+	}
+
+	defer func() {
+
+		run(m)
+
+	}()
+
+	callback(m)
+
+}
+
+func Table(table string, callback func(*Migrate)) {
+
+	m := &Migrate{
+		Table: table,
+		Tag:   UPDATE,
 	}
 
 	defer func() {
@@ -98,11 +120,41 @@ func (c *Migrate) BigIncrements(column string) {
 // Integer int
 func (c *Migrate) Integer(column string) *field {
 
-	f := &field{column: column, types: Int, length: 10}
+	f := &field{column: column, types: Int, length: 10, tag: CREATE}
 
 	c.fields = append(c.fields, f)
 
 	return f
+}
+
+func (c *Migrate) String(column string, length int) *field {
+
+	f := &field{column: column, types: String, length: length, tag: CREATE}
+
+	c.fields = append(c.fields, f)
+
+	return f
+
+}
+
+func (f *field) Default(value interface{}) *field {
+
+	f.defaultValue = value
+
+	return f
+}
+
+func (f *field) Comment(comment string) {
+
+	f.comment = comment
+
+}
+
+func (f *field) Change() {
+
+	//f.isChange = true
+	f.tag = UPDATE
+
 }
 
 // Unsigned 无符号
@@ -146,12 +198,63 @@ func run(m *Migrate) {
 
 		t := database.GetDb().Exec(sql)
 
-		fmt.Println(t.Error)
+		if t.Error != nil {
+
+			fmt.Println(t.Error)
+
+			fmt.Println(sql)
+
+			return
+		}
 
 		database.GetDb().Create(&model.Migrations{
 			Migration: m.Name,
 			Batch:     batch,
 		})
+
+	}
+
+	if m.Tag == UPDATE {
+
+		sql := "alter table `" + m.Table + "` "
+
+		for _, f := range m.fields {
+
+			switch f.tag {
+
+			case CREATE:
+
+				sql += " add column  " + setColumnAttr(f)
+
+			case UPDATE:
+
+				sql += " MODIFY " + setColumnAttr(f)
+
+			}
+
+			sql += ","
+
+		}
+
+		sql = tools.SubStr(sql, 0, len(sql)-1)
+
+		t := database.GetDb().Exec(sql)
+
+		//fmt.Println(t.Error)
+
+		if t.Error != nil {
+
+			fmt.Println(t.Error)
+
+			return
+		}
+
+		database.GetDb().Create(&model.Migrations{
+			Migration: m.Name,
+			Batch:     batch,
+		})
+
+		//fmt.Println(sql)
 
 	}
 
@@ -189,20 +292,52 @@ func getColumn(m *Migrate) string {
 
 		}
 
-		str += "`" + f.column + "` " + f.types.ToString() + "(" + cast.ToString(f.length) + ") "
-
-		if f.isUnsigned {
-
-			str += " unsigned "
-		}
-
-		if !f.isNullable {
-
-			str += " NOT NULL "
-		}
+		str += setColumnAttr(f)
 
 		str += ","
 
+	}
+
+	return str
+}
+
+func setColumnAttr(f *field) string {
+
+	str := ""
+
+	str += "`" + f.column + "` " + f.types.ToString() + "(" + cast.ToString(f.length) + ") "
+
+	if f.isUnsigned {
+
+		str += " unsigned "
+	}
+
+	if !f.isNullable && f.defaultValue != nil {
+
+		str += " NOT NULL "
+	}
+
+	switch f.defaultValue.(type) {
+
+	case nil:
+
+		str += " DEFAULT NULL "
+
+		break
+
+	case string:
+
+		str += " DEFAULT '" + cast.ToString(f.defaultValue) + "' "
+
+	case int:
+
+		str += " DEFAULT '" + cast.ToString(f.defaultValue) + "' "
+
+	}
+
+	if f.comment != "" {
+
+		str += " COMMENT '" + f.comment + "' "
 	}
 
 	return str

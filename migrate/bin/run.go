@@ -74,6 +74,25 @@ func main() {
 
 		}
 
+		if result == "修改表" {
+
+			//CreateMigration()
+			prompt := promptui.Prompt{
+				Label: "输入表名",
+				//Validate: validate,
+			}
+
+			result, err := prompt.Run()
+
+			if err != nil {
+				fmt.Printf("Prompt failed %v\n", err)
+				return
+			}
+
+			CreateMigration(result, "update")
+
+		}
+
 	}
 
 	if result == "执行迁移" {
@@ -131,6 +150,49 @@ func CreateMigration(table string, types string) {
 
 		CreateTable(name, table)
 	}
+
+	if types == "update" {
+
+		UpdateTable(name, table)
+	}
+
+}
+
+func UpdateTable(pack string, table string) {
+
+	f, err := os.OpenFile("./migrate/migrations/"+pack+"/migrate.go", os.O_CREATE|os.O_TRUNC|os.O_RDWR, 644)
+
+	if err != nil {
+
+		panic(err)
+
+	}
+
+	defer f.Close()
+
+	f.Write([]byte(`package ` + pack + `
+
+import "gin-web/migrate"
+
+func Up() {
+
+	migrate.Table("` + table + `", func(createMigrate *migrate.Migrate) {
+
+		createMigrate.Name = "` + pack + `"
+
+
+	})
+
+}
+
+func Down() {
+
+
+}
+
+
+
+`))
 
 }
 
@@ -266,13 +328,6 @@ func Down() {
 	migrations := make([]*model.Migrations, 0)
 
 	database.GetDb().Model(&model.Migrations{}).Where("batch = ?", batch).Find(&migrations)
-
-	//for _, m := range migrations {
-	//
-	//	//fmt.Println(m)
-	//
-	//
-	//}
 
 	f, _ := os.OpenFile("./migrate/bin/Y.go", os.O_CREATE|os.O_TRUNC|os.O_RDWR, 644)
 
