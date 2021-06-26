@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -36,7 +35,7 @@ func connect() {
 
 	s, _ := db.DB()
 
-	fmt.Println("数据库连接成功。。。")
+	//fmt.Println("数据库连接成功。。。")
 
 	//连接池打开最大连接数
 	s.SetMaxOpenConns(50)
@@ -54,7 +53,7 @@ func GetDb() *gorm.DB {
 	//数据库连接单例
 	mysqlOnce.Do(func() {
 
-		fmt.Println("数据库开始连接。。。")
+		//fmt.Println("数据库开始连接。。。")
 
 		connect()
 

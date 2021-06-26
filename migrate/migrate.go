@@ -85,7 +85,7 @@ func Create(table string, callback func(*Migrate)) {
 
 func DropIfExists(table string) {
 
-	database.GetDb().Exec("drop table if exists " + table)
+	database.GetDb().Exec("drop table if exists `" + table + "`")
 
 }
 
