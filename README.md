@@ -142,7 +142,19 @@ func Regex(c *contextPlus.Context) interface{} {
 
 ```shell
 go run migrate/bin/run.go
+
+
+[root@localhost ~]# go run migrate/bin/run.go
+Use the arrow keys to navigate: ↓ ↑ → ←
+? 选择类型:
+  > 创建数据库迁移
+    执行迁移
+    回滚迁移
+
+
+
 ```
+
 
 
 迁移文件
