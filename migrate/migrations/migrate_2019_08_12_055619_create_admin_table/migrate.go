@@ -12,6 +12,8 @@ func Up() {
 
 		createMigrate.Integer("user_id").Unsigned().Nullable().Default(0).Comment("用户id")
 
+		createMigrate.String("title", 255).Default("").Comment("标题")
+
 	})
 
 }
