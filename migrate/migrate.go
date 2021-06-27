@@ -44,6 +44,7 @@ type Types string
 const (
 	Int    Types = "int"
 	String Types = "varchar"
+	Text   Types = "text"
 )
 
 func (t Types) ToString() string {
@@ -135,6 +136,15 @@ func (c *Migrate) String(column string, length int) *field {
 
 	return f
 
+}
+
+func (c *Migrate) Text(column string) *field {
+
+	f := &field{column: column, types: String, tag: CREATE}
+
+	c.fields = append(c.fields, f)
+
+	return f
 }
 
 func (f *field) Default(value interface{}) *field {
@@ -305,7 +315,19 @@ func setColumnAttr(f *field) string {
 
 	str := ""
 
-	str += "`" + f.column + "` " + f.types.ToString() + "(" + cast.ToString(f.length) + ") "
+	switch f.types {
+
+	case Text:
+
+		str += "`" + f.column + "` " + f.types.ToString() + " "
+
+		break
+
+	default:
+
+		str += "`" + f.column + "` " + f.types.ToString() + "(" + cast.ToString(f.length) + ") "
+
+	}
 
 	if f.isUnsigned {
 

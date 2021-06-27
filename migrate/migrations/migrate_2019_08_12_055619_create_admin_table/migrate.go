@@ -14,6 +14,8 @@ func Up() {
 
 		createMigrate.String("title", 255).Default("").Comment("标题")
 
+		createMigrate.Text("content").Comment("内容")
+
 	})
 
 }
