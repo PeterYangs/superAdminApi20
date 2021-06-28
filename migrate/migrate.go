@@ -335,7 +335,7 @@ func setColumnAttr(f *field) string {
 
 	case Timestamp:
 
-		str += " `" + f.column + "` NULL "
+		str += " `" + f.column + "` " + f.types.ToString() + " NULL "
 
 		break
 
