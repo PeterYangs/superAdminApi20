@@ -42,9 +42,10 @@ const (
 type Types string
 
 const (
-	Int    Types = "int"
-	String Types = "varchar"
-	Text   Types = "text"
+	Int       Types = "int"
+	String    Types = "varchar"
+	Text      Types = "text"
+	Timestamp Types = "timestamp"
 )
 
 func (t Types) ToString() string {
@@ -141,6 +142,15 @@ func (c *Migrate) String(column string, length int) *field {
 func (c *Migrate) Text(column string) *field {
 
 	f := &field{column: column, types: String, tag: CREATE}
+
+	c.fields = append(c.fields, f)
+
+	return f
+}
+
+func (c *Migrate) Timestamp(column string) *field {
+
+	f := &field{column: column, types: Timestamp, tag: CREATE}
 
 	c.fields = append(c.fields, f)
 
@@ -319,13 +329,19 @@ func setColumnAttr(f *field) string {
 
 	case Text:
 
-		str += "`" + f.column + "` " + f.types.ToString() + " "
+		str += " `" + f.column + "` " + f.types.ToString() + " "
+
+		break
+
+	case Timestamp:
+
+		str += " `" + f.column + "` NULL "
 
 		break
 
 	default:
 
-		str += "`" + f.column + "` " + f.types.ToString() + "(" + cast.ToString(f.length) + ") "
+		str += " `" + f.column + "` " + f.types.ToString() + "(" + cast.ToString(f.length) + ") "
 
 	}
 
