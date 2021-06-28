@@ -15,10 +15,10 @@ func Login(c *contextPlus.Context) interface{} {
 func Registered(c *contextPlus.Context) interface{} {
 
 	type Validator struct {
-		Username   string `json:"username" form:"username"`
-		Password   string `json:"password" form:"password" `
-		RePassword string `form:"repassword"`
-		Email      string `json:"email" form:"email" `
+		Username   string `json:"username" form:"username" binding:"required"`
+		Password   string `json:"password" form:"password" binding:"required"`
+		RePassword string `form:"repassword" binding:"required"`
+		Email      string `json:"email" form:"email" binding:"required"`
 	}
 
 	var form Validator
