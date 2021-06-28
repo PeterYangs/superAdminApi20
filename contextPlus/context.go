@@ -36,8 +36,6 @@ type HandlerFunc func(*Context)
 
 func (c *Context) Domain() string {
 
-	//c.Mu
-
 	return tools.Explode(":", c.Request.Host)[0]
 }
 
@@ -213,9 +211,9 @@ func (s *Session) Set(key string, value interface{}) error {
 
 func (s *Session) Get(key string) (interface{}, error) {
 
-	s.Lock.Lock()
-
-	defer s.Lock.Unlock()
+	//s.Lock.Lock()
+	//
+	//defer s.Lock.Unlock()
 
 	sessionString, err := redis.GetClient().Get(context.TODO(), GetRedisSessionKey(s.Cookie)).Result()
 
