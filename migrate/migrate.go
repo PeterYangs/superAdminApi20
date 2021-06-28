@@ -58,6 +58,7 @@ type Migrate struct {
 	Table  string
 	fields []*field
 	Name   string
+	unique [][]string //[ [name,title]  ]
 }
 
 type field struct {
@@ -70,6 +71,7 @@ type field struct {
 	tag          Tag
 	defaultValue interface{}
 	comment      string
+	unique       bool //唯一索引
 }
 
 // Create 创建表
@@ -117,6 +119,13 @@ func DropIfExists(table string) {
 func (c *Migrate) BigIncrements(column string) {
 
 	c.fields = append(c.fields, &field{column: column, isPrimaryKey: true})
+}
+
+// Unique 设置唯一索引
+func (c *Migrate) Unique(column ...string) {
+
+	c.unique = append(c.unique, column)
+
 }
 
 // Integer int
@@ -185,6 +194,14 @@ func (f *field) Unsigned() *field {
 	return f
 }
 
+// Unique 唯一索引
+func (f *field) Unique() *field {
+
+	f.unique = true
+
+	return f
+}
+
 func (f *field) Nullable() *field {
 
 	f.isNullable = true
@@ -212,7 +229,9 @@ func run(m *Migrate) {
 
 		sql := "CREATE TABLE `" + m.Table + "` (" +
 			"`" + getPrimaryKey(m) + "` int(10) unsigned NOT NULL AUTO_INCREMENT," +
+			setTableUnique(m) +
 			getColumn(m) +
+			setColumnUnique(m) +
 			"PRIMARY KEY (`" + getPrimaryKey(m) + "`)" +
 			") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
 
@@ -321,6 +340,39 @@ func getColumn(m *Migrate) string {
 	return str
 }
 
+//设置字段唯一索引
+func setColumnUnique(m *Migrate) string {
+
+	str := ""
+
+	for _, f := range m.fields {
+
+		if f.unique {
+
+			str += " UNIQUE KEY `" + f.column + "` (`" + f.column + "`), "
+
+		}
+
+	}
+
+	return str
+
+}
+
+func setTableUnique(m *Migrate) string {
+
+	str := ""
+
+	for _, strings := range m.unique {
+
+		str += " UNIQUE KEY `" + tools.Join("+", strings) + "` (`" + tools.Join("`,`", strings) + "`)" + " USING BTREE, "
+
+	}
+
+	return str
+}
+
+//设置字段类型
 func setColumnAttr(f *field) string {
 
 	str := ""
