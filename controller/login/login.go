@@ -1,6 +1,7 @@
 package login
 
 import (
+	"gin-web/common"
 	"gin-web/contextPlus"
 	"gin-web/database"
 	"gin-web/model"
@@ -8,6 +9,34 @@ import (
 )
 
 func Login(c *contextPlus.Context) interface{} {
+
+	type Form struct {
+		Username string `json:"username" form:"username" binding:"required"`
+		Password string `json:"password" form:"password" binding:"required"`
+		Captcha  string `json:"captcha"  form:"captcha" binding:"required"`
+	}
+
+	var form Form
+
+	err := c.ShouldBind(&form)
+
+	if err != nil {
+
+		return gin.H{"code": 2, "mgs": err.Error()}
+
+	}
+
+	if !c.CheckCaptcha(form.Captcha) {
+
+		return gin.H{"code": 2, "mgs": "验证码错误"}
+	}
+
+	re := database.GetDb().Where("username = ?", form.Username).Where("password = ?", common.HmacSha256(form.Password)).First(&model.Admin{})
+
+	if re.Error != nil {
+
+		return gin.H{"code": 2, "mgs": "密码错误"}
+	}
 
 	return gin.H{"code": 1, "msg": "success"}
 }

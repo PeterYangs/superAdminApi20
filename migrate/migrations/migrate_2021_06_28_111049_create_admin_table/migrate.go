@@ -14,11 +14,11 @@ func Up() {
 
 		createMigrate.Timestamp("updated_at").Nullable()
 
-		createMigrate.String("username", 255).Comment("用户名")
+		createMigrate.String("username", 255).Unique().Comment("用户名")
 
 		createMigrate.String("password", 255).Comment("密码")
 
-		createMigrate.String("email", 255).Comment("邮箱")
+		createMigrate.String("email", 255).Unique().Comment("邮箱")
 
 		createMigrate.Integer("status").Default(1).Comment("状态")
 

@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"gin-web/controller/captcha"
 	"gin-web/controller/login"
 )
 
@@ -12,6 +13,11 @@ func _init(_r group) {
 
 		g.Registered(POST, "/registered", login.Registered).Bind()
 
+	})
+
+	_r.Group("/captcha", func(g group) {
+
+		g.Registered(GET, "/captcha", captcha.Captcha).Bind()
 	})
 
 }
