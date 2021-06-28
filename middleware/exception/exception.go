@@ -18,9 +18,6 @@ func Exception(c *contextPlus.Context) {
 
 			defer c.Abort()
 
-			//打印错误堆栈信息
-			//log.Printf("panic: %v\n", r)
-
 			f, err := os.OpenFile("log/err.log", os.O_RDWR|os.O_APPEND|os.O_CREATE, 644)
 
 			if err != nil {
