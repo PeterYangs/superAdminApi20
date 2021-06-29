@@ -1,7 +1,6 @@
 package limiter
 
 import (
-	"fmt"
 	"golang.org/x/time/rate"
 	"sync"
 	"time"
@@ -37,7 +36,7 @@ func (l *KeyLimiter) Allow() bool {
 
 	//fmt.Println(globalLimiters)
 
-	fmt.Println(l.lastGet)
+	//fmt.Println(l.lastGet)
 
 	l.lastGet = time.Now()
 
