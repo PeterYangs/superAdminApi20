@@ -3,13 +3,14 @@ package routes
 import (
 	"gin-web/controller/captcha"
 	"gin-web/controller/login"
+	"gin-web/middleware/loginLimiter"
 )
 
 func _init(_r group) {
 
 	_r.Group("/login", func(g group) {
 
-		g.Registered(POST, "/login", login.Login).Bind()
+		g.Registered(POST, "/login", login.Login, loginLimiter.LoginLimiter).Bind()
 
 		g.Registered(POST, "/registered", login.Registered).Bind()
 
