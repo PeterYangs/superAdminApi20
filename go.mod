@@ -14,6 +14,7 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/cast v1.3.1
 	golang.org/x/image v0.0.0-20210607152325-775e3b0c77b9
+	golang.org/x/time v0.0.0-20210611083556-38a9dc6acbc6
 	gorm.io/driver/mysql v1.0.3
 	gorm.io/gorm v1.20.8
 )

@@ -252,6 +252,7 @@ func Up() {
 import (
  ` + getPackageList(fileInfo) + `
 "github.com/joho/godotenv"
+"gin-web/migrate/transaction"
 
 )
 
@@ -269,7 +270,7 @@ func init() {
 func main() {
 
 
-	//migrate_2019_08_12_055619_create_admin_table.Up()
+	transaction.E = nil
 
    ` + getFuncList(fileInfo) + `
 
@@ -336,6 +337,7 @@ func Down() {
 import (
  ` + getPackageListForDown(migrations) + `
 "github.com/joho/godotenv"
+"gin-web/migrate/transaction"
 
 )
 
@@ -353,7 +355,7 @@ func init() {
 func main() {
 
 
-	//migrate_2019_08_12_055619_create_admin_table.Up()
+	transaction.E = nil
 
    ` + getFuncListForDown(migrations) + `
 

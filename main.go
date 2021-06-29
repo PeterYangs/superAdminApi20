@@ -18,8 +18,6 @@ func main() {
 
 	r := gin.Default()
 
-	//r.GET()
-
 	//加载配置
 	conf.Load()
 
@@ -80,5 +78,7 @@ func logInit() {
 	}
 
 	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
+
+	gin.ErrorLogger()
 
 }

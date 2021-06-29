@@ -15,8 +15,6 @@ import (
 
 func StartSession(c *contextPlus.Context) {
 
-	defer c.Next()
-
 	cookie, err := c.Cookie(conf.Get("cookie_name").(string))
 
 	if err == nil {
@@ -30,6 +28,8 @@ func StartSession(c *contextPlus.Context) {
 			json.Unmarshal([]byte(cookies), &session)
 
 			c.Set(conf.Get("cookie_key").(string), session)
+
+			//c.Abort()
 
 			return
 		}
