@@ -28,6 +28,7 @@ func Index(c *contextPlus.Context) interface{} {
 **route**
 
 route/web.go
+
 ```go
 package routes
 
@@ -57,24 +58,23 @@ func _init(_r group) {
 
 	//单路由
 	_r.Registered(GET, "/", controller.Index).Bind()
-	
+
 	_r.Registered(GET, "/check", controller.CheckCaptcha).Bind()
-
-
 
 }
 
 ```
 
 **session**
+
 ```go
 func Session(c *contextPlus.Context) interface{} {
-	
-    c.Session.Set("key","value")
-	
-    c.Session.Get("key")
-	
-    return nil
+
+c.Session.Set("key", "value")
+
+c.Session.Get("key")
+
+return nil
 }
 ```
 
@@ -84,29 +84,31 @@ func Session(c *contextPlus.Context) interface{} {
 
 ```go
 func Captcha(c *contextPlus.Context) interface{} {
-	
-    b:=c.GetCaptcha()
 
-    c.Header("content-type", "image/png")
+b := c.GetCaptcha()
 
-    return b
+c.Header("content-type", "image/png")
+
+return b
 }
 ```
 
 检查验证码
+
 ```go
 func CheckCaptcha(c *contextPlus.Context) interface{} {
 
-    code := c.Query("code")
-    
-    bool:=c.CheckCaptcha(code)
-    
-    return gin.H{"data":bool }
+code := c.Query("code")
+
+bool:= c.CheckCaptcha(code)
+
+return gin.H{"data":bool }
 
 }
 ```
 
 **参数验证**
+
 ```go
 package regex
 
@@ -152,9 +154,8 @@ Use the arrow keys to navigate: ↓ ↑ → ←
 
 ```
 
-
-
 迁移文件
+
 ```go
 package migrate_2019_08_12_055619_create_admin_table
 
@@ -192,5 +193,35 @@ func Down() {
 }
 
 ```
+
+**限流器**
+
+```go
+package loginLimiter
+
+import (
+	"gin-web/component/limiter"
+	"gin-web/contextPlus"
+	"golang.org/x/time/rate"
+	"time"
+)
+
+func LoginLimiter(c *contextPlus.Context) {
+
+	//每秒生成一个令牌，桶的大小是10,第三个参数是自定义key，根据自定义的key寻找限流器（默认是每1分钟清理一次过期的限流器）
+	if !limiter.NewLimiter(rate.Every(1*time.Second), 10, c.ClientIP()).Allow() {
+
+		c.String(500, "访问频率过高")
+
+		c.Abort()
+
+	}
+
+}
+
+```
+
+
+
 
 

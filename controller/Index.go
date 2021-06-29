@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"fmt"
+	"gin-web/component/limiter"
 	"gin-web/contextPlus"
 	"github.com/gin-gonic/gin"
 	"strconv"
@@ -14,6 +16,13 @@ func Index(c *contextPlus.Context) interface{} {
 	//fmt.Println(c.Get("test"))
 
 	//panic("123")
+
+	return gin.H{"code": 1, "msg": "hello world"}
+}
+
+func Index2(c *contextPlus.Context) interface{} {
+
+	fmt.Println(limiter.GlobalLimiters)
 
 	return gin.H{"code": 1, "msg": "hello world"}
 }
