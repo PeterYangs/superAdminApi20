@@ -3,6 +3,7 @@ package migrate
 import (
 	"fmt"
 	"gin-web/database"
+	"gin-web/migrate/transaction"
 	"gin-web/model"
 	"github.com/PeterYangs/tools"
 	"github.com/joho/godotenv"
@@ -211,6 +212,11 @@ func (f *field) Nullable() *field {
 
 func run(m *Migrate) {
 
+	if transaction.E != nil {
+
+		return
+	}
+
 	isFind := database.GetDb().Where("migration = ?", m.Name).First(&model.Migrations{})
 
 	//已存在的迁移不执行
@@ -239,9 +245,11 @@ func run(m *Migrate) {
 
 		if t.Error != nil {
 
-			fmt.Println(t.Error)
-
+			//fmt.Println(t.Error)
+			//
 			fmt.Println(sql)
+
+			transaction.E = t.Error
 
 			return
 		}
@@ -284,6 +292,8 @@ func run(m *Migrate) {
 		if t.Error != nil {
 
 			fmt.Println(t.Error)
+
+			transaction.E = t.Error
 
 			return
 		}
