@@ -3,6 +3,7 @@ package routes
 import (
 	"gin-web/contextPlus"
 	"gin-web/kernel"
+	"gin-web/response"
 	"github.com/gin-gonic/gin"
 	"sync"
 )
@@ -25,7 +26,7 @@ type group struct {
 }
 
 type handler struct {
-	handlerFunc func(*contextPlus.Context) interface{}
+	handlerFunc func(*contextPlus.Context) *response.Response
 	middlewares []contextPlus.HandlerFunc
 	engine      *gin.Engine
 	url         string
@@ -68,55 +69,55 @@ func (gg group) Group(path string, callback func(group2 group), middlewares ...c
 
 }
 
-func (rr *router) Registered(method int, url string, f func(c *contextPlus.Context) interface{}, middlewares ...contextPlus.HandlerFunc) {
+//func (rr *router) Registered(method int, url string, f func(c *contextPlus.Context) interface{}, middlewares ...contextPlus.HandlerFunc) {
+//
+//	ff := func(c *contextPlus.Context) {
+//
+//		data := f(c)
+//
+//		getDataType(data, c)
+//
+//	}
+//
+//	middlewares = append(middlewares, ff)
+//
+//	var temp = make([]gin.HandlerFunc, len(middlewares))
+//
+//	for i, funcs := range middlewares {
+//
+//		tempFuncs := funcs
+//
+//		temp[i] = func(context *gin.Context) {
+//
+//			tempFuncs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
+//
+//		}
+//
+//	}
+//
+//	switch method {
+//
+//	case GET:
+//
+//		rr.engine.GET(url, temp...)
+//
+//	case POST:
+//
+//		rr.engine.POST(url, temp...)
+//
+//	case PUT:
+//
+//		rr.engine.PUT(url, temp...)
+//
+//	case DELETE:
+//
+//		rr.engine.DELETE(url, temp...)
+//
+//	}
+//
+//}
 
-	ff := func(c *contextPlus.Context) {
-
-		data := f(c)
-
-		getDataType(data, c)
-
-	}
-
-	middlewares = append(middlewares, ff)
-
-	var temp = make([]gin.HandlerFunc, len(middlewares))
-
-	for i, funcs := range middlewares {
-
-		tempFuncs := funcs
-
-		temp[i] = func(context *gin.Context) {
-
-			tempFuncs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
-
-		}
-
-	}
-
-	switch method {
-
-	case GET:
-
-		rr.engine.GET(url, temp...)
-
-	case POST:
-
-		rr.engine.POST(url, temp...)
-
-	case PUT:
-
-		rr.engine.PUT(url, temp...)
-
-	case DELETE:
-
-		rr.engine.DELETE(url, temp...)
-
-	}
-
-}
-
-func (gg group) Registered(method int, url string, f func(c *contextPlus.Context) interface{}, middlewares ...contextPlus.HandlerFunc) *handler {
+func (gg group) Registered(method int, url string, f func(c *contextPlus.Context) *response.Response, middlewares ...contextPlus.HandlerFunc) *handler {
 
 	for _, middleware := range middlewares {
 
@@ -148,7 +149,7 @@ func (h *handler) Bind() {
 
 		data := h.handlerFunc(c)
 
-		getDataType(data, c)
+		getDataType(data.GetData(), c)
 
 	}
 

@@ -7,6 +7,7 @@ import (
 	"gin-web/component/captcha"
 	"gin-web/conf"
 	"gin-web/redis"
+	"gin-web/response"
 	"github.com/PeterYangs/tools"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
@@ -24,7 +25,7 @@ type Context struct {
 }
 
 type Handler struct {
-	HandlerFunc func(*Context) interface{}
+	HandlerFunc func(*Context) *response.Response
 	//Middlewares []HandlerFunc
 	Engine *gin.Engine
 	Url    string

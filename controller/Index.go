@@ -1,34 +1,25 @@
 package controller
 
 import (
-	"fmt"
-	"gin-web/component/limiter"
 	"gin-web/contextPlus"
+	"gin-web/response"
 	"github.com/gin-gonic/gin"
 	"strconv"
 )
 
 // Index 主页
-func Index(c *contextPlus.Context) interface{} {
+func Index(c *contextPlus.Context) *response.Response {
 
-	//fmt.Println(c.Jj)
-
-	//fmt.Println(c.Get("test"))
-
-	//panic("123")
-
-	return gin.H{"code": 1, "msg": "hello world"}
+	return response.Resp().Json(gin.H{"data": "hello world"})
 }
 
-func Index2(c *contextPlus.Context) interface{} {
+func Index2(c *contextPlus.Context) *response.Response {
 
-	fmt.Println(limiter.GlobalLimiters)
-
-	return gin.H{"code": 1, "msg": "hello world"}
+	return response.Resp().Json(gin.H{"code": 1, "msg": "hello world"})
 }
 
 // SessionSet 并发写入demo
-func SessionSet(c *contextPlus.Context) interface{} {
+func SessionSet(c *contextPlus.Context) *response.Response {
 
 	s := c.Session()
 
@@ -41,22 +32,22 @@ func SessionSet(c *contextPlus.Context) interface{} {
 		}(i, s)
 	}
 
-	return gin.H{"code": 1, "msg": "hello world"}
+	return response.Resp().Json(gin.H{"code": 1, "msg": "hello world"})
 }
 
-func Captcha(c *contextPlus.Context) interface{} {
+func Captcha(c *contextPlus.Context) *response.Response {
 
 	b := c.GetCaptcha()
 
 	c.Header("content-type", "image/png")
 
-	return b
+	return response.Resp().Byte(b)
 }
 
-func CheckCaptcha(c *contextPlus.Context) interface{} {
+func CheckCaptcha(c *contextPlus.Context) *response.Response {
 
 	code := c.Query("code")
 
-	return gin.H{"data": c.CheckCaptcha(code)}
+	return response.Resp().Json(gin.H{"bool": code})
 
 }

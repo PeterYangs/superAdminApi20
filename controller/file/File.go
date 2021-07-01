@@ -3,9 +3,10 @@ package file
 import (
 	"fmt"
 	"gin-web/contextPlus"
+	"gin-web/response"
 )
 
-func File(c *contextPlus.Context) interface{} {
+func File(c *contextPlus.Context) *response.Response {
 
 	file, _ := c.FormFile("file")
 

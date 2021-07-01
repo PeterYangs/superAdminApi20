@@ -16,12 +16,13 @@ package controller
 import (
 	"gin-web/contextPlus"
 	"github.com/gin-gonic/gin"
+	"gin-web/response"
 )
 
 // Index 主页
-func Index(c *contextPlus.Context) interface{} {
+func Index(c *contextPlus.Context) *response.Response {
 
-	return gin.H{"code": 1, "msg": "hello world"}
+	return response.Resp().Json(gin.H{"data": "hello world"})
 }
 ```
 
@@ -68,7 +69,7 @@ func _init(_r group) {
 **session**
 
 ```go
-func Session(c *contextPlus.Context) interface{} {
+func Session(c *contextPlus.Context) *response.Response {
 
 c.Session.Set("key", "value")
 
@@ -83,26 +84,26 @@ return nil
 获取验证码
 
 ```go
-func Captcha(c *contextPlus.Context) interface{} {
+func Captcha(c *contextPlus.Context) *response.Response {
 
 b := c.GetCaptcha()
 
 c.Header("content-type", "image/png")
 
-return b
+return response.Resp().Byte(b)
 }
 ```
 
 检查验证码
 
 ```go
-func CheckCaptcha(c *contextPlus.Context) interface{} {
+func CheckCaptcha(c *contextPlus.Context) *response.Response {
 
 code := c.Query("code")
 
 bool:= c.CheckCaptcha(code)
 
-return gin.H{"data":bool }
+return response.Resp().Json(gin.H{"bool":code})
 
 }
 ```
@@ -118,7 +119,7 @@ import (
 )
 
 // Regex 参数规则验证示例，路由为 /regex/:name ,请求为 /regex/1sds?test[]=1&test[]=2,regex标记只支持string和[]string两个类型
-func Regex(c *contextPlus.Context) interface{} {
+func Regex(c *contextPlus.Context) *response.Response {
 
 	type regex struct {
 		Test []string `form:"test[]" json:"test" regex:"[0-9a-z/]+"`
@@ -131,11 +132,11 @@ func Regex(c *contextPlus.Context) interface{} {
 
 	if err != nil {
 
-		return gin.H{"code": 2, "mgs": err.Error()}
+		return response.Resp().Json(gin.H{"code": 2, "mgs": err.Error()})
 
 	}
 
-	return gin.H{"code": 1, "msg": "hello world"}
+	return response.Resp().Json(gin.H{"code": 1, "msg": "hello world"})
 }
 
 ```
