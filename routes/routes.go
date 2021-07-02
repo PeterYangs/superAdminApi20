@@ -41,7 +41,7 @@ func newRouter(engine *gin.Engine) *router {
 	}
 }
 
-func (rr *router) Group(path string, callback func(group2 group), middlewares ...contextPlus.HandlerFunc) {
+func (rr *router) Group(path string, callback func(group), middlewares ...contextPlus.HandlerFunc) {
 
 	g := group{
 		engine:      rr.engine,
