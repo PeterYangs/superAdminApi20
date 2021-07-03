@@ -205,7 +205,14 @@ func (s *Session) Set(key string, value interface{}) error {
 
 	sessionStringNew, err := json.Marshal(session)
 
-	redis.GetClient().Set(context.TODO(), GetRedisSessionKey(s.Cookie), sessionStringNew, time.Duration(s.ExpireTime-time.Now().Unix())*time.Second)
+	e := s.ExpireTime - time.Now().Unix()
+
+	if e < 0 {
+
+		return nil
+	}
+
+	redis.GetClient().Set(context.TODO(), GetRedisSessionKey(s.Cookie), sessionStringNew, time.Duration(e)*time.Second)
 
 	return nil
 }
