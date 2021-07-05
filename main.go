@@ -8,7 +8,6 @@ import (
 	"github.com/joho/godotenv"
 	"io"
 	"os"
-	"runtime"
 )
 
 func main() {
@@ -35,7 +34,7 @@ func main() {
 		port = "8887"
 	}
 
-	sysType := runtime.GOOS
+	//sysType := runtime.GOOS
 
 	////支持平滑重启，kill -1 pid
 	//if sysType == "linux" {
@@ -45,12 +44,12 @@ func main() {
 	//}
 
 	//windows只做开发测试
-	if sysType == "windows" {
-		// windows系统
+	//if sysType == "windows" {
+	// windows系统
 
-		r.Run(":" + port)
+	r.Run(":" + port)
 
-	}
+	//}
 
 }
 

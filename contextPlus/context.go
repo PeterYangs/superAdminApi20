@@ -20,7 +20,7 @@ import (
 
 type Context struct {
 	*gin.Context
-	Lock    *sync.Mutex
+	//Lock    *sync.Mutex
 	Handler *Handler
 }
 
@@ -194,8 +194,6 @@ func (s *Session) Set(key string, value interface{}) error {
 
 	err = json.Unmarshal([]byte(sessionString), &session)
 
-	//fmt.Println(session)
-
 	if err != nil {
 
 		return err
@@ -218,10 +216,6 @@ func (s *Session) Set(key string, value interface{}) error {
 }
 
 func (s *Session) Get(key string) (interface{}, error) {
-
-	//s.Lock.Lock()
-	//
-	//defer s.Lock.Unlock()
 
 	sessionString, err := redis.GetClient().Get(context.TODO(), GetRedisSessionKey(s.Cookie)).Result()
 
