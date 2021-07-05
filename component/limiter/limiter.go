@@ -39,10 +39,6 @@ func NewLimiter(r rate.Limit, b int, key string) *KeyLimiter {
 
 func (l *KeyLimiter) Allow() bool {
 
-	//fmt.Println(globalLimiters)
-
-	//fmt.Println(l.lastGet)
-
 	l.lastGet = time.Now()
 
 	return l.limiter.Allow()
