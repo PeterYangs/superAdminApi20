@@ -275,7 +275,14 @@ func (s *Session) Remove(key string) error {
 		return err
 	}
 
-	redis.GetClient().Set(context.TODO(), GetRedisSessionKey(s.Cookie), sessionStringNew, time.Duration(s.ExpireTime-time.Now().Unix())*time.Second)
+	e := s.ExpireTime - time.Now().Unix()
+
+	if e < 0 {
+
+		return nil
+	}
+
+	redis.GetClient().Set(context.TODO(), GetRedisSessionKey(s.Cookie), sessionStringNew, time.Duration(e)*time.Second)
 
 	return nil
 
