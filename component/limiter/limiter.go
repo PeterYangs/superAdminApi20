@@ -22,9 +22,14 @@ var GlobalLimiters = &Limiters{
 	lock:    sync.Mutex{},
 }
 
+var once = sync.Once{}
+
 func NewLimiter(r rate.Limit, b int, key string) *KeyLimiter {
 
-	go GlobalLimiters.clearLimiter()
+	once.Do(func() {
+
+		go GlobalLimiters.clearLimiter()
+	})
 
 	keyLimiter := GlobalLimiters.Get(r, b, key)
 
