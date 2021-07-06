@@ -2,6 +2,7 @@ package controller
 
 import (
 	"gin-web/contextPlus"
+	"gin-web/logs"
 	"gin-web/response"
 	"github.com/gin-gonic/gin"
 	"strconv"
@@ -9,6 +10,10 @@ import (
 
 // Index 主页
 func Index(c *contextPlus.Context) *response.Response {
+
+	//panic("自定义错误")
+
+	logs.NewLogs().Debug("yy").Stdout()
 
 	return response.Resp().Json(gin.H{"data": "hello world"})
 }

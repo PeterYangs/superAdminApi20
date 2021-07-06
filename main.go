@@ -3,10 +3,10 @@ package main
 import (
 	"gin-web/conf"
 	"gin-web/kernel"
+	"gin-web/logs"
 	"gin-web/routes"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"io"
 	"os"
 )
 
@@ -65,19 +65,8 @@ func init() {
 
 func logInit() {
 
-	os.Mkdir("log", 755)
+	l := logs.CreateLogs("logs/error.log")
 
-	f, err := os.OpenFile("log/log.log", os.O_RDWR|os.O_APPEND|os.O_CREATE, 644)
-
-	if err != nil {
-
-		panic(err)
-
-		return
-	}
-
-	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
-
-	gin.ErrorLogger()
+	go l.Task()
 
 }
