@@ -24,38 +24,41 @@ const (
 	Debug level = "Debug"
 )
 
-type logs struct {
+type logsService struct {
 	queue chan string
-	file  *os.File
+	//file    *os.File
+	logPath string
+	errPath string
 }
 
-var Logs logs
+var service logsService
 
-func CreateLogs(filePath string) *logs {
+func CreateLogs(logPath string, errPath string) *logsService {
 
-	f, err := os.OpenFile(filePath, os.O_RDWR|os.O_APPEND|os.O_CREATE, 644)
+	//f, err := os.OpenFile(filePath, os.O_RDWR|os.O_APPEND|os.O_CREATE, 644)
+	//
+	//if err != nil {
+	//
+	//	panic(err)
+	//
+	//}
 
-	if err != nil {
-
-		panic(err)
-
+	service = logsService{
+		queue:   make(chan string, 10),
+		logPath: logPath,
+		errPath: errPath,
 	}
 
-	Logs = logs{
-		queue: make(chan string, 10),
-		file:  f,
-	}
-
-	return &Logs
+	return &service
 
 }
 
-func NewLogs() *logs {
+func NewLogs() *logsService {
 
-	return &Logs
+	return &service
 }
 
-func (l *logs) Error(message string) *result {
+func (l *logsService) Error(message string) *result {
 
 	m := logFormat(Error, message)
 
@@ -66,7 +69,7 @@ func (l *logs) Error(message string) *result {
 	}
 }
 
-func (l *logs) Info(message string) *result {
+func (l *logsService) Info(message string) *result {
 
 	m := logFormat(Info, message)
 
@@ -77,7 +80,7 @@ func (l *logs) Info(message string) *result {
 	}
 }
 
-func (l *logs) Debug(message string) *result {
+func (l *logsService) Debug(message string) *result {
 
 	m := logFormat(Debug, message)
 
@@ -102,19 +105,43 @@ func (r *result) Stdout() {
 	fmt.Println(r.message)
 }
 
-func (l *logs) Task() {
+func (l *logsService) Task() {
 
-	defer func() {
+	fileIsOpen := true
 
-		close(l.queue)
+	defer close(l.queue)
 
-		l.file.Close()
+	logfile, err := os.OpenFile(l.logPath, os.O_RDWR|os.O_APPEND|os.O_CREATE, 644)
 
-	}()
+	if err != nil {
+
+		fileIsOpen = false
+
+		fmt.Println(err)
+	}
+
+	defer logfile.Close()
+
+	errfile, err := os.OpenFile(l.errPath, os.O_RDWR|os.O_APPEND|os.O_CREATE, 644)
+
+	if err != nil {
+
+		fileIsOpen = false
+
+		fmt.Println(err)
+	}
+
+	defer errfile.Close()
 
 	for message := range l.queue {
 
-		l.file.Write([]byte(message))
+		if !fileIsOpen {
+
+			fmt.Println(message)
+
+		}
+
+		//l.file.Write([]byte(message))
 	}
 
 }
