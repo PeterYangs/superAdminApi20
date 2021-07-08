@@ -11,7 +11,7 @@ import (
 // Index 主页
 func Index(c *contextPlus.Context) *response.Response {
 
-	panic("自定义错误")
+	//panic("自定义错误")
 
 	logs.NewLogs().Debug("yy").Stdout()
 
