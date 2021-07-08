@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/PeterYangs/tools"
 	"github.com/spf13/cast"
-	"log"
 	"os"
 	"runtime"
 	"runtime/debug"
@@ -30,50 +29,63 @@ type logsService struct {
 }
 
 type logLevel struct {
-	filePath string
-	file     *os.File
+	fileDir string
+	file    *os.File
 }
 
 type logs struct {
 	level   level
 	message string
+	time    time.Time
 }
 
-var service logsService
+var service *logsService
 
 func CreateLogs() *logsService {
 
-	service = logsService{
+	service = &logsService{
 		queue: make(chan logs, 10),
 		logLevels: map[level]*logLevel{
 			Error: {
-				filePath: "logs/error.log",
+				fileDir: "logs/error",
 			},
 			Info: {
-				filePath: "logs/info.log",
+				fileDir: "logs/info",
 			},
 			Debug: {
-				filePath: "logs/debug.log",
+				fileDir: "logs/debug",
 			},
 		},
 	}
 
-	return &service
+	service.MakeDir()
 
+	return service
+
+}
+
+func (ls *logsService) MakeDir() {
+
+	for _, l2 := range ls.logLevels {
+
+		os.MkdirAll(l2.fileDir, 755)
+
+	}
 }
 
 func NewLogs() *logsService {
 
-	return &service
+	return service
 }
 
-func (l *logsService) Error(message string) *result {
+func (ls *logsService) Error(message string) *result {
 
 	m := logFormat(Error, message)
 
-	l.queue <- logs{
+	ls.queue <- logs{
 		level:   Error,
 		message: m,
+		time:    time.Now(),
 	}
 
 	return &result{
@@ -81,13 +93,14 @@ func (l *logsService) Error(message string) *result {
 	}
 }
 
-func (l *logsService) Info(message string) *result {
+func (ls *logsService) Info(message string) *result {
 
 	m := logFormat(Info, message)
 
-	l.queue <- logs{
+	ls.queue <- logs{
 		level:   Info,
 		message: m,
+		time:    time.Now(),
 	}
 
 	return &result{
@@ -95,13 +108,14 @@ func (l *logsService) Info(message string) *result {
 	}
 }
 
-func (l *logsService) Debug(message string) *result {
+func (ls *logsService) Debug(message string) *result {
 
 	m := logFormat(Debug, message)
 
-	l.queue <- logs{
+	ls.queue <- logs{
 		level:   Debug,
 		message: m,
+		time:    time.Now(),
 	}
 
 	return &result{
@@ -123,35 +137,21 @@ func (r *result) Stdout() {
 	fmt.Println(r.message)
 }
 
-func (l *logsService) Task() {
+func (ls *logsService) Task() {
 
-	defer close(l.queue)
+	defer close(ls.queue)
 
-	for _, item := range l.logLevels {
+	for message := range ls.queue {
 
-		f, e := os.OpenFile(item.filePath, os.O_RDWR|os.O_APPEND|os.O_CREATE, 644)
+		message.checkFileName(ls.logLevels[message.level])
 
-		if e != nil {
-
-			log.Fatal(e)
-
-		}
-
-		item.file = f
-
-	}
-
-	for message := range l.queue {
-
-		l.logLevels[message.level].file.Write([]byte(message.message))
+		ls.logLevels[message.level].file.Write([]byte(message.message))
 
 	}
 
 }
 
 func logFormat(level level, message string) string {
-
-	//f, l := GetLine()
 
 	_, f, l, _ := runtime.Caller(2)
 
@@ -164,4 +164,32 @@ func logFormat(level level, message string) string {
 
 	return m
 
+}
+
+func (logs logs) checkFileName(logLevel *logLevel) {
+
+	name := logs.fileFormat()
+
+	if logLevel.file == nil || logLevel.file.Name() != name {
+
+		//关闭文件
+		logLevel.file.Close()
+
+		f, e := os.OpenFile(logLevel.fileDir+"/"+name, os.O_RDWR|os.O_APPEND|os.O_CREATE, 644)
+
+		if e != nil {
+
+			panic(e)
+
+		}
+
+		logLevel.file = f
+
+	}
+
+}
+
+func (logs logs) fileFormat() string {
+
+	return tools.Date("Y-m-d", logs.time.Unix()) + ".log"
 }
