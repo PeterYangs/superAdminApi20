@@ -2,8 +2,8 @@ package exception
 
 import (
 	"fmt"
+	"gin-web/component/logs"
 	"gin-web/contextPlus"
-	"gin-web/logs"
 	"github.com/gin-gonic/gin"
 	"os"
 )

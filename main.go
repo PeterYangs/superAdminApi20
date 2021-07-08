@@ -1,9 +1,9 @@
 package main
 
 import (
+	"gin-web/component/logs"
 	"gin-web/conf"
 	"gin-web/kernel"
-	"gin-web/logs"
 	"gin-web/routes"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -65,7 +65,7 @@ func init() {
 
 func logInit() {
 
-	l := logs.CreateLogs("logs/error.log")
+	l := logs.CreateLogs()
 
 	go l.Task()
 

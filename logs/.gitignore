@@ -4,4 +4,3 @@
 # IntelliJ project files
 *
 !.gitignore
-!log.go
