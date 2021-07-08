@@ -143,6 +143,11 @@ func (ls *logsService) Task() {
 
 	for message := range ls.queue {
 
+		if ls.logLevels[message.level].fileDir == "" {
+
+			continue
+		}
+
 		message.checkFileName(ls.logLevels[message.level])
 
 		ls.logLevels[message.level].file.Write([]byte(message.message))
