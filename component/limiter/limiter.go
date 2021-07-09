@@ -1,42 +1,43 @@
 package limiter
 
+//component/limiter/limiter.go
+
 import (
 	"golang.org/x/time/rate"
 	"sync"
 	"time"
 )
 
-type KeyLimiter struct {
+type Limiters struct {
+	limiters *sync.Map
+}
+
+type Limiter struct {
 	limiter *rate.Limiter
 	lastGet time.Time //上一次获取token的时间
 	key     string
 }
 
-type Limiters struct {
-	limiter map[string]*KeyLimiter
-	lock    sync.Mutex
-}
-
 var GlobalLimiters = &Limiters{
-	limiter: make(map[string]*KeyLimiter),
-	lock:    sync.Mutex{},
+	limiters: &sync.Map{},
 }
 
-func NewLimiter(r rate.Limit, b int, key string) *KeyLimiter {
+var once = sync.Once{}
 
-	go GlobalLimiters.clearLimiter()
+func NewLimiter(r rate.Limit, b int, key string) *Limiter {
 
-	keyLimiter := GlobalLimiters.Get(r, b, key)
+	once.Do(func() {
+
+		go GlobalLimiters.clearLimiter()
+	})
+
+	keyLimiter := GlobalLimiters.getLimiter(r, b, key)
 
 	return keyLimiter
 
 }
 
-func (l *KeyLimiter) Allow() bool {
-
-	//fmt.Println(globalLimiters)
-
-	//fmt.Println(l.lastGet)
+func (l *Limiter) Allow() bool {
 
 	l.lastGet = time.Now()
 
@@ -44,26 +45,22 @@ func (l *KeyLimiter) Allow() bool {
 
 }
 
-func (ls *Limiters) Get(r rate.Limit, b int, key string) *KeyLimiter {
+func (ls *Limiters) getLimiter(r rate.Limit, b int, key string) *Limiter {
 
-	ls.lock.Lock()
-
-	defer ls.lock.Unlock()
-
-	limiter, ok := ls.limiter[key]
+	limiter, ok := ls.limiters.Load(key)
 
 	if ok {
 
-		return limiter
+		return limiter.(*Limiter)
 	}
 
-	l := &KeyLimiter{
+	l := &Limiter{
 		limiter: rate.NewLimiter(r, b),
 		lastGet: time.Now(),
 		key:     key,
 	}
 
-	ls.limiter[key] = l
+	ls.limiters.Store(key, l)
 
 	return l
 }
@@ -75,16 +72,16 @@ func (ls *Limiters) clearLimiter() {
 
 		time.Sleep(1 * time.Minute)
 
-		for i, i2 := range ls.limiter {
+		ls.limiters.Range(func(key, value interface{}) bool {
 
 			//超过1分钟
-			if time.Now().Unix()-i2.lastGet.Unix() > 60 {
-				ls.lock.Lock()
-				delete(ls.limiter, i)
-				ls.lock.Unlock()
+			if time.Now().Unix()-value.(*Limiter).lastGet.Unix() > 60 {
+
+				ls.limiters.Delete(key)
 			}
 
-		}
+			return true
+		})
 
 	}
 

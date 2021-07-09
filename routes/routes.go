@@ -3,8 +3,8 @@ package routes
 import (
 	"gin-web/contextPlus"
 	"gin-web/kernel"
+	"gin-web/response"
 	"github.com/gin-gonic/gin"
-	"sync"
 )
 
 const (
@@ -25,7 +25,7 @@ type group struct {
 }
 
 type handler struct {
-	handlerFunc func(*contextPlus.Context) interface{}
+	handlerFunc func(*contextPlus.Context) *response.Response
 	middlewares []contextPlus.HandlerFunc
 	engine      *gin.Engine
 	url         string
@@ -40,7 +40,7 @@ func newRouter(engine *gin.Engine) *router {
 	}
 }
 
-func (rr *router) Group(path string, callback func(group2 group), middlewares ...contextPlus.HandlerFunc) {
+func (rr *router) Group(path string, callback func(group), middlewares ...contextPlus.HandlerFunc) {
 
 	g := group{
 		engine:      rr.engine,
@@ -54,13 +54,7 @@ func (rr *router) Group(path string, callback func(group2 group), middlewares ..
 
 func (gg group) Group(path string, callback func(group2 group), middlewares ...contextPlus.HandlerFunc) {
 
-	for _, funcs := range middlewares {
-
-		tempFuncs := funcs
-
-		gg.middlewares = append(gg.middlewares, tempFuncs)
-
-	}
+	gg.middlewares = append(gg.middlewares, middlewares...)
 
 	gg.path += path
 
@@ -68,62 +62,9 @@ func (gg group) Group(path string, callback func(group2 group), middlewares ...c
 
 }
 
-func (rr *router) Registered(method int, url string, f func(c *contextPlus.Context) interface{}, middlewares ...contextPlus.HandlerFunc) {
+func (gg group) Registered(method int, url string, f func(c *contextPlus.Context) *response.Response, middlewares ...contextPlus.HandlerFunc) *handler {
 
-	ff := func(c *contextPlus.Context) {
-
-		data := f(c)
-
-		getDataType(data, c)
-
-	}
-
-	middlewares = append(middlewares, ff)
-
-	var temp = make([]gin.HandlerFunc, len(middlewares))
-
-	for i, funcs := range middlewares {
-
-		tempFuncs := funcs
-
-		temp[i] = func(context *gin.Context) {
-
-			tempFuncs(&contextPlus.Context{Context: context, Lock: &sync.Mutex{}})
-
-		}
-
-	}
-
-	switch method {
-
-	case GET:
-
-		rr.engine.GET(url, temp...)
-
-	case POST:
-
-		rr.engine.POST(url, temp...)
-
-	case PUT:
-
-		rr.engine.PUT(url, temp...)
-
-	case DELETE:
-
-		rr.engine.DELETE(url, temp...)
-
-	}
-
-}
-
-func (gg group) Registered(method int, url string, f func(c *contextPlus.Context) interface{}, middlewares ...contextPlus.HandlerFunc) *handler {
-
-	for _, middleware := range middlewares {
-
-		tempFuncs := middleware
-
-		gg.middlewares = append(gg.middlewares, tempFuncs)
-	}
+	gg.middlewares = append(gg.middlewares, middlewares...)
 
 	return &handler{
 		handlerFunc: f,
@@ -148,7 +89,7 @@ func (h *handler) Bind() {
 
 		data := h.handlerFunc(c)
 
-		getDataType(data, c)
+		getDataType(data.GetData(), c)
 
 	}
 
@@ -164,7 +105,6 @@ func (h *handler) Bind() {
 
 			tempFuncs(&contextPlus.Context{
 				Context: context,
-				Lock:    &sync.Mutex{},
 				Handler: &contextPlus.Handler{
 					HandlerFunc: h.handlerFunc,
 					Engine:      h.engine,

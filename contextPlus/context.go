@@ -7,6 +7,7 @@ import (
 	"gin-web/component/captcha"
 	"gin-web/conf"
 	"gin-web/redis"
+	"gin-web/response"
 	"github.com/PeterYangs/tools"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
@@ -19,12 +20,12 @@ import (
 
 type Context struct {
 	*gin.Context
-	Lock    *sync.Mutex
+	//Lock    *sync.Mutex
 	Handler *Handler
 }
 
 type Handler struct {
-	HandlerFunc func(*Context) interface{}
+	HandlerFunc func(*Context) *response.Response
 	//Middlewares []HandlerFunc
 	Engine *gin.Engine
 	Url    string
@@ -193,8 +194,6 @@ func (s *Session) Set(key string, value interface{}) error {
 
 	err = json.Unmarshal([]byte(sessionString), &session)
 
-	//fmt.Println(session)
-
 	if err != nil {
 
 		return err
@@ -204,16 +203,19 @@ func (s *Session) Set(key string, value interface{}) error {
 
 	sessionStringNew, err := json.Marshal(session)
 
-	redis.GetClient().Set(context.TODO(), GetRedisSessionKey(s.Cookie), sessionStringNew, time.Duration(s.ExpireTime-time.Now().Unix())*time.Second)
+	e := s.ExpireTime - time.Now().Unix()
+
+	if e < 0 {
+
+		return nil
+	}
+
+	redis.GetClient().Set(context.TODO(), GetRedisSessionKey(s.Cookie), sessionStringNew, time.Duration(e)*time.Second)
 
 	return nil
 }
 
 func (s *Session) Get(key string) (interface{}, error) {
-
-	//s.Lock.Lock()
-	//
-	//defer s.Lock.Unlock()
 
 	sessionString, err := redis.GetClient().Get(context.TODO(), GetRedisSessionKey(s.Cookie)).Result()
 
@@ -273,7 +275,14 @@ func (s *Session) Remove(key string) error {
 		return err
 	}
 
-	redis.GetClient().Set(context.TODO(), GetRedisSessionKey(s.Cookie), sessionStringNew, time.Duration(s.ExpireTime-time.Now().Unix())*time.Second)
+	e := s.ExpireTime - time.Now().Unix()
+
+	if e < 0 {
+
+		return nil
+	}
+
+	redis.GetClient().Set(context.TODO(), GetRedisSessionKey(s.Cookie), sessionStringNew, time.Duration(e)*time.Second)
 
 	return nil
 

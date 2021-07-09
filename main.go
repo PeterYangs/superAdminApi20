@@ -1,14 +1,13 @@
 package main
 
 import (
+	"gin-web/component/logs"
 	"gin-web/conf"
 	"gin-web/kernel"
 	"gin-web/routes"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"io"
 	"os"
-	"runtime"
 )
 
 func main() {
@@ -35,7 +34,7 @@ func main() {
 		port = "8887"
 	}
 
-	sysType := runtime.GOOS
+	//sysType := runtime.GOOS
 
 	////支持平滑重启，kill -1 pid
 	//if sysType == "linux" {
@@ -45,12 +44,12 @@ func main() {
 	//}
 
 	//windows只做开发测试
-	if sysType == "windows" {
-		// windows系统
+	//if sysType == "windows" {
+	// windows系统
 
-		r.Run(":" + port)
+	r.Run(":" + port)
 
-	}
+	//}
 
 }
 
@@ -66,19 +65,8 @@ func init() {
 
 func logInit() {
 
-	os.Mkdir("log", 755)
+	l := logs.CreateLogs()
 
-	f, err := os.OpenFile("log/log.log", os.O_RDWR|os.O_APPEND|os.O_CREATE, 644)
-
-	if err != nil {
-
-		panic(err)
-
-		return
-	}
-
-	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
-
-	gin.ErrorLogger()
+	go l.Task()
 
 }

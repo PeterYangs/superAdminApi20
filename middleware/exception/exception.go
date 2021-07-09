@@ -2,12 +2,10 @@ package exception
 
 import (
 	"fmt"
+	"gin-web/component/logs"
 	"gin-web/contextPlus"
-	"github.com/PeterYangs/tools"
 	"github.com/gin-gonic/gin"
 	"os"
-	"runtime/debug"
-	"time"
 )
 
 // Exception 错误捕获
@@ -18,19 +16,9 @@ func Exception(c *contextPlus.Context) {
 
 			defer c.Abort()
 
-			f, err := os.OpenFile("log/err.log", os.O_RDWR|os.O_APPEND|os.O_CREATE, 644)
+			msg := fmt.Sprint(r)
 
-			if err != nil {
-
-				//c.Abort()
-				return
-			}
-
-			defer f.Close()
-
-			msg := "[" + tools.Date("Y-m-d H:i:s", time.Now().Unix()) + "]  " + fmt.Sprint(r) + "\n" + string(debug.Stack())
-
-			f.Write([]byte(msg))
+			msg = logs.NewLogs().Error(msg).Message()
 
 			if os.Getenv("APP_DEBUG") == "true" {
 
