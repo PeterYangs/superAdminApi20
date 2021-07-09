@@ -5,10 +5,11 @@ import (
 	"gin-web/contextPlus"
 	"gin-web/database"
 	"gin-web/model"
+	"gin-web/response"
 	"github.com/gin-gonic/gin"
 )
 
-func Login(c *contextPlus.Context) interface{} {
+func Login(c *contextPlus.Context) *response.Response {
 
 	type Form struct {
 		Username string `json:"username" form:"username" binding:"required"`
@@ -22,26 +23,30 @@ func Login(c *contextPlus.Context) interface{} {
 
 	if err != nil {
 
-		return gin.H{"code": 2, "mgs": err.Error()}
+		return response.Resp().Json(gin.H{"code": 2, "mgs": err.Error()})
 
 	}
 
 	if !c.CheckCaptcha(form.Captcha) {
 
-		return gin.H{"code": 2, "mgs": "验证码错误"}
+		return response.Resp().Json(gin.H{"code": 2, "mgs": "验证码错误"})
 	}
 
-	re := database.GetDb().Where("username = ?", form.Username).Where("password = ?", common.HmacSha256(form.Password)).First(&model.Admin{})
+	var admin model.Admin
+
+	re := database.GetDb().Where("username = ?", form.Username).Where("password = ?", common.HmacSha256(form.Password)).First(&admin)
 
 	if re.Error != nil {
 
-		return gin.H{"code": 2, "mgs": "密码错误"}
+		return response.Resp().Json(gin.H{"code": 2, "mgs": "密码错误"})
 	}
 
-	return gin.H{"code": 1, "msg": "success"}
+	c.Session().Set("admin", admin)
+
+	return response.Resp().Json(gin.H{"code": 1, "mgs": "success"})
 }
 
-func Registered(c *contextPlus.Context) interface{} {
+func Registered(c *contextPlus.Context) *response.Response {
 
 	type Validator struct {
 		Username   string `json:"username" form:"username" binding:"required"`
@@ -56,20 +61,21 @@ func Registered(c *contextPlus.Context) interface{} {
 
 	if err != nil {
 
-		return gin.H{"code": 2, "mgs": err.Error()}
+		return response.Resp().Json(gin.H{"code": 2, "mgs": err.Error()})
 
 	}
 
 	if form.Password != form.RePassword {
 
-		return gin.H{"code": 2, "mgs": "两次密码不一致"}
+		return response.Resp().Json(gin.H{"code": 2, "mgs": "两次密码不一致"})
 	}
 
 	ok := database.GetDb().Where("username = ?", form.Username).Or("email = ?", form.Email).First(&model.Admin{})
 
 	if ok.Error == nil {
 
-		return gin.H{"code": 1, "msg": "用户名已被注册", "data": form}
+		return response.Resp().Json(gin.H{"code": 2, "mgs": "用户名已被注册"})
+
 	}
 
 	database.GetDb().Create(&model.Admin{
@@ -78,6 +84,6 @@ func Registered(c *contextPlus.Context) interface{} {
 		Email:    form.Email,
 	})
 
-	return gin.H{"code": 1, "msg": "success"}
+	return response.Resp().Json(gin.H{"code": 1, "mgs": "success"})
 
 }
