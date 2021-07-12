@@ -80,7 +80,7 @@ func Registered(c *contextPlus.Context) *response.Response {
 
 	database.GetDb().Create(&model.Admin{
 		Username: form.Username,
-		Password: form.Password,
+		Password: common.HmacSha256(form.Password),
 		Email:    form.Email,
 	})
 
