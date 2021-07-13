@@ -14,7 +14,9 @@ func Index(c *contextPlus.Context) *response.Response {
 
 	//logs.NewLogs().Debug("yy").Stdout()
 
-	//c.Session().Set("yy","gg")
+	//c.Session().Set("gg","gg")
+	//
+	//fmt.Println(c.Session().Exist("gg"))
 
 	return response.Resp().Json(gin.H{"data": "hello world"})
 }

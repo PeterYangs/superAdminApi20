@@ -75,5 +75,12 @@ func (cc *_connect) Get(cxt context.Context, key string) *redis.StringCmd {
 
 func (cc *_connect) Set(cxt context.Context, key string, value interface{}, expiration time.Duration) *redis.StatusCmd {
 
+	//cc.connect.Exists().Result()
+
 	return cc.connect.Set(cxt, conf.Get("redis_prefix").(string)+key, value, expiration)
+}
+
+func (cc *_connect) Exists(cxt context.Context, key ...string) *redis.IntCmd {
+
+	return cc.connect.Exists(cxt, key...)
 }

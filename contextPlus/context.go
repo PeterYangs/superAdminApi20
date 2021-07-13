@@ -288,6 +288,35 @@ func (s *Session) Remove(key string) error {
 
 }
 
+func (s *Session) Exist(key string) bool {
+
+	sessionString, err := redis.GetClient().Get(context.TODO(), GetRedisSessionKey(s.Cookie)).Result()
+
+	if err != nil {
+
+		return false
+	}
+
+	var session Session
+
+	err = json.Unmarshal([]byte(sessionString), &session)
+
+	if err != nil {
+
+		return false
+	}
+
+	_, ok := session.SessionList[key]
+
+	if ok {
+
+		return true
+	}
+
+	return false
+
+}
+
 func GetRedisSessionKey(cookie string) string {
 
 	return strings.Replace(conf.Get("redis_session_key").(string), "{cookie}", cookie, 1)
