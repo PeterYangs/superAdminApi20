@@ -2,28 +2,50 @@ package controller
 
 import (
 	"gin-web/contextPlus"
+	"gin-web/redis"
 	"gin-web/response"
 	"github.com/gin-gonic/gin"
 	"strconv"
+	"time"
 )
+
+//var m =make(map[string]string)
 
 // Index 主页
 func Index(c *contextPlus.Context) *response.Response {
 
-	//panic("自定义错误")
+	//申请一个锁，过期时间是10秒
+	lock := redis.GetClient().Lock("lock", 10*time.Second)
 
-	//logs.NewLogs().Debug("yy").Stdout()
+	//释放锁
+	defer lock.Release()
 
-	//c.Session().Set("gg","gg")
-	//
-	//fmt.Println(c.Session().Exist("gg"))
+	//是否拿到锁
+	if lock.Get() {
 
-	return response.Resp().Json(gin.H{"data": "hello world"})
+		return response.Resp().Json(gin.H{"res": true})
+	}
+
+	return response.Resp().Json(gin.H{"res": false})
+
 }
 
 func Index2(c *contextPlus.Context) *response.Response {
 
-	return response.Resp().Json(gin.H{"code": 1, "msg": "hello world"})
+	lock := redis.GetClient().Lock("lock", 1000*time.Second)
+
+	defer lock.Release()
+
+	if lock.Get() {
+
+		return response.Resp().Json(gin.H{"res": true})
+	}
+
+	//m["1"]="2"
+
+	return response.Resp().Json(gin.H{"res": false})
+
+	//return response.Resp().Json(gin.H{"code": 1, "msg": "hello world"})
 }
 
 // SessionSet 并发写入demo

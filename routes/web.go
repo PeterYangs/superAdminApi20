@@ -5,7 +5,6 @@ import (
 	"gin-web/controller/file"
 	"gin-web/controller/regex"
 	"gin-web/middleware"
-	"gin-web/middleware/loginLimiter"
 )
 
 func _init(_r group) {
@@ -24,7 +23,7 @@ func _init(_r group) {
 	}, middleware.GoOn)
 
 	//单路由
-	_r.Registered(GET, "/", controller.Index, loginLimiter.LoginLimiter).Bind()
+	_r.Registered(GET, "/", controller.Index).Bind()
 	_r.Registered(GET, "/2", controller.Index2).Bind()
 
 	_r.Registered(GET, "/c", controller.Captcha).Bind()
