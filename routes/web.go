@@ -13,6 +13,7 @@ func _init(_r group) {
 		g.Registered(POST, "/login", login.Login, loginLimiter.LoginLimiter).Bind()
 
 		g.Registered(POST, "/registered", login.Registered).Bind()
+		g.Registered(POST, "/logout", login.Logout).Bind()
 
 	})
 

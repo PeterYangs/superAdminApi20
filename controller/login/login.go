@@ -87,3 +87,10 @@ func Registered(c *contextPlus.Context) *response.Response {
 	return response.Resp().Json(gin.H{"code": 1, "mgs": "success"})
 
 }
+
+func Logout(c *contextPlus.Context) *response.Response {
+
+	c.Session().Remove("admin")
+
+	return response.Resp().Json(gin.H{"code": 1, "mgs": "success"})
+}
