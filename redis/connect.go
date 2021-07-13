@@ -140,6 +140,39 @@ func (lk *lock) Get() bool {
 	return ok
 }
 
+func (lk *lock) Block(expiration time.Duration) bool {
+
+	t := time.Now()
+
+	for {
+
+		cxt, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+
+		ok, err := lk.connect.SetNX(cxt, lk.key, lk.requestId, lk.expiration).Result()
+
+		cancel()
+
+		if err != nil {
+
+			return false
+		}
+
+		if ok {
+
+			return true
+		}
+
+		time.Sleep(200 * time.Millisecond)
+
+		if time.Now().Sub(t) > expiration {
+
+			return false
+		}
+
+	}
+
+}
+
 // Release 释放锁
 func (lk *lock) Release() (interface{}, error) {
 
