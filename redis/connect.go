@@ -192,3 +192,19 @@ func (lk *lock) Release() (interface{}, error) {
 	return script.Run(cxt, GetClient().connect, []string{conf.Get("redis_prefix").(string) + lk.key}, lk.requestId).Result()
 
 }
+
+// ForceRelease 强制释放锁，忽略请求id
+func (lk *lock) ForceRelease() error {
+
+	return nil
+}
+
+// GetCall get的回调形式
+func (lk *lock) GetCall(call func()) {
+
+}
+
+// BlockCall Block的回调形式
+func (lk *lock) BlockCall(expiration time.Duration, call func()) {
+
+}
