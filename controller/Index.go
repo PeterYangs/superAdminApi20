@@ -23,12 +23,52 @@ func Index(c *contextPlus.Context) *response.Response {
 	//是否拿到锁
 	if lock.Get() {
 
+		time.Sleep(100 * time.Millisecond)
+
 		return response.Resp().Json(gin.H{"res": true})
 	}
 
 	return response.Resp().Json(gin.H{"res": false})
 
 }
+
+func Block(c *contextPlus.Context) *response.Response {
+
+	//申请一个锁，过期时间是10秒
+	lock := redis.GetClient().Lock("lock", 10*time.Second)
+
+	defer lock.Release()
+
+	//最多等待5秒
+	if lock.Block(5 * time.Second) {
+
+		time.Sleep(100 * time.Millisecond)
+
+		return response.Resp().Json(gin.H{"res": true})
+
+	}
+
+	return response.Resp().Json(gin.H{"res": false})
+}
+
+//func Block2(c *contextPlus.Context) *response.Response {
+//
+//	//申请一个锁，过期时间是10秒
+//	lock := redis.GetClient().Lock("lock", 10*time.Second)
+//
+//	defer lock.Release()
+//
+//	//最多等待5秒
+//	if lock.Block(5 * time.Second) {
+//
+//		//time.Sleep(1 * time.Minute)
+//
+//		return response.Resp().Json(gin.H{"res": true})
+//
+//	}
+//
+//	return response.Resp().Json(gin.H{"res": false})
+//}
 
 func Index2(c *contextPlus.Context) *response.Response {
 

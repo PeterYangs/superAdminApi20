@@ -126,7 +126,7 @@ func (cc *_connect) Lock(key string, expiration time.Duration) *lock {
 // Get 获取锁
 func (lk *lock) Get() bool {
 
-	cxt, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	cxt, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 
 	defer cancel()
 
@@ -140,6 +140,7 @@ func (lk *lock) Get() bool {
 	return ok
 }
 
+// Block 获取锁阻塞
 func (lk *lock) Block(expiration time.Duration) bool {
 
 	t := time.Now()
@@ -176,7 +177,7 @@ func (lk *lock) Block(expiration time.Duration) bool {
 // Release 释放锁
 func (lk *lock) Release() (interface{}, error) {
 
-	cxt, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	cxt, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 
 	defer cancel()
 
@@ -196,15 +197,12 @@ func (lk *lock) Release() (interface{}, error) {
 // ForceRelease 强制释放锁，忽略请求id
 func (lk *lock) ForceRelease() error {
 
-	return nil
-}
+	cxt, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 
-// GetCall get的回调形式
-func (lk *lock) GetCall(call func()) {
+	defer cancel()
 
-}
+	_, err := lk.connect.Del(cxt, lk.key).Result()
 
-// BlockCall Block的回调形式
-func (lk *lock) BlockCall(expiration time.Duration, call func()) {
+	return err
 
 }

@@ -35,4 +35,8 @@ func _init(_r group) {
 
 	_r.Registered(GET, "/regex/:name", regex.Regex).Bind()
 
+	_r.Registered(GET, "/block", controller.Block).Bind()
+
+	//_r.Registered(GET, "/block2", controller.Block2).Bind()
+
 }
