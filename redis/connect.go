@@ -120,7 +120,7 @@ func (cc *_connect) Lock(key string, expiration time.Duration) *lock {
 
 	lockId := uuid.NewV4().String()
 
-	return &lock{key: key, expiration: expiration, connect: cc, requestId: lockId}
+	return &lock{key: conf.Get("lock_prefix").(string) + key, expiration: expiration, connect: cc, requestId: lockId}
 }
 
 // Get 获取锁
