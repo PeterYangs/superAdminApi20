@@ -15,15 +15,14 @@ import (
 func Index(c *contextPlus.Context) *response.Response {
 
 	//申请一个锁，过期时间是10秒
-	lock := redis.GetClient().Lock("lock", 10*time.Second)
+	lock := redis.GetClient().Lock("lock", 1*time.Second)
 
-	//释放锁
 	defer lock.Release()
 
 	//是否拿到锁
 	if lock.Get() {
 
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(4 * time.Second)
 
 		return response.Resp().Json(gin.H{"res": true})
 	}
