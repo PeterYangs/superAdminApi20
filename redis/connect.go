@@ -2,7 +2,6 @@ package redis
 
 import (
 	"context"
-	"fmt"
 	"gin-web/conf"
 	"github.com/go-redis/redis/v8"
 	uuid "github.com/satori/go.uuid"
@@ -277,7 +276,7 @@ func (lk *lock) checkLockIsRelease() {
 		//取消
 		case <-lk.checkCancel:
 
-			fmt.Println("释放")
+			//fmt.Println("释放")
 
 			return
 
@@ -319,7 +318,7 @@ func (lk *lock) done() bool {
 
 		if ok {
 
-			fmt.Println("续期")
+			//fmt.Println("续期")
 
 			return true
 
