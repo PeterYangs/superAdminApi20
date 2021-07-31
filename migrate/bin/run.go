@@ -219,7 +219,12 @@ func Up() {
 		createMigrate.Name = "` + pack + `"
 
 		createMigrate.BigIncrements("id")
+		
+		createMigrate.Timestamp("created_at").Nullable()
 
+		createMigrate.Timestamp("updated_at").Nullable()
+
+		// createMigrate.Timestamp("deleted_at").Nullable()
 		
 
 	})

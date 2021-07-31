@@ -14,13 +14,15 @@ func Up() {
 
 		createMigrate.Timestamp("updated_at").Nullable()
 
+		createMigrate.Timestamp("deleted_at").Nullable()
+
 		createMigrate.String("title", 255).Comment("规则描述")
 
 		createMigrate.String("rule", 255).Comment("规则")
 
 		createMigrate.String("group_name", 255).Comment("分组名称")
 
-		createMigrate.String("test", 255).Default(migrate.Null).Comment("测试")
+		//createMigrate.String("test", 255).Default(migrate.Null).Comment("测试")
 
 	})
 

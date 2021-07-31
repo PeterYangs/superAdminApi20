@@ -3,6 +3,7 @@ package routes
 import (
 	"gin-web/controller/captcha"
 	"gin-web/controller/login"
+	rule2 "gin-web/controller/rule"
 	"gin-web/middleware/loginLimiter"
 )
 
@@ -14,6 +15,19 @@ func _init(_r group) {
 
 		g.Registered(POST, "/registered", login.Registered).Bind()
 		g.Registered(POST, "/logout", login.Logout).Bind()
+
+	})
+
+	_r.Group("/admin", func(admin group) {
+
+		admin.Group("/rule", func(rule group) {
+
+			rule.Registered(GET, "/update", rule2.Update).Bind()
+			rule.Registered(GET, "/list", rule2.List).Bind()
+
+			rule.Registered(GET, "/detail/:id", rule2.Detail).Bind()
+
+		})
 
 	})
 
