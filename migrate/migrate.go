@@ -33,6 +33,10 @@ func init() {
 
 }
 
+type NullValue int
+
+const Null NullValue = 0x00000
+
 type Tag int
 
 const (
@@ -412,14 +416,14 @@ func setColumnAttr(f *field) string {
 		str += " unsigned "
 	}
 
-	if !f.isNullable && f.defaultValue != nil {
+	if !f.isNullable && f.defaultValue != Null {
 
 		str += " NOT NULL "
 	}
 
 	switch f.defaultValue.(type) {
 
-	case nil:
+	case NullValue:
 
 		str += " DEFAULT NULL "
 
