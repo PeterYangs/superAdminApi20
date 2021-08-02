@@ -18,6 +18,13 @@ func (r *Response) Json(data gin.H) *Response {
 	return r
 }
 
+func (r *Response) Api(code int, msg string, data interface{}) *Response {
+
+	r.data = gin.H{"code": code, "msg": msg, "data": data}
+
+	return r
+}
+
 func (r *Response) String(data string) *Response {
 
 	r.data = data

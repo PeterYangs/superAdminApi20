@@ -1,12 +1,13 @@
 package rule
 
 import (
-	"fmt"
+	"gin-web/common"
 	"gin-web/contextPlus"
 	"gin-web/database"
 	"gin-web/model"
 	"gin-web/response"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/cast"
 )
 
 func Update(c *contextPlus.Context) *response.Response {
@@ -53,15 +54,15 @@ func List(c *contextPlus.Context) *response.Response {
 
 	rules := make([]*model.Rule, 0)
 
-	database.GetDb().Model(&model.Rule{}).Find(&rules)
+	tx := database.GetDb().Model(&model.Rule{})
 
-	return response.Resp().Json(gin.H{"data": rules})
+	data := common.Paginate(tx, &rules, cast.ToInt(c.DefaultQuery("p", "1")), 10)
+
+	return response.Resp().Api(1, "success", data)
 
 }
 
 func Detail(c *contextPlus.Context) *response.Response {
-
-	fmt.Println(c.Param("id"))
 
 	type Form struct {
 		Id int `json:"id" uri:"id"`
@@ -82,5 +83,27 @@ func Detail(c *contextPlus.Context) *response.Response {
 	database.GetDb().Where("id = ?", form.Id).First(&r)
 
 	return response.Resp().Json(gin.H{"data": r})
+
+}
+
+func Destroy(c *contextPlus.Context) *response.Response {
+
+	type Form struct {
+		Id int `json:"id" uri:"id"`
+	}
+
+	var form Form
+
+	err := c.ShouldBindPlus(&form)
+
+	if err != nil {
+
+		return response.Resp().Json(gin.H{"code": 2, "mgs": err.Error()})
+
+	}
+
+	database.GetDb().Delete(&model.Rule{}, form.Id)
+
+	return response.Resp().Api(1, "success", "")
 
 }
