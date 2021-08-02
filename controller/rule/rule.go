@@ -41,11 +41,11 @@ func Update(c *contextPlus.Context) *response.Response {
 
 	} else {
 
-		database.GetDb().Model(&model.Rule{}).Updates(&r)
+		database.GetDb().Model(&r).Updates(&r)
 
 	}
 
-	return response.Resp().Json(gin.H{"data": r})
+	return response.Resp().Json(gin.H{"data": r, "msg": "测试消息", "code": 1})
 
 }
 
