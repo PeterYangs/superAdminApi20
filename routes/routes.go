@@ -12,6 +12,7 @@ const (
 	POST   int = 0x000001
 	PUT    int = 0x000002
 	DELETE int = 0x000003
+	ANY    int = 0x000004
 )
 
 type router struct {
@@ -135,6 +136,10 @@ func (h *handler) Bind() {
 	case DELETE:
 
 		h.engine.DELETE(h.url, temp...)
+
+	case ANY:
+
+		h.engine.Any(h.url, temp...)
 	}
 
 }

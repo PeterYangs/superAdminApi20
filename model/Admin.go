@@ -6,12 +6,14 @@ import (
 )
 
 type Admin struct {
-	Id        uint
+	Id        uint           `json:"id"`
 	CreatedAt types.Time     `json:"created_at"`
 	UpdatedAt types.Time     `json:"updated_at"`
 	Username  string         `json:"username" form:"username"`
-	Password  string         `json:"password" form:"password" `
+	Password  string         `json:"-" form:"password" `
 	Email     string         `json:"email" form:"email" `
-	Status    int            `json:"status" form:"status"`
+	Status    int            `json:"status" form:"status" gorm:"default:1"`
 	DeletedAt gorm.DeletedAt `json:"deleted_at"`
+	//RoleId    int            `json:"role_id"`
+	Role []Role `json:"role" gorm:"many2many:role_detail"`
 }
