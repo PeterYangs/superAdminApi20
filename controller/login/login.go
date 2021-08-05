@@ -7,7 +7,6 @@ import (
 	"gin-web/model"
 	"gin-web/response"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm/clause"
 )
 
 func Login(c *contextPlus.Context) *response.Response {
@@ -20,7 +19,7 @@ func Login(c *contextPlus.Context) *response.Response {
 
 	var form Form
 
-	err := c.ShouldBind(&form)
+	err := c.ShouldBindPlus(&form)
 
 	if err != nil {
 
@@ -54,7 +53,7 @@ func Registered(c *contextPlus.Context) *response.Response {
 		Password   string `json:"password" form:"password" `
 		RePassword string `form:"repassword"`
 		Email      string `json:"email" form:"email" binding:"required"`
-		RoleId     int    `json:"role_id" form:"role_id" binding:"required"`
+		RoleId     int    `json:"role_id" form:"role_id"`
 		Id         int    `json:"id" form:"id"`
 	}
 
@@ -68,7 +67,14 @@ func Registered(c *contextPlus.Context) *response.Response {
 
 	}
 
+	//新增
 	if form.Id == 0 {
+
+		if form.Password == "" {
+
+			return response.Resp().Json(gin.H{"code": 2, "msg": "密码不能为空"})
+
+		}
 
 		if form.Password != form.RePassword {
 
@@ -85,7 +91,7 @@ func Registered(c *contextPlus.Context) *response.Response {
 
 	} else {
 
-		if form.Password != "" && form.Password != form.RePassword {
+		if form.Password != form.RePassword {
 
 			return response.Resp().Json(gin.H{"code": 2, "msg": "两次密码不一致"})
 		}
@@ -98,6 +104,7 @@ func Registered(c *contextPlus.Context) *response.Response {
 		Username: form.Username,
 		Password: common.HmacSha256(form.Password),
 		Email:    form.Email,
+		Id:       uint(form.Id),
 	}
 
 	updateColumns := []string{"username", "email"}
@@ -107,28 +114,32 @@ func Registered(c *contextPlus.Context) *response.Response {
 		updateColumns = append(updateColumns, "password")
 	}
 
-	re := tx.Clauses(clause.OnConflict{
-		Columns:   []clause.Column{{Name: "id"}},
-		DoUpdates: clause.AssignmentColumns(updateColumns),
-	}).Create(&admin)
+	var omits []string
 
-	if re.Error != nil {
+	//密码为空则忽略字段更新
+	if form.Password == "" {
 
-		tx.Rollback()
-
-		return response.Resp().Api(2, re.Error.Error(), "")
+		omits = append(omits, "password")
 	}
 
-	re = tx.Clauses(clause.OnConflict{
-		Columns:   []clause.Column{{Name: "admin_id"}},
-		DoUpdates: clause.AssignmentColumns([]string{"role_id"}),
-	}).Create(&model.RoleDetail{AdminId: int(admin.Id), RoleId: form.RoleId})
+	err = common.UpdateOrCreateOne(tx, &model.Admin{}, map[string]interface{}{"id": admin.Id}, &admin, omits...)
 
-	if re.Error != nil {
+	if err != nil {
 
 		tx.Rollback()
 
-		return response.Resp().Api(2, re.Error.Error(), "")
+		return response.Resp().Api(2, err.Error(), "")
+	}
+
+	//fmt.Println(form.RoleId)
+
+	err = common.UpdateOrCreateOne(tx, &model.RoleDetail{}, map[string]interface{}{"admin_id": admin.Id}, &model.RoleDetail{AdminId: int(admin.Id), RoleId: form.RoleId})
+
+	if err != nil {
+
+		tx.Rollback()
+
+		return response.Resp().Api(2, err.Error(), "")
 	}
 
 	tx.Commit()

@@ -15,5 +15,5 @@ type Admin struct {
 	Status    int            `json:"status" form:"status" gorm:"default:1"`
 	DeletedAt gorm.DeletedAt `json:"deleted_at"`
 	//RoleId    int            `json:"role_id"`
-	Role []Role `json:"role" gorm:"many2many:role_detail"`
+	RoleDetail RoleDetail `json:"role_detail" gorm:"foreignKey:admin_id"`
 }

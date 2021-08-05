@@ -178,9 +178,11 @@ func (f *field) Default(value interface{}) *field {
 	return f
 }
 
-func (f *field) Comment(comment string) {
+func (f *field) Comment(comment string) *field {
 
 	f.comment = comment
+
+	return f
 
 }
 
@@ -249,8 +251,6 @@ func run(m *Migrate) {
 
 		if t.Error != nil {
 
-			//fmt.Println(t.Error)
-			//
 			fmt.Println(sql)
 
 			transaction.E = t.Error
@@ -269,7 +269,7 @@ func run(m *Migrate) {
 
 		sql := "alter table `" + m.Table + "` "
 
-		for _, f := range m.fields {
+		for i, f := range m.fields {
 
 			switch f.tag {
 
@@ -283,15 +283,14 @@ func run(m *Migrate) {
 
 			}
 
-			sql += ","
+			if i+1 < len(m.fields) {
+
+				sql += ","
+			}
 
 		}
 
-		sql = tools.SubStr(sql, 0, len(sql)-1)
-
 		t := database.GetDb().Exec(sql)
-
-		//fmt.Println(t.Error)
 
 		if t.Error != nil {
 

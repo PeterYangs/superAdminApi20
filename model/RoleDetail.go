@@ -5,4 +5,5 @@ type RoleDetail struct {
 	Id      uint `json:"id"`
 	AdminId int  `json:"admin_id"`
 	RoleId  int  `json:"role_id"`
+	Role    Role `json:"role"`
 }

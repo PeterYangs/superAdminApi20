@@ -6,6 +6,8 @@ import (
 	"gin-web/controller/login"
 	role2 "gin-web/controller/role"
 	rule2 "gin-web/controller/rule"
+	"gin-web/middleware/authCheck"
+	"gin-web/middleware/loginCheck"
 	"gin-web/middleware/loginLimiter"
 )
 
@@ -13,7 +15,7 @@ func _init(_r group) {
 
 	_r.Group("/login", func(g group) {
 
-		g.Registered(ANY, "/login", login.Login, loginLimiter.LoginLimiter).Bind()
+		g.Registered(POST, "/login", login.Login, loginLimiter.LoginLimiter).Bind()
 
 		//g.Registered(ANY, "/registered", login.Registered).Bind()
 		g.Registered(ANY, "/logout", login.Logout).Bind()
@@ -50,7 +52,7 @@ func _init(_r group) {
 
 		})
 
-	})
+	}, loginCheck.LoginCheck, authCheck.AuthCheck)
 
 	_r.Group("/captcha", func(g group) {
 

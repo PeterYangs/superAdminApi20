@@ -23,7 +23,7 @@ func List(c *contextPlus.Context) *response.Response {
 
 	roles := make([]*model.Admin, 0)
 
-	tx := database.GetDb().Model(&model.Admin{})
+	tx := database.GetDb().Model(&model.Admin{}).Order("id desc").Preload("RoleDetail.Role")
 
 	data := common.Paginate(tx, &roles, cast.ToInt(c.DefaultQuery("p", "1")), 10)
 
@@ -49,7 +49,7 @@ func Detail(c *contextPlus.Context) *response.Response {
 
 	var r model.Admin
 
-	database.GetDb().Where("id = ?", form.Id).Preload("Role").First(&r)
+	database.GetDb().Where("id = ?", form.Id).Preload("RoleDetail").First(&r)
 
 	//var role model.RoleDetail
 	//
@@ -57,6 +57,16 @@ func Detail(c *contextPlus.Context) *response.Response {
 
 	//r.RoleId= role.RoleId
 
-	return response.Resp().Json(gin.H{"data": r})
+	type res struct {
+		model.Admin
+		RoleId int `json:"role_id"`
+	}
+
+	rr := res{
+		Admin:  r,
+		RoleId: r.RoleDetail.RoleId,
+	}
+
+	return response.Resp().Json(gin.H{"data": rr})
 
 }
