@@ -32,6 +32,7 @@ type handler struct {
 	url         string
 	method      int
 	regex       map[string]string //路由正则表达式
+	Tag         string            //函数标记
 }
 
 func newRouter(engine *gin.Engine) *router {
@@ -84,6 +85,13 @@ func (h *handler) Regex(reg map[string]string) *handler {
 	return h
 }
 
+func (h *handler) SetTag(tag string) *handler {
+
+	h.Tag = tag
+
+	return h
+}
+
 func (h *handler) Bind() {
 
 	ff := func(c *contextPlus.Context) {
@@ -112,6 +120,7 @@ func (h *handler) Bind() {
 					Url:         h.url,
 					Method:      h.method,
 					Regex:       h.regex,
+					Tag:         h.Tag,
 				},
 			})
 

@@ -70,3 +70,10 @@ func Detail(c *contextPlus.Context) *response.Response {
 	return response.Resp().Json(gin.H{"data": rr})
 
 }
+
+func Info(c *contextPlus.Context) *response.Response {
+
+	admin, _ := c.Session().Get("admin")
+
+	return response.Resp().Api(1, "success", admin)
+}

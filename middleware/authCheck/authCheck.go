@@ -10,6 +10,14 @@ import (
 
 func AuthCheck(c *contextPlus.Context) {
 
+	//fmt.Println(c.Handler.Tag,"----------")
+
+	//跳过权限检查
+	if c.Handler.Tag == "skip_auth" {
+
+		return
+	}
+
 	admin_, err := c.Session().Get("admin")
 
 	if err != nil {
@@ -44,7 +52,7 @@ func AuthCheck(c *contextPlus.Context) {
 		str = append(str, cast.ToString(rule))
 	}
 
-	database.GetDb().Debug().Model(&model.Rule{}).Where("id in ? ", str).Find(&rules)
+	database.GetDb().Model(&model.Rule{}).Where("id in ? ", str).Find(&rules)
 
 	url := c.FullPath()
 

@@ -31,6 +31,7 @@ type Handler struct {
 	Url    string
 	Method int
 	Regex  map[string]string //路由正则表达式
+	Tag    string            //函数标记
 }
 
 type HandlerFunc func(*Context)

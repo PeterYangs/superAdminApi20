@@ -35,7 +35,7 @@ func _init(_r group) {
 
 		admin.Group("/role", func(role group) {
 
-			role.Registered(GET, "/GetRuleList", role2.GetRuleList).Bind()
+			role.Registered(GET, "/GetRuleList", role2.GetRuleList).SetTag("skip_auth").Bind()
 			role.Registered(POST, "/update", role2.Update).Bind()
 			role.Registered(GET, "/list", role2.List).Bind()
 			role.Registered(GET, "/detail/:id", role2.Detail).Bind()
@@ -49,6 +49,7 @@ func _init(_r group) {
 			admins.Registered(POST, "/registered", login.Registered).Bind()
 			admins.Registered(POST, "/list", admin2.List).Bind()
 			admins.Registered(POST, "/detail/:id", admin2.Detail).Bind()
+			admins.Registered(GET, "/info", admin2.Info).SetTag("skip_auth").Bind()
 
 		})
 
