@@ -6,7 +6,7 @@ import (
 )
 
 type Admin struct {
-	Id        uint           `json:"id"`
+	Id        uint           `json:"id" fillable:"Username,Password,Email,Status"`
 	CreatedAt types.Time     `json:"created_at"`
 	UpdatedAt types.Time     `json:"updated_at"`
 	Username  string         `json:"username" form:"username"`

@@ -4,7 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
+	"github.com/PeterYangs/tools"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"os"
@@ -33,6 +33,9 @@ func Paginate(tx *gorm.DB, dest interface{}, page int, size int) gin.H {
 }
 
 // UpdateOrCreateOne 更新或修改
+/**
+Omits 是忽略的字段
+*/
 func UpdateOrCreateOne(tx *gorm.DB, model interface{}, where map[string]interface{}, modelData interface{}, Omits ...string) error {
 
 	tt := tx.Model(model)
@@ -56,9 +59,7 @@ func UpdateOrCreateOne(tx *gorm.DB, model interface{}, where map[string]interfac
 
 	if re.Error == nil {
 
-		//fmt.Println("更新")
-
-		fmt.Println(id)
+		//fmt.Println(id)
 
 		up := tx.Model(model).Where("id=?", id)
 
@@ -68,11 +69,24 @@ func UpdateOrCreateOne(tx *gorm.DB, model interface{}, where map[string]interfac
 
 		}
 
-		//fmt.Println(modelData)
+		s := reflect.TypeOf(modelData).Elem()
+
+		ss, b := s.FieldByName("Id")
+
+		if b {
+
+			fillable := ss.Tag.Get("fillable")
+
+			if fillable != "" {
+
+				f := tools.Explode(",", fillable)
+
+				up = up.Select(f)
+			}
+
+		}
 
 		up.Updates(modelData)
-
-		//fmt.Println(rrr.Error)
 
 		return nil
 	}
