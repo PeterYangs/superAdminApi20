@@ -50,6 +50,7 @@ func _init(_r group) {
 			admins.Registered(POST, "/list", admin2.List).Bind()
 			admins.Registered(POST, "/detail/:id", admin2.Detail).Bind()
 			admins.Registered(GET, "/info", admin2.Info).SetTag("skip_auth").Bind()
+			admins.Registered(GET, "/SearchRule", admin2.SearchRule).SetTag("skip_auth").Bind()
 
 		})
 

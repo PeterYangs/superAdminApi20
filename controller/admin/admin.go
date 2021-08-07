@@ -77,3 +77,27 @@ func Info(c *contextPlus.Context) *response.Response {
 
 	return response.Resp().Api(1, "success", admin)
 }
+
+func SearchRule(c *contextPlus.Context) *response.Response {
+
+	type Form struct {
+		Keyword string `json:"keyword" form:"keyword" regex:"/admin.*"`
+	}
+
+	var form Form
+
+	err := c.ShouldBindPlus(&form)
+
+	if err != nil {
+
+		return response.Resp().Api(1, "规则不匹配", []string{})
+
+	}
+
+	var rules = make([]*model.Rule, 0)
+
+	database.GetDb().Model(model.Rule{}).Where("rule like ?", "%"+form.Keyword+"%").Limit(10).Find(&rules)
+
+	return response.Resp().Api(1, "success", rules)
+
+}

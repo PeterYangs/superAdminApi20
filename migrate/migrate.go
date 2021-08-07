@@ -267,6 +267,8 @@ func run(m *Migrate) {
 
 	if m.Tag == UPDATE {
 
+		fmt.Println("hi you")
+
 		sql := "alter table `" + m.Table + "` "
 
 		for i, f := range m.fields {
@@ -289,6 +291,25 @@ func run(m *Migrate) {
 			}
 
 		}
+
+		//索引添加
+		for i, strings := range m.unique {
+
+			if len(m.fields) > 0 {
+
+				sql += ","
+			}
+
+			sql += " add UNIQUE  `" + tools.Join("+", strings) + "` (`" + tools.Join("`,`", strings) + "`)" + " USING BTREE"
+
+			if i+1 < len(m.unique) {
+
+				sql += ","
+			}
+
+		}
+
+		fmt.Println(sql)
 
 		t := database.GetDb().Exec(sql)
 
