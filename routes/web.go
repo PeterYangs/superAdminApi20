@@ -4,6 +4,7 @@ import (
 	admin2 "gin-web/controller/admin"
 	"gin-web/controller/captcha"
 	"gin-web/controller/login"
+	menu2 "gin-web/controller/menu"
 	role2 "gin-web/controller/role"
 	rule2 "gin-web/controller/rule"
 	"gin-web/middleware/authCheck"
@@ -51,6 +52,15 @@ func _init(_r group) {
 			admins.Registered(POST, "/detail/:id", admin2.Detail).Bind()
 			admins.Registered(GET, "/info", admin2.Info).SetTag("skip_auth").Bind()
 			admins.Registered(GET, "/SearchRule", admin2.SearchRule).SetTag("skip_auth").Bind()
+
+		})
+
+		admin.Group("/menu", func(menu group) {
+
+			menu.Registered(GET, "/getFatherMenu", menu2.GetFatherMenu).Bind()
+			menu.Registered(POST, "/update", menu2.Update).Bind()
+			menu.Registered(POST, "/list", menu2.List).Bind()
+			menu.Registered(GET, "/detail/:id", menu2.Detail).Bind()
 
 		})
 
