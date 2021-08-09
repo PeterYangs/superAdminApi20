@@ -89,7 +89,7 @@ func Detail(c *contextPlus.Context) *response.Response {
 
 	if err != nil {
 
-		return response.Resp().Json(gin.H{"code": 2, "mgs": err.Error()})
+		return response.Resp().Json(gin.H{"code": 2, "msg": err.Error()})
 
 	}
 
@@ -97,7 +97,7 @@ func Detail(c *contextPlus.Context) *response.Response {
 
 	database.GetDb().Where("id = ?", form.Id).First(&r)
 
-	return response.Resp().Json(gin.H{"data": r})
+	return response.Resp().Json(gin.H{"data": r, "code": 1})
 
 }
 
@@ -113,7 +113,7 @@ func Destroy(c *contextPlus.Context) *response.Response {
 
 	if err != nil {
 
-		return response.Resp().Json(gin.H{"code": 2, "mgs": err.Error()})
+		return response.Resp().Json(gin.H{"code": 2, "msg": err.Error()})
 
 	}
 

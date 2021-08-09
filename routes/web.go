@@ -19,7 +19,7 @@ func _init(_r group) {
 		g.Registered(POST, "/login", login.Login, loginLimiter.LoginLimiter).Bind()
 
 		//g.Registered(ANY, "/registered", login.Registered).Bind()
-		g.Registered(ANY, "/logout", login.Logout).Bind()
+		g.Registered(GET, "/logout", login.Logout).Bind()
 
 	})
 

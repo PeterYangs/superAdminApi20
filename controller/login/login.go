@@ -23,13 +23,13 @@ func Login(c *contextPlus.Context) *response.Response {
 
 	if err != nil {
 
-		return response.Resp().Json(gin.H{"code": 2, "mgs": err.Error()})
+		return response.Resp().Json(gin.H{"code": 2, "msg": err.Error()})
 
 	}
 
 	if !c.CheckCaptcha(form.Captcha) {
 
-		return response.Resp().Json(gin.H{"code": 2, "mgs": "验证码错误"})
+		return response.Resp().Json(gin.H{"code": 2, "msg": "验证码错误"})
 	}
 
 	var admin model.Admin
@@ -38,12 +38,12 @@ func Login(c *contextPlus.Context) *response.Response {
 
 	if re.Error != nil {
 
-		return response.Resp().Json(gin.H{"code": 2, "mgs": "密码错误"})
+		return response.Resp().Json(gin.H{"code": 2, "msg": "密码错误"})
 	}
 
 	c.Session().Set("admin", admin)
 
-	return response.Resp().Json(gin.H{"code": 1, "mgs": "success"})
+	return response.Resp().Json(gin.H{"code": 1, "msg": "success"})
 }
 
 func Registered(c *contextPlus.Context) *response.Response {
@@ -144,7 +144,7 @@ func Registered(c *contextPlus.Context) *response.Response {
 
 	tx.Commit()
 
-	return response.Resp().Json(gin.H{"code": 1, "mgs": "success"})
+	return response.Resp().Json(gin.H{"code": 1, "msg": "success"})
 
 }
 
@@ -152,5 +152,5 @@ func Logout(c *contextPlus.Context) *response.Response {
 
 	c.Session().Remove("admin")
 
-	return response.Resp().Json(gin.H{"code": 1, "mgs": "success"})
+	return response.Resp().Json(gin.H{"code": 1, "msg": "success"})
 }

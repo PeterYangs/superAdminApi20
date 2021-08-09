@@ -59,9 +59,9 @@ func StartSession(c *contextPlus.Context) {
 	//不存在就设置session值
 	u := uuid.NewV4().String() + "-" + tools.Md5(os.Getenv("APP_NAME"))
 
-	life, _ := strconv.Atoi(os.Getenv("SESSION_LIFETIME"))
+	//life, _ := strconv.Atoi(os.Getenv("SESSION_LIFETIME"))
 
-	c.SetCookie(conf.Get("cookie_name").(string), u, life, "/", c.Domain(), false, true)
+	c.SetCookie(conf.Get("cookie_name").(string), u, 3600*24*12, "/", c.Domain(), false, true)
 
 	session := contextPlus.Session{
 		Cookie:      u,

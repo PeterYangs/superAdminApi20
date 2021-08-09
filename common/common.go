@@ -7,6 +7,10 @@ import (
 	"github.com/PeterYangs/tools"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"math/big"
+
+	"crypto/rand"
+	//"math/rand"
 	"os"
 	"reflect"
 )
@@ -93,4 +97,15 @@ func UpdateOrCreateOne(tx *gorm.DB, model interface{}, where map[string]interfac
 
 	return re.Error
 
+}
+
+func MtRand(min, max int64) int64 {
+
+	//rand.Seed(time.Now().UnixNano())
+
+	//return rand.Intn(max-min+1) + min
+
+	n, _ := rand.Int(rand.Reader, big.NewInt(max-min+1))
+
+	return n.Int64() + min
 }

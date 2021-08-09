@@ -43,7 +43,7 @@ func Detail(c *contextPlus.Context) *response.Response {
 
 	if err != nil {
 
-		return response.Resp().Json(gin.H{"code": 2, "mgs": err.Error()})
+		return response.Resp().Json(gin.H{"code": 2, "msg": err.Error()})
 
 	}
 
@@ -67,7 +67,7 @@ func Detail(c *contextPlus.Context) *response.Response {
 		RoleId: r.RoleDetail.RoleId,
 	}
 
-	return response.Resp().Json(gin.H{"data": rr})
+	return response.Resp().Json(gin.H{"data": rr, "code": 1})
 
 }
 
