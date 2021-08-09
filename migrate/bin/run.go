@@ -1,4 +1,4 @@
-package main
+package bin
 
 import (
 	"fmt"
@@ -13,6 +13,9 @@ import (
 	"time"
 )
 
+type MigrateRun struct {
+}
+
 func init() {
 
 	//加载配置文件
@@ -23,11 +26,7 @@ func init() {
 
 }
 
-func main() {
-
-	//Down()
-	//
-	//return
+func (m MigrateRun) Run() {
 
 	prompt := promptui.Select{
 		Label: "选择类型",
