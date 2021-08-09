@@ -3,10 +3,12 @@ package routes
 import (
 	admin2 "gin-web/controller/admin"
 	"gin-web/controller/captcha"
+	category2 "gin-web/controller/category"
 	"gin-web/controller/login"
 	menu2 "gin-web/controller/menu"
 	role2 "gin-web/controller/role"
 	rule2 "gin-web/controller/rule"
+	upload2 "gin-web/controller/upload"
 	"gin-web/middleware/authCheck"
 	"gin-web/middleware/loginCheck"
 	"gin-web/middleware/loginLimiter"
@@ -18,7 +20,6 @@ func _init(_r group) {
 
 		g.Registered(POST, "/login", login.Login, loginLimiter.LoginLimiter).Bind()
 
-		//g.Registered(ANY, "/registered", login.Registered).Bind()
 		g.Registered(GET, "/logout", login.Logout).Bind()
 
 	})
@@ -62,6 +63,17 @@ func _init(_r group) {
 			menu.Registered(POST, "/list", menu2.List).Bind()
 			menu.Registered(GET, "/detail/:id", menu2.Detail).Bind()
 
+		})
+
+		admin.Group("/category", func(category group) {
+
+			category.Registered(GET, "/list", category2.List).Bind()
+
+		})
+
+		admin.Group("/upload", func(upload group) {
+
+			upload.Registered(POST, "/upload", upload2.Upload).Bind()
 		})
 
 	}, loginCheck.LoginCheck, authCheck.AuthCheck)
