@@ -267,7 +267,7 @@ func run(m *Migrate) {
 
 	if m.Tag == UPDATE {
 
-		fmt.Println("hi you")
+		//fmt.Println("hi you")
 
 		sql := "alter table `" + m.Table + "` "
 
@@ -309,7 +309,7 @@ func run(m *Migrate) {
 
 		}
 
-		fmt.Println(sql)
+		//fmt.Println(sql)
 
 		t := database.GetDb().Exec(sql)
 

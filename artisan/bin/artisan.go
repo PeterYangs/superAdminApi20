@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"gin-web/migrate/bin"
+	"gin-web/migrate"
 	bin2 "gin-web/seeds/bin"
 	"github.com/manifoldco/promptui"
 )
@@ -25,7 +25,7 @@ func main() {
 
 	case "数据库迁移":
 
-		new(bin.MigrateRun).Run()
+		new(migrate.MigrateRun).Run()
 
 	case "数据填充":
 
