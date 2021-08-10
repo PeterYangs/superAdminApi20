@@ -55,7 +55,12 @@ func UpdateOrCreateOne(tx *gorm.DB, model interface{}, where map[string]interfac
 
 	if re.Error == gorm.ErrRecordNotFound {
 
-		tx.Model(model).Create(modelData)
+		cRe := tx.Model(model).Create(modelData)
+
+		if cRe.Error != nil {
+
+			return cRe.Error
+		}
 
 		return nil
 
@@ -90,7 +95,12 @@ func UpdateOrCreateOne(tx *gorm.DB, model interface{}, where map[string]interfac
 
 		}
 
-		up.Updates(modelData)
+		uRe := up.Updates(modelData)
+
+		if uRe.Error != nil {
+
+			return uRe.Error
+		}
 
 		return nil
 	}

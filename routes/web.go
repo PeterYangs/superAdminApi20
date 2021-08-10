@@ -68,6 +68,7 @@ func _init(_r group) {
 		admin.Group("/category", func(category group) {
 
 			category.Registered(GET, "/list", category2.List).Bind()
+			category.Registered(POST, "/update", category2.Update).Bind()
 
 		})
 

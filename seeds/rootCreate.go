@@ -5,6 +5,7 @@ import (
 	"gin-web/common"
 	"gin-web/database"
 	"gin-web/model"
+	"github.com/PeterYangs/tools"
 	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 )
@@ -64,7 +65,7 @@ func createPassword(length int) string {
 
 	for i := 0; i < length; i++ {
 
-		password += c[common.MtRand(0, int64(len(c)-1))]
+		password += c[tools.MtRand(0, int64(len(c)-1))]
 	}
 
 	return password

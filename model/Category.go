@@ -10,3 +10,11 @@ type Category struct {
 	Sort  int    `json:"sort"`
 	Path  string `json:"path"`
 }
+
+//func (c *Category)BeforeCreate(tx *gorm.DB) (err error) {
+//
+//
+//
+//
+//	return
+//}

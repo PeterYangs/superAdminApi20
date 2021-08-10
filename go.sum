@@ -2,6 +2,8 @@ github.com/PeterYangs/gcmd v0.0.4 h1:gWxSUo/YDa0KPGPhULUz4WxI96tIhpfm4mzKZiuWypQ
 github.com/PeterYangs/gcmd v0.0.4/go.mod h1:1sV+E1MiAfWAO7Ar1ukC4RO/V/9KBbEvOtFqhxgzftA=
 github.com/PeterYangs/tools v0.2.31 h1:ARNiojuX+Ypc1rS12wrCgFSAylbBOXGLL8RTPtrhjJc=
 github.com/PeterYangs/tools v0.2.31/go.mod h1:VMrlLNpXOuQBkHmZjH7HPMUFMd9JyvT/amjxICvlOfQ=
+github.com/PeterYangs/tools v0.2.32 h1:pDe4CHOuIhCOzTreLF0JBt5qmpFBEYsjmjBrAU29y+M=
+github.com/PeterYangs/tools v0.2.32/go.mod h1:VMrlLNpXOuQBkHmZjH7HPMUFMd9JyvT/amjxICvlOfQ=
 github.com/axgle/mahonia v0.0.0-20180208002826-3358181d7394 h1:OYA+5W64v3OgClL+IrOD63t4i/RW7RqrAVl9LTZ9UqQ=
 github.com/axgle/mahonia v0.0.0-20180208002826-3358181d7394/go.mod h1:Q8n74mJTIgjX4RBBcHnJ05h//6/k6foqmgE45jTQtxg=
 github.com/cespare/xxhash/v2 v2.1.1 h1:6MnRN8NT7+YBpUIWxHtefFZOKTAPgGjpQSxqLNn0+qY=
