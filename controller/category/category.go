@@ -1,7 +1,6 @@
 package category
 
 import (
-	"fmt"
 	"gin-web/common"
 	"gin-web/contextPlus"
 	"gin-web/database"
@@ -85,7 +84,7 @@ func Update(c *contextPlus.Context) *response.Response {
 		return response.Resp().Api(2, err.Error(), "")
 	}
 
-	fmt.Println(category.Base.CreatedAt)
+	//fmt.Println(category.Base.CreatedAt)
 
 	//if category.Id == 0 {
 
@@ -93,7 +92,9 @@ func Update(c *contextPlus.Context) *response.Response {
 
 		category.Path = cast.ToString(category.Id)
 
-		database.GetDb().Omit("CreatedAt").Save(&category)
+		//database.GetDb().Omit("CreatedAt").Save(&category)
+
+		database.GetDb().Updates(&category)
 
 	} else {
 
