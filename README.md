@@ -178,7 +178,7 @@ func Up() {
 		createMigrate.String("title", 255).Default("").Comment("标题")
 
 		//text
-		createMigrate.Text("content").Comment("内容")
+		createMigrate.Text("content").Default(migrate.Null).Comment("内容")
 
 		//索引
 		createMigrate.Unique("user_id", "title")
