@@ -6,6 +6,7 @@ import (
 	"gin-web/database"
 	"gin-web/model"
 	"gin-web/response"
+	"gin-web/routes/allUrl"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 )
@@ -88,11 +89,15 @@ func SearchRule(c *contextPlus.Context) *response.Response {
 
 	}
 
-	var rules = make([]*model.Rule, 0)
+	//var rules = make([]*model.Rule, 0)
+	//
+	//database.GetDb().Model(model.Rule{}).Where("rule like ?", "%"+form.Keyword+"%").Limit(10).Find(&rules)
 
-	database.GetDb().Model(model.Rule{}).Where("rule like ?", "%"+form.Keyword+"%").Limit(10).Find(&rules)
+	all := allUrl.NewAllUrl()
 
-	return response.Resp().Api(1, "success", rules)
+	list := all.Search(form.Keyword)
+
+	return response.Resp().Api(1, "success", list)
 
 }
 

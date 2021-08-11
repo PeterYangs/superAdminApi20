@@ -4,6 +4,7 @@ import (
 	"gin-web/contextPlus"
 	"gin-web/kernel"
 	"gin-web/response"
+	"gin-web/routes/allUrl"
 	"github.com/gin-gonic/gin"
 )
 
@@ -102,6 +103,7 @@ func (h *handler) Bind() {
 
 	}
 
+	//控制器放最前面
 	h.middlewares = append(h.middlewares, ff)
 
 	var temp = make([]gin.HandlerFunc, len(h.middlewares))
@@ -127,6 +129,10 @@ func (h *handler) Bind() {
 		}
 
 	}
+
+	all := allUrl.NewAllUrl()
+
+	all.Add(h.url)
 
 	switch h.method {
 
