@@ -6,6 +6,7 @@ import (
 	"gin-web/database"
 	"gin-web/model"
 	"gin-web/response"
+	regexp "github.com/dlclark/regexp2"
 	"github.com/gin-gonic/gin"
 )
 
@@ -99,6 +100,19 @@ func Registered(c *contextPlus.Context) *response.Response {
 
 	}
 
+	if form.Password != "" {
+
+		reg := regexp.MustCompile(`^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,100}$`, 0)
+
+		ok, _ := reg.MatchString(form.Password)
+
+		if !ok {
+
+			return response.Resp().Api(2, "密码必须由数字和大小写字母组成", "")
+		}
+
+	}
+
 	tx := database.GetDb().Begin()
 
 	admin := model.Admin{
@@ -107,13 +121,6 @@ func Registered(c *contextPlus.Context) *response.Response {
 		Email:    form.Email,
 		Id:       uint(form.Id),
 	}
-
-	//updateColumns := []string{"username", "email"}
-	//
-	//if form.Password != "" {
-	//
-	//	updateColumns = append(updateColumns, "password")
-	//}
 
 	var omits []string
 
@@ -137,8 +144,6 @@ func Registered(c *contextPlus.Context) *response.Response {
 
 		return response.Resp().Api(2, err.Error(), "")
 	}
-
-	//fmt.Println(form.RoleId)
 
 	err = common.UpdateOrCreateOne(tx, &model.RoleDetail{}, map[string]interface{}{"admin_id": admin.Id}, &model.RoleDetail{AdminId: int(admin.Id), RoleId: form.RoleId})
 
