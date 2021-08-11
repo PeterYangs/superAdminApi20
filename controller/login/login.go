@@ -46,6 +46,7 @@ func Login(c *contextPlus.Context) *response.Response {
 	return response.Resp().Json(gin.H{"code": 1, "msg": "success"})
 }
 
+// Registered 后台管理员添加
 func Registered(c *contextPlus.Context) *response.Response {
 
 	type Validator struct {
@@ -107,12 +108,12 @@ func Registered(c *contextPlus.Context) *response.Response {
 		Id:       uint(form.Id),
 	}
 
-	updateColumns := []string{"username", "email"}
-
-	if form.Password != "" {
-
-		updateColumns = append(updateColumns, "password")
-	}
+	//updateColumns := []string{"username", "email"}
+	//
+	//if form.Password != "" {
+	//
+	//	updateColumns = append(updateColumns, "password")
+	//}
 
 	var omits []string
 
@@ -120,6 +121,12 @@ func Registered(c *contextPlus.Context) *response.Response {
 	if form.Password == "" {
 
 		omits = append(omits, "password")
+	}
+
+	//不能更新用户名
+	if form.Id != 0 {
+
+		omits = append(omits, "username")
 	}
 
 	err = common.UpdateOrCreateOne(tx, &model.Admin{}, map[string]interface{}{"id": admin.Id}, &admin, omits...)

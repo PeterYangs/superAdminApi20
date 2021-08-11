@@ -20,7 +20,7 @@ func _init(_r group) {
 
 		g.Registered(POST, "/login", login.Login, loginLimiter.LoginLimiter).Bind()
 
-		g.Registered(GET, "/logout", login.Logout).Bind()
+		g.Registered(POST, "/logout", login.Logout).Bind()
 
 	})
 
@@ -53,6 +53,7 @@ func _init(_r group) {
 			admins.Registered(POST, "/detail/:id", admin2.Detail).Bind()
 			admins.Registered(GET, "/info", admin2.Info).SetTag("skip_auth").Bind()
 			admins.Registered(GET, "/SearchRule", admin2.SearchRule).SetTag("skip_auth").Bind()
+			admins.Registered(POST, "/destroy/:id", admin2.Destroy).Bind()
 
 		})
 

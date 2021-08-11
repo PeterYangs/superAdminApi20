@@ -51,12 +51,6 @@ func Detail(c *contextPlus.Context) *response.Response {
 
 	database.GetDb().Where("id = ?", form.Id).Preload("RoleDetail").First(&r)
 
-	//var role model.RoleDetail
-	//
-	//database.GetDb().Where("admin_id=?",r.Id).First(&role)
-
-	//r.RoleId= role.RoleId
-
 	type res struct {
 		model.Admin
 		RoleId int `json:"role_id"`
@@ -99,5 +93,27 @@ func SearchRule(c *contextPlus.Context) *response.Response {
 	database.GetDb().Model(model.Rule{}).Where("rule like ?", "%"+form.Keyword+"%").Limit(10).Find(&rules)
 
 	return response.Resp().Api(1, "success", rules)
+
+}
+
+func Destroy(c *contextPlus.Context) *response.Response {
+
+	type Form struct {
+		Id int `json:"id" uri:"id"`
+	}
+
+	var form Form
+
+	err := c.ShouldBindPlus(&form)
+
+	if err != nil {
+
+		return response.Resp().Json(gin.H{"code": 2, "msg": err.Error()})
+
+	}
+
+	database.GetDb().Delete(&model.Admin{}, form.Id)
+
+	return response.Resp().Api(1, "success", "")
 
 }
