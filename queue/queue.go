@@ -7,13 +7,28 @@ import (
 	"gin-web/component/logs"
 	"gin-web/interface/task"
 	"gin-web/redis"
+	"gin-web/task/email"
+	"gin-web/task/sms"
 	"github.com/spf13/cast"
 	"log"
 	"runtime/debug"
 	"sync"
+	"time"
 )
 
 var handles = sync.Map{}
+
+type job struct {
+	delay time.Duration //延迟
+	data  []byte
+}
+
+func init() {
+
+	handles.Store("email", &email.TaskEmail{Parameters: &email.Parameter{}})
+	handles.Store("sms", &sms.TaskSms{Parameters: &sms.Parameter{}})
+
+}
 
 func Run() {
 
@@ -46,8 +61,6 @@ func Run() {
 
 		var jsons map[string]interface{}
 
-		//fmt.Println(s[1])
-
 		err = json.Unmarshal([]byte(s[1]), &jsons)
 
 		if err != nil {
@@ -77,14 +90,30 @@ func Run() {
 
 	}
 
+	//eval
 }
 
-func Dispatch(task task.Task) {
-
-	handles.Store(task.GetName(), task)
+func Dispatch(task task.Task) *job {
 
 	t, _ := json.Marshal(task)
 
-	redis.GetClient().LPush(context.TODO(), "queue:default", t)
+	return &job{
+		data:  t,
+		delay: 0,
+	}
 
+}
+
+func (j *job) Delay(duration time.Duration) *job {
+
+	j.delay = duration
+
+	return j
+}
+
+func (j *job) Run() {
+
+	//fmt.Println(j.delay.Seconds())
+
+	redis.GetClient().LPush(context.TODO(), "queue:default", j.data)
 }

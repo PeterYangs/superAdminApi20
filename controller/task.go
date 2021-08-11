@@ -10,7 +10,7 @@ import (
 
 func Task(c *contextPlus.Context) *response.Response {
 
-	queue.Dispatch(email.NewTask("904801074@qq.com", "title", "content"))
+	queue.Dispatch(email.NewTask("904801074@qq.com", "title", "content")).Run()
 
 	return response.Resp().Api(1, "123", "13")
 
@@ -18,7 +18,7 @@ func Task(c *contextPlus.Context) *response.Response {
 
 func Task2(c *contextPlus.Context) *response.Response {
 
-	queue.Dispatch(sms.NewTask("110", "content"))
+	queue.Dispatch(sms.NewTask("110", "content")).Run()
 
 	return response.Resp().Api(1, "123", "13")
 
