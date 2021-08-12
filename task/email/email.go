@@ -32,6 +32,7 @@ func NewTask(email string, title string, content string) *TaskEmail {
 
 func (t *TaskEmail) Run() {
 
+	//time.Sleep(200*time.Millisecond)
 	fmt.Println(t.Parameters.Email, t.Parameters.Title, t.Parameters.Content)
 
 }
@@ -42,6 +43,8 @@ func (t *TaskEmail) GetName() string {
 }
 
 func (t *TaskEmail) BindParameters(p map[string]string) {
+
+	//t.Parameters= p
 
 	s := reflect.ValueOf(t.Parameters).Elem()
 

@@ -9,8 +9,12 @@ import (
 	"gin-web/redis"
 	"gin-web/task/email"
 	"gin-web/task/sms"
+	"github.com/PeterYangs/tools"
+	redis2 "github.com/go-redis/redis/v8"
+	uuid "github.com/satori/go.uuid"
 	"github.com/spf13/cast"
 	"log"
+	"os"
 	"runtime/debug"
 	"sync"
 	"time"
@@ -19,9 +23,13 @@ import (
 var handles = sync.Map{}
 
 type job struct {
-	delay time.Duration //延迟
-	data  []byte
+	Delay_ time.Duration `json:"-"` //延迟
+	Data_  task.Task     `json:"data"`
+	Queue_ string        `json:"queue"` //队列名称
+	Id     string        `json:"id"`
 }
+
+var once sync.Once
 
 func init() {
 
@@ -46,9 +54,22 @@ func Run() {
 		}
 	}()
 
+	once.Do(func() {
+
+		go checkDelay()
+	})
+
+	queues := tools.Explode(",", os.Getenv("QUEUES"))
+
+	for i, queue := range queues {
+
+		queues[i] = os.Getenv("QUEUE_PREFIX") + queue
+	}
+
 	for {
 
-		s, err := redis.GetClient().BRPop(context.TODO(), 0, "queue:default").Result()
+		//timeout为0则为永久超时
+		s, err := redis.GetClient().BRPop(context.TODO(), 0, queues...).Result()
 
 		if err != nil {
 
@@ -70,9 +91,14 @@ func Run() {
 			continue
 		}
 
-		////获取task
-		hh, ok := handles.Load(jsons["TaskName"].(string))
+		data := jsons["data"].(map[string]interface{})
 
+		//fmt.Println(p)
+
+		////获取task
+		hh, ok := handles.Load(data["TaskName"].(string))
+		//hh, ok := handles.Load(jsons.Data_.GetName())
+		//
 		h := hh.(task.Task)
 
 		if !ok {
@@ -82,38 +108,170 @@ func Run() {
 			continue
 		}
 
-		//绑定参数
-		h.BindParameters(cast.ToStringMapString(jsons["Parameters"]))
-
-		//执行任务
+		////绑定参数
+		h.BindParameters(cast.ToStringMapString(data["Parameters"]))
+		//
+		////执行任务
 		h.Run()
 
 	}
 
-	//eval
+}
+
+func checkDelay() {
+
+	defer func() {
+		if r := recover(); r != nil {
+
+			fmt.Println(r)
+
+			fmt.Println(string(debug.Stack()))
+
+			msg := fmt.Sprint(r)
+
+			logs.NewLogs().Error(msg)
+
+		}
+	}()
+
+	for {
+
+		list, err := redis.GetClient().ZRangeByScore(context.TODO(), os.Getenv("QUEUE_PREFIX")+"delay", &redis2.ZRangeBy{
+			Min: "0",
+			Max: cast.ToString(time.Now().Unix()),
+		}).Result()
+
+		if err != nil {
+
+			fmt.Println(err)
+
+			time.Sleep(1 * time.Second)
+			continue
+		}
+
+		//fmt.Println(list)
+
+		for _, s := range list {
+
+			var jsons map[string]interface{}
+
+			err = json.Unmarshal([]byte(s), &jsons)
+
+			if err != nil {
+
+				fmt.Println(err)
+
+				continue
+			}
+
+			queue := ""
+
+			if jsons["queue"].(string) == "" {
+
+				queue = os.Getenv("QUEUE_PREFIX") + os.Getenv("DEFAULT_QUEUE")
+
+			} else {
+
+				queue = os.Getenv("QUEUE_PREFIX") + jsons["queue"].(string)
+			}
+
+			fmt.Println(redis.GetClient().LPush(context.TODO(), queue, s).Result())
+
+		}
+
+		time.Sleep(1 * time.Second)
+
+	}
+
 }
 
 func Dispatch(task task.Task) *job {
 
-	t, _ := json.Marshal(task)
+	//t, _ := json.Marshal(task)
 
 	return &job{
-		data:  t,
-		delay: 0,
+		Data_:  task,
+		Delay_: 0,
+		Id:     uuid.NewV4().String(),
 	}
 
 }
 
 func (j *job) Delay(duration time.Duration) *job {
 
-	j.delay = duration
+	j.Delay_ = duration
+
+	return j
+}
+
+func (j *job) Queue(queue string) *job {
+
+	j.Queue_ = queue
 
 	return j
 }
 
 func (j *job) Run() {
 
-	//fmt.Println(j.delay.Seconds())
+	queue := ""
 
-	redis.GetClient().LPush(context.TODO(), "queue:default", j.data)
+	if j.Delay_ == 0 {
+
+		if j.Queue_ == "" {
+
+			queue = os.Getenv("QUEUE_PREFIX") + os.Getenv("DEFAULT_QUEUE")
+
+		} else {
+
+			queue = os.Getenv("QUEUE_PREFIX") + j.Queue_
+		}
+
+		data, err := json.Marshal(j)
+
+		if err != nil {
+
+			return
+		}
+
+		redis.GetClient().LPush(context.TODO(), queue, data)
+
+	} else {
+
+		if j.Queue_ == "" {
+
+			queue = os.Getenv("QUEUE_PREFIX") + "delay"
+
+		} else {
+
+			queue = os.Getenv("QUEUE_PREFIX") + "delay"
+		}
+
+		//queueName := os.Getenv("DEFAULT_QUEUE")
+		//
+		//if j.queue != "" {
+		//
+		//	queueName = j.queue
+		//}
+
+		//json.Marshal()
+
+		data, err := json.Marshal(j)
+
+		//fmt.Println()
+		//
+		//fmt.Println(string(data))
+
+		if err != nil {
+
+			fmt.Println(err)
+
+			return
+		}
+
+		redis.GetClient().ZAdd(context.TODO(), queue, &redis2.Z{
+			Score:  float64(time.Now().Unix() + cast.ToInt64(j.Delay_.Seconds())),
+			Member: data,
+		})
+	}
+
 }

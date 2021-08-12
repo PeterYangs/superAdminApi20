@@ -27,6 +27,7 @@ func main() {
 	//加载路由
 	routes.Load(r)
 
+	//启动消息队列
 	go queue.Run()
 
 	//设置端口

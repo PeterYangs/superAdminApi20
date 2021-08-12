@@ -28,6 +28,7 @@ func NewTask(phone, content string) *TaskSms {
 
 func (t *TaskSms) Run() {
 
+	//time.Sleep(200*time.Millisecond)
 	fmt.Println(t.Parameters.Phone, t.Parameters.Content)
 
 }

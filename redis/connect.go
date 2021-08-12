@@ -89,13 +89,14 @@ func (cc *_connect) Set(cxt context.Context, key string, value interface{}, expi
 func (cc *_connect) Exists(cxt context.Context, keys ...string) *redis.IntCmd {
 
 	//cc.connect.Expire()
+	temp := make([]string, len(keys))
 
 	for i, key := range keys {
 
-		keys[i] = conf.Get("redis_prefix").(string) + key
+		temp[i] = conf.Get("redis_prefix").(string) + key
 	}
 
-	return cc.connect.Exists(cxt, keys...)
+	return cc.connect.Exists(cxt, temp...)
 }
 
 func (cc *_connect) Expire(ctx context.Context, key string, expiration time.Duration) *redis.BoolCmd {
@@ -111,12 +112,14 @@ func (cc *_connect) SetNX(ctx context.Context, key string, value interface{}, ex
 
 func (cc *_connect) Del(ctx context.Context, keys ...string) *redis.IntCmd {
 
+	temp := make([]string, len(keys))
+
 	for i, key := range keys {
 
-		keys[i] = conf.Get("redis_prefix").(string) + key
+		temp[i] = conf.Get("redis_prefix").(string) + key
 	}
 
-	return cc.connect.Del(ctx, keys...)
+	return cc.connect.Del(ctx, temp...)
 }
 
 func (cc *_connect) LPush(cxt context.Context, key string, value ...interface{}) *redis.IntCmd {
@@ -132,12 +135,24 @@ func (cc *_connect) RPop(cxt context.Context, key string) *redis.StringCmd {
 
 func (cc *_connect) BRPop(cxt context.Context, timeout time.Duration, keys ...string) *redis.StringSliceCmd {
 
+	temp := make([]string, len(keys))
+
 	for i, key := range keys {
 
-		keys[i] = conf.Get("redis_prefix").(string) + key
+		temp[i] = conf.Get("redis_prefix").(string) + key
 	}
 
-	return cc.connect.BRPop(cxt, timeout, keys...)
+	return cc.connect.BRPop(cxt, timeout, temp...)
+}
+
+func (cc *_connect) ZAdd(cxt context.Context, key string, members ...*redis.Z) *redis.IntCmd {
+
+	return cc.connect.ZAdd(cxt, conf.Get("redis_prefix").(string)+key, members...)
+}
+
+func (cc *_connect) ZRangeByScore(cxt context.Context, key string, opt *redis.ZRangeBy) *redis.StringSliceCmd {
+
+	return cc.connect.ZRangeByScore(cxt, conf.Get("redis_prefix").(string)+key, opt)
 }
 
 func (cc *_connect) Eval(ctx context.Context, script string, keys []string, args ...interface{}) *redis.Cmd {
