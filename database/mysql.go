@@ -1,6 +1,7 @@
 package database
 
 import (
+	"github.com/spf13/cast"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -38,13 +39,13 @@ func connect() {
 	//fmt.Println("数据库连接成功。。。")
 
 	//连接池打开最大连接数
-	s.SetMaxOpenConns(50)
+	s.SetMaxOpenConns(cast.ToInt(os.Getenv("DB_MAX_OPEN_CONNS")))
 
 	//连接池最大空闲连接数
-	s.SetMaxIdleConns(10)
+	s.SetMaxIdleConns(cast.ToInt(os.Getenv("DB_MAX_IDLE_CONNS")))
 
 	//设置连接过期时间
-	s.SetConnMaxLifetime(5 * time.Minute)
+	s.SetConnMaxLifetime(1 * time.Minute)
 
 }
 
