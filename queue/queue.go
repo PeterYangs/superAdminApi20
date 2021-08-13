@@ -136,51 +136,65 @@ func checkDelay() {
 
 	for {
 
-		list, err := redis.GetClient().ZRangeByScore(context.TODO(), os.Getenv("QUEUE_PREFIX")+"delay", &redis2.ZRangeBy{
-			Min: "0",
-			Max: cast.ToString(time.Now().Unix()),
-		}).Result()
-
-		if err != nil {
-
-			fmt.Println(err)
-
-			time.Sleep(1 * time.Second)
-			continue
-		}
-
-		//fmt.Println(list)
-
-		for _, s := range list {
-
-			var jsons map[string]interface{}
-
-			err = json.Unmarshal([]byte(s), &jsons)
-
-			if err != nil {
-
-				fmt.Println(err)
-
-				continue
-			}
-
-			queue := ""
-
-			if jsons["queue"].(string) == "" {
-
-				queue = os.Getenv("QUEUE_PREFIX") + os.Getenv("DEFAULT_QUEUE")
-
-			} else {
-
-				queue = os.Getenv("QUEUE_PREFIX") + jsons["queue"].(string)
-			}
-
-			fmt.Println(redis.GetClient().LPush(context.TODO(), queue, s).Result())
-
-		}
+		push()
 
 		time.Sleep(1 * time.Second)
 
+	}
+
+}
+
+func push() {
+
+	//分布式锁
+	lock := redis.GetClient().Lock("queue:delay:lock", 10*time.Second)
+
+	defer lock.Release()
+
+	if !lock.Get() {
+
+		time.Sleep(1 * time.Second)
+
+		return
+	}
+
+	list, err := redis.GetClient().ZRangeByScore(context.TODO(), os.Getenv("QUEUE_PREFIX")+"delay", &redis2.ZRangeBy{
+		Min: "0",
+		Max: cast.ToString(time.Now().Unix()),
+	}).Result()
+
+	if err != nil {
+
+		fmt.Println(err)
+
+		time.Sleep(1 * time.Second)
+		return
+	}
+
+	for _, s := range list {
+
+		var jsons map[string]interface{}
+
+		json.Unmarshal([]byte(s), &jsons)
+
+		queue := ""
+
+		if jsons["queue"].(string) == "" {
+
+			queue = os.Getenv("QUEUE_PREFIX") + os.Getenv("DEFAULT_QUEUE")
+
+		} else {
+
+			queue = os.Getenv("QUEUE_PREFIX") + jsons["queue"].(string)
+		}
+
+		redis.GetClient().LPush(context.TODO(), queue, s).Result()
+
+	}
+
+	if len(list) > 0 {
+
+		redis.GetClient().ZRemRangeByRank(context.TODO(), os.Getenv("QUEUE_PREFIX")+"delay", 0, int64(len(list)-1))
 	}
 
 }

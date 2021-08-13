@@ -225,47 +225,97 @@ func LoginLimiter(c *contextPlus.Context) {
 **分布式锁**
 
 非阻塞
+
 ```go
 func Index(c *contextPlus.Context) *response.Response {
 
-	//申请一个锁，过期时间是10秒
-	lock := redis.GetClient().Lock("lock", 10*time.Second)
+//申请一个锁，过期时间是10秒
+lock := redis.GetClient().Lock("lock", 10*time.Second)
 
-	//释放锁
-	defer lock.Release()
+//释放锁
+defer lock.Release()
 
-	//是否拿到锁
-	if lock.Get() {
+//是否拿到锁
+if lock.Get() {
 
-		return response.Resp().Json(gin.H{"res": true})
-	}
+return response.Resp().Json(gin.H{"res": true})
+}
 
-	return response.Resp().Json(gin.H{"res": false})
+return response.Resp().Json(gin.H{"res": false})
 
 }
 ```
 
 阻塞
+
 ```go
 func Index(c *contextPlus.Context) *response.Response {
 
-	//申请一个锁，过期时间是10秒
-	lock := redis.GetClient().Lock("lock", 10*time.Second)
+//申请一个锁，过期时间是10秒
+lock := redis.GetClient().Lock("lock", 10*time.Second)
 
-	defer lock.Release()
+defer lock.Release()
 
-	//是否拿到锁
-	if lock.Block(time.Second * 3) {
+//是否拿到锁
+if lock.Block(time.Second * 3) {
 
-		time.Sleep(4 * time.Second)
+time.Sleep(4 * time.Second)
 
-		return response.Resp().Json(gin.H{"res": true})
-	}
+return response.Resp().Json(gin.H{"res": true})
+}
 
-	return response.Resp().Json(gin.H{"res": false})
+return response.Resp().Json(gin.H{"res": false})
 
 }
 ```
+
+**分布式锁**
+
+即时任务
+
+```go
+package controller
+
+import (
+	"gin-web/contextPlus"
+	"gin-web/queue"
+	"gin-web/response"
+	"gin-web/task/email"
+	"gin-web/task/sms"
+)
+
+func Task(c *contextPlus.Context) *response.Response {
+
+	queue.Dispatch(email.NewTask("904801074@qq.com", "title", "content")).Queue("low").Run()
+
+	return response.Resp().Api(1, "123", "")
+
+}
+```
+
+延迟队列
+
+```go
+package controller
+
+import (
+	"gin-web/contextPlus"
+	"gin-web/queue"
+	"gin-web/response"
+	"gin-web/task/email"
+	"gin-web/task/sms"
+	"time"
+)
+
+func Task(c *contextPlus.Context) *response.Response {
+
+	queue.Dispatch(email.NewTask("904801074@qq.com", "title", "content")).Queue("low").Delay(100 * time.Second).Run()
+
+	return response.Resp().Api(1, "123", "")
+
+}
+```
+
 
 
 
