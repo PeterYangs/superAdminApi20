@@ -269,7 +269,7 @@ return response.Resp().Json(gin.H{"res": false})
 }
 ```
 
-**分布式锁**
+**消息队列**
 
 即时任务
 
