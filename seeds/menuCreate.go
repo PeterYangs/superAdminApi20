@@ -18,6 +18,9 @@ func main() {
 		{Id: 7, Title: "菜单列表", Path: "/main/menu_list", Sort: 100, Pid: 6},
 		{Id: 8, Title: "角色列表", Path: "/main/role_list", Sort: 100, Pid: 1},
 		{Id: 9, Title: "规则列表", Path: "/main/rule_list", Sort: 100, Pid: 1},
+		{Id: 10, Title: "消息队列", Path: "", Sort: 100, Pid: 0},
+		{Id: 11, Title: "即时队列", Path: "/main/queue_list", Sort: 100, Pid: 10},
+		{Id: 12, Title: "延迟队列", Path: "/main/queue_delay_list", Sort: 100, Pid: 10},
 	}
 
 	re := database.GetDb().Create(&menu)

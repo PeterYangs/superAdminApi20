@@ -83,6 +83,7 @@ func _init(_r group) {
 		admin.Group("/queue", func(queue group) {
 
 			queue.Registered(POST, "/list", queue2.List).Bind()
+			queue.Registered(POST, "/delay_list", queue2.DelayList).Bind()
 
 		})
 

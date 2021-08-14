@@ -27,6 +27,7 @@ type job struct {
 	Data_  task.Task     `json:"data"`
 	Queue_ string        `json:"queue"` //队列名称
 	Id     string        `json:"id"`
+	Time   string        `json:"time"`
 }
 
 var once sync.Once
@@ -204,8 +205,6 @@ func push() {
 
 func Dispatch(task task.Task) *job {
 
-	//t, _ := json.Marshal(task)
-
 	return &job{
 		Data_:  task,
 		Delay_: 0,
@@ -217,6 +216,11 @@ func Dispatch(task task.Task) *job {
 func (j *job) Delay(duration time.Duration) *job {
 
 	j.Delay_ = duration
+
+	if j.Delay_.Seconds() != 0 {
+
+		j.Time = tools.Date("Y-m-d H:i:s", time.Now().Unix()+int64(j.Delay_.Seconds()))
+	}
 
 	return j
 }

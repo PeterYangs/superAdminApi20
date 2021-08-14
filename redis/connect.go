@@ -188,6 +188,16 @@ func (cc *_connect) ZRangeByScore(cxt context.Context, key string, opt *redis.ZR
 	return cc.connect.ZRangeByScore(cxt, conf.Get("redis_prefix").(string)+key, opt)
 }
 
+func (cc *_connect) ZRange(cxt context.Context, key string, start, stop int64) *redis.StringSliceCmd {
+
+	return cc.connect.ZRange(cxt, conf.Get("redis_prefix").(string)+key, start, stop)
+}
+
+func (cc *_connect) ZCard(cxt context.Context, key string) *redis.IntCmd {
+
+	return cc.connect.ZCard(cxt, conf.Get("redis_prefix").(string)+key)
+}
+
 func (cc *_connect) ZRemRangeByRank(cxt context.Context, key string, start, stop int64) *redis.IntCmd {
 
 	return cc.connect.ZRemRangeByRank(cxt, conf.Get("redis_prefix").(string)+key, start, stop)
