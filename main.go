@@ -8,6 +8,7 @@ import (
 	"gin-web/routes"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/spf13/cast"
 	"os"
 )
 
@@ -27,8 +28,12 @@ func main() {
 	//加载路由
 	routes.Load(r)
 
-	//启动消息队列
-	go queue.Run()
+	for i := 0; i < cast.ToInt(os.Getenv("QUEUE_NUM")); i++ {
+
+		//启动消息队列
+		go queue.Run()
+
+	}
 
 	//设置端口
 	port := os.Getenv("PORT")

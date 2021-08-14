@@ -5,6 +5,7 @@ import (
 	"gin-web/conf"
 	"github.com/go-redis/redis/v8"
 	uuid "github.com/satori/go.uuid"
+	"github.com/spf13/cast"
 	"os"
 	"sync"
 	"time"
@@ -34,8 +35,10 @@ func connect() {
 	cxt, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 
 	conf_ := &redis.Options{
-		Addr: os.Getenv("REDIS_HOST") + ":" + os.Getenv("REDIS_PORT"),
-		DB:   0,
+		Addr:         os.Getenv("REDIS_HOST") + ":" + os.Getenv("REDIS_PORT"),
+		DB:           0,
+		MinIdleConns: cast.ToInt(os.Getenv("REDIS_MIN_IDLE_CONNS")),
+		PoolSize:     cast.ToInt(os.Getenv("REDIS_POOL_SIZE")),
 	}
 
 	if os.Getenv("REDIS_PASSWORD") != "null" {
