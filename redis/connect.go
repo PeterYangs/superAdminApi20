@@ -122,9 +122,17 @@ func (cc *_connect) Del(ctx context.Context, keys ...string) *redis.IntCmd {
 	return cc.connect.Del(ctx, temp...)
 }
 
+// LPush 列表，头部插入
 func (cc *_connect) LPush(cxt context.Context, key string, value ...interface{}) *redis.IntCmd {
 
 	return cc.connect.LPush(cxt, conf.Get("redis_prefix").(string)+key, value)
+
+}
+
+// RPush 列表，尾部插入
+func (cc *_connect) RPush(cxt context.Context, key string, value ...interface{}) *redis.IntCmd {
+
+	return cc.connect.RPush(cxt, conf.Get("redis_prefix").(string)+key, value)
 
 }
 
@@ -133,6 +141,7 @@ func (cc *_connect) RPop(cxt context.Context, key string) *redis.StringCmd {
 	return cc.connect.RPop(cxt, conf.Get("redis_prefix").(string)+key)
 }
 
+// BRPop 移除列表最后一个元素（阻塞，可监听多个队列）
 func (cc *_connect) BRPop(cxt context.Context, timeout time.Duration, keys ...string) *redis.StringSliceCmd {
 
 	temp := make([]string, len(keys))
@@ -143,6 +152,30 @@ func (cc *_connect) BRPop(cxt context.Context, timeout time.Duration, keys ...st
 	}
 
 	return cc.connect.BRPop(cxt, timeout, temp...)
+}
+
+// BLPop 移除列表第一个元素（阻塞，可监听多个队列）
+func (cc *_connect) BLPop(cxt context.Context, timeout time.Duration, keys ...string) *redis.StringSliceCmd {
+
+	temp := make([]string, len(keys))
+
+	for i, key := range keys {
+
+		temp[i] = conf.Get("redis_prefix").(string) + key
+	}
+
+	return cc.connect.BLPop(cxt, timeout, temp...)
+}
+
+func (cc *_connect) LRange(cxt context.Context, key string, start, stop int64) *redis.StringSliceCmd {
+
+	return cc.connect.LRange(cxt, conf.Get("redis_prefix").(string)+key, start, stop)
+}
+
+// LLen 获取列表长度
+func (cc *_connect) LLen(cxt context.Context, key string) *redis.IntCmd {
+
+	return cc.connect.LLen(cxt, conf.Get("redis_prefix").(string)+key)
 }
 
 func (cc *_connect) ZAdd(cxt context.Context, key string, members ...*redis.Z) *redis.IntCmd {

@@ -4,7 +4,6 @@ import (
 	"gin-web/component/logs"
 	"gin-web/conf"
 	"gin-web/kernel"
-	"gin-web/queue"
 	"gin-web/routes"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -28,7 +27,7 @@ func main() {
 	routes.Load(r)
 
 	//启动消息队列
-	go queue.Run()
+	//go queue.Run()
 
 	//设置端口
 	port := os.Getenv("PORT")

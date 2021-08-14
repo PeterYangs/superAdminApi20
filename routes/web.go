@@ -7,6 +7,7 @@ import (
 	category2 "gin-web/controller/category"
 	"gin-web/controller/login"
 	menu2 "gin-web/controller/menu"
+	queue2 "gin-web/controller/queue"
 	role2 "gin-web/controller/role"
 	rule2 "gin-web/controller/rule"
 	upload2 "gin-web/controller/upload"
@@ -77,6 +78,12 @@ func _init(_r group) {
 		admin.Group("/upload", func(upload group) {
 
 			upload.Registered(POST, "/upload", upload2.Upload).Bind()
+		})
+
+		admin.Group("/queue", func(queue group) {
+
+			queue.Registered(POST, "/list", queue2.List).Bind()
+
 		})
 
 	}, loginCheck.LoginCheck, authCheck.AuthCheck)

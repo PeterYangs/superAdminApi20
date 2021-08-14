@@ -69,7 +69,7 @@ func Run() {
 	for {
 
 		//timeout为0则为永久超时
-		s, err := redis.GetClient().BRPop(context.TODO(), 0, queues...).Result()
+		s, err := redis.GetClient().BLPop(context.TODO(), 0, queues...).Result()
 
 		if err != nil {
 
@@ -158,6 +158,7 @@ func push() {
 		return
 	}
 
+	//查询已到期任务
 	list, err := redis.GetClient().ZRangeByScore(context.TODO(), os.Getenv("QUEUE_PREFIX")+"delay", &redis2.ZRangeBy{
 		Min: "0",
 		Max: cast.ToString(time.Now().Unix()),
@@ -188,12 +189,14 @@ func push() {
 			queue = os.Getenv("QUEUE_PREFIX") + jsons["queue"].(string)
 		}
 
+		//头部插入，先执行
 		redis.GetClient().LPush(context.TODO(), queue, s).Result()
 
 	}
 
 	if len(list) > 0 {
 
+		//删除已到期的任务
 		redis.GetClient().ZRemRangeByRank(context.TODO(), os.Getenv("QUEUE_PREFIX")+"delay", 0, int64(len(list)-1))
 	}
 
@@ -247,7 +250,7 @@ func (j *job) Run() {
 			return
 		}
 
-		redis.GetClient().LPush(context.TODO(), queue, data)
+		redis.GetClient().RPush(context.TODO(), queue, data)
 
 	} else {
 
