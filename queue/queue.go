@@ -39,7 +39,7 @@ func init() {
 
 }
 
-func Run() {
+func Run(cxt context.Context, wait *sync.WaitGroup) {
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -55,9 +55,12 @@ func Run() {
 		}
 	}()
 
+	defer wait.Done()
+
+	//延迟队列
 	once.Do(func() {
 
-		go checkDelay()
+		go checkDelay(cxt, wait)
 	})
 
 	queues := tools.Explode(",", os.Getenv("QUEUES"))
@@ -67,10 +70,40 @@ func Run() {
 		queues[i] = os.Getenv("QUEUE_PREFIX") + queue
 	}
 
+	queueContext, queueCancel := context.WithCancel(context.Background())
+
+	go func() {
+
+		select {
+
+		case <-cxt.Done():
+
+			//fmt.Println("即时队列退出")
+
+			queueCancel()
+
+			return
+
+		}
+
+	}()
+
 	for {
 
+		select {
+
+		case <-cxt.Done():
+
+			fmt.Println("即时队列退出")
+
+			return
+
+		default:
+
+		}
+
 		//timeout为0则为永久超时
-		s, err := redis.GetClient().BLPop(context.TODO(), 0, queues...).Result()
+		s, err := redis.GetClient().BLPop(queueContext, 0, queues...).Result()
 
 		if err != nil {
 
@@ -119,7 +152,7 @@ func Run() {
 
 }
 
-func checkDelay() {
+func checkDelay(cxt context.Context, wait *sync.WaitGroup) {
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -135,7 +168,21 @@ func checkDelay() {
 		}
 	}()
 
+	defer wait.Done()
+
 	for {
+
+		select {
+
+		case <-cxt.Done():
+
+			fmt.Println("延迟队列退出")
+
+			return
+
+		default:
+
+		}
 
 		push()
 

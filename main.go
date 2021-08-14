@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"gin-web/component/logs"
 	"gin-web/conf"
 	"gin-web/kernel"
@@ -10,55 +12,129 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/spf13/cast"
 	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 )
 
 func main() {
 
-	//日志文件夹初始化
-	logInit()
+	////日志文件夹初始化
+	//logInit()
+	//
+	//r := gin.Default()
+	//
+	////加载配置
+	//conf.Load()
+	//
+	////加载全局中间件
+	//kernel.Load()
+	//
+	////加载路由
+	//routes.Load(r)
+	//
+	////启动消息队列
+	////queueStart()
+	//
+	////设置端口
+	//port := os.Getenv("PORT")
+	//
+	//if port == "" {
+	//
+	//	port = "8887"
+	//}
+	//
+	//
+	//sigs := make(chan os.Signal, 1)
+	//
+	//signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	//
+	//cxt, cancel := context.WithCancel(context.Background())
+	//
+	//wait := sync.WaitGroup{}
+	//
+	////延迟队列的标记
+	//wait.Add(1)
+	//
+	//for i := 0; i < cast.ToInt(os.Getenv("QUEUE_NUM")); i++ {
+	//
+	//	wait.Add(1)
+	//
+	//	//启动消息队列
+	//	go queue.Run(cxt,&wait)
+	//
+	//}
+	//
+	//
+	//go func() {
+	//
+	//	sig := <-sigs
+	//	fmt.Println()
+	//	fmt.Println(sig)
+	//	//time.Sleep(3 * time.Second)
+	//	fmt.Println("结束完毕")
+	//
+	//	cancel()
+	//}()
+	//
+	//
+	////sysType := runtime.GOOS
+	//
+	//////支持平滑重启，kill -1 pid
+	////if sysType == "linux" {
+	////	// LINUX系统
+	////
+	////	endless.ListenAndServe(":"+port, r)
+	////}
+	//
+	////windows只做开发测试
+	////if sysType == "windows" {
+	//// windows系统
+	//
+	//r.Run(":" + port)
+	//
+	////fmt.Println("gg")
+	//
+	//wait.Wait()
 
-	r := gin.Default()
+	//}
 
-	//加载配置
-	conf.Load()
+	sigs := make(chan os.Signal, 1)
 
-	//加载全局中间件
-	kernel.Load()
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
-	//加载路由
-	routes.Load(r)
+	cxt, cancel := context.WithCancel(context.Background())
+
+	wait := sync.WaitGroup{}
+
+	go start(sigs, cxt, &wait)
+
+	//延迟队列的标记
+	wait.Add(1)
 
 	for i := 0; i < cast.ToInt(os.Getenv("QUEUE_NUM")); i++ {
 
+		wait.Add(1)
+
 		//启动消息队列
-		go queue.Run()
+		go queue.Run(cxt, &wait)
 
 	}
 
-	//设置端口
-	port := os.Getenv("PORT")
+	go func() {
 
-	if port == "" {
+		sig := <-sigs
+		fmt.Println()
+		fmt.Println(sig)
+		//time.Sleep(3 * time.Second)
+		//fmt.Println("结束完毕")
 
-		port = "8887"
-	}
+		cancel()
+	}()
 
-	//sysType := runtime.GOOS
+	wait.Wait()
 
-	////支持平滑重启，kill -1 pid
-	//if sysType == "linux" {
-	//	// LINUX系统
-	//
-	//	endless.ListenAndServe(":"+port, r)
-	//}
-
-	//windows只做开发测试
-	//if sysType == "windows" {
-	// windows系统
-
-	r.Run(":" + port)
-
-	//}
+	fmt.Println("finish")
 
 }
 
@@ -77,5 +153,72 @@ func logInit() {
 	l := logs.CreateLogs()
 
 	go l.Task()
+
+}
+
+func start(sigs chan os.Signal, cxt context.Context, wait *sync.WaitGroup) {
+
+	//日志文件夹初始化
+	logInit()
+
+	r := gin.Default()
+
+	//加载配置
+	conf.Load()
+
+	//加载全局中间件
+	kernel.Load()
+
+	//加载路由
+	routes.Load(r)
+
+	//启动消息队列
+	//queueStart()
+
+	//设置端口
+	port := os.Getenv("PORT")
+
+	if port == "" {
+
+		port = "8887"
+	}
+
+	//sigs := make(chan os.Signal, 1)
+	//
+	//signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	//
+	//cxt, cancel := context.WithCancel(context.Background())
+	//
+	//wait := sync.WaitGroup{}
+
+	//go func() {
+	//
+	//	sig := <-sigs
+	//	fmt.Println()
+	//	fmt.Println(sig)
+	//	//time.Sleep(3 * time.Second)
+	//	fmt.Println("结束完毕")
+	//
+	//	cancel()
+	//}()
+
+	//sysType := runtime.GOOS
+
+	////支持平滑重启，kill -1 pid
+	//if sysType == "linux" {
+	//	// LINUX系统
+	//
+	//	endless.ListenAndServe(":"+port, r)
+	//}
+
+	//windows只做开发测试
+	//if sysType == "windows" {
+	// windows系统
+
+	r.Run(":" + port)
+
+	//fmt.Println("gg")
+
+	//wait.Wait()
 
 }
