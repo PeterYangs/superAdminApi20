@@ -8,6 +8,7 @@ import (
 	"gin-web/response"
 	regexp "github.com/dlclark/regexp2"
 	"github.com/gin-gonic/gin"
+	"strings"
 )
 
 func Login(c *contextPlus.Context) *response.Response {
@@ -35,7 +36,7 @@ func Login(c *contextPlus.Context) *response.Response {
 
 	var admin model.Admin
 
-	re := database.GetDb().Where("username = ?", form.Username).Where("password = ?", common.HmacSha256(form.Password)).First(&admin)
+	re := database.GetDb().Where("username = ?", strings.TrimSpace(form.Username)).Where("password = ?", common.HmacSha256(strings.TrimSpace(form.Password))).First(&admin)
 
 	if re.Error != nil {
 
