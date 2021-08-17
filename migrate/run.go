@@ -185,6 +185,12 @@ func Up() {
 }
 
 func Down() {
+	
+	migrate.Table("` + table + `", func(createMigrate *migrate.Migrate) {
+
+		
+
+	})
 
 
 }

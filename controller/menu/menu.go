@@ -28,6 +28,7 @@ func Update(c *contextPlus.Context) *response.Response {
 		Id    int    `json:"id" form:"id"`
 		Path  string `json:"path" form:"path"`
 		Sort  int    `json:"sort" form:"sort" binding:"required"`
+		Rule  string `json:"rule" form:"rule"`
 	}
 
 	var form Form
@@ -46,6 +47,7 @@ func Update(c *contextPlus.Context) *response.Response {
 		Title: form.Title,
 		Path:  form.Path,
 		Sort:  form.Sort,
+		Rule:  form.Rule,
 	}
 
 	err = common.UpdateOrCreateOne(database.GetDb(), &model.Menu{}, map[string]interface{}{"id": form.Id}, &menu)

@@ -42,6 +42,7 @@ type Tag int
 const (
 	CREATE Tag = 0x00000
 	UPDATE Tag = 0x00001
+	DELETE Tag = 0x00002
 )
 
 type Types string
@@ -171,6 +172,15 @@ func (c *Migrate) Timestamp(column string) *field {
 	return f
 }
 
+// DropColumn 删除字段
+func (c *Migrate) DropColumn(column string) {
+
+	f := &field{column: column, tag: DELETE}
+
+	c.fields = append(c.fields, f)
+
+}
+
 func (f *field) Default(value interface{}) *field {
 
 	f.defaultValue = value
@@ -223,6 +233,8 @@ func run(m *Migrate) {
 		return
 	}
 
+	checkMigrationsTable()
+
 	isFind := database.GetDb().Where("migration = ?", m.Name).First(&model.Migrations{})
 
 	//已存在的迁移不执行
@@ -232,8 +244,6 @@ func run(m *Migrate) {
 
 		return
 	}
-
-	checkMigrationsTable()
 
 	//batch := 1
 
@@ -267,8 +277,6 @@ func run(m *Migrate) {
 
 	if m.Tag == UPDATE {
 
-		//fmt.Println("hi you")
-
 		sql := "alter table `" + m.Table + "` "
 
 		for i, f := range m.fields {
@@ -281,7 +289,11 @@ func run(m *Migrate) {
 
 			case UPDATE:
 
-				sql += " MODIFY " + setColumnAttr(f)
+				sql += " modify " + setColumnAttr(f)
+
+			case DELETE:
+
+				sql += " drop COLUMN `" + f.column + "` "
 
 			}
 
@@ -300,7 +312,7 @@ func run(m *Migrate) {
 				sql += ","
 			}
 
-			sql += " add UNIQUE  `" + tools.Join("+", strings) + "` (`" + tools.Join("`,`", strings) + "`)" + " USING BTREE"
+			sql += " add unique  `" + tools.Join("+", strings) + "` (`" + tools.Join("`,`", strings) + "`)" + " USING BTREE"
 
 			if i+1 < len(m.unique) {
 
@@ -308,8 +320,6 @@ func run(m *Migrate) {
 			}
 
 		}
-
-		//fmt.Println(sql)
 
 		t := database.GetDb().Exec(sql)
 
@@ -322,12 +332,15 @@ func run(m *Migrate) {
 			return
 		}
 
-		database.GetDb().Create(&model.Migrations{
-			Migration: m.Name,
-			Batch:     batch,
-		})
+		if m.Name != "" {
 
-		//fmt.Println(sql)
+			//添加迁移记录
+			database.GetDb().Create(&model.Migrations{
+				Migration: m.Name,
+				Batch:     batch,
+			})
+
+		}
 
 	}
 
