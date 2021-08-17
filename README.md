@@ -1,6 +1,6 @@
-# gin-web
+# superAdmin
 
-基于gin封装的mc框架
+开箱即用的后台框架
 
 ### 在线demo
 http://www.peterdemo.net/login
