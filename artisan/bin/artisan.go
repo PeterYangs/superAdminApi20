@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"gin-web/command/key"
 	"gin-web/migrate"
 	bin2 "gin-web/seeds/bin"
 	"github.com/manifoldco/promptui"
@@ -11,7 +12,7 @@ func main() {
 
 	prompt := promptui.Select{
 		Label: "选择类型",
-		Items: []string{"数据库迁移", "数据填充"},
+		Items: []string{"数据库迁移", "数据填充", "生成key"},
 	}
 
 	_, result, err := prompt.Run()
@@ -30,6 +31,10 @@ func main() {
 	case "数据填充":
 
 		new(bin2.Bin).Run()
+
+	case "生成key":
+
+		new(key.Key).Run()
 
 	}
 }
