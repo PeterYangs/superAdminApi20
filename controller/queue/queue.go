@@ -23,6 +23,7 @@ func List(c *contextPlus.Context) *response.Response {
 
 	stop := start + size
 
+	//os.MkdirAll()
 	list, _ := redis.GetClient().LRange(context.TODO(), os.Getenv("QUEUE_PREFIX")+queue, int64(start), int64(stop)).Result()
 
 	count, _ := redis.GetClient().LLen(context.TODO(), os.Getenv("QUEUE_PREFIX")+queue).Result()

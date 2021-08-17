@@ -2,9 +2,18 @@
 
 基于gin封装的mc框架
 
+### 在线demo
+http://www.peterdemo.net/login
+
+账号：test
+
+密码：Aa123456
+
 ### 环境要求
 
 redis
+
+mysql
 
 ### Quick start
 

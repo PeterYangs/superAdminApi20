@@ -61,7 +61,7 @@ func _init(_r group) {
 
 		admin.Group("/menu", func(menu group) {
 
-			menu.Registered(GET, "/getFatherMenu", menu2.GetFatherMenu).Bind()
+			menu.Registered(GET, "/getFatherMenu", menu2.GetFatherMenu).SetTag("skip_auth").Bind()
 			menu.Registered(POST, "/update", menu2.Update).Bind()
 			menu.Registered(POST, "/list", menu2.List).Bind()
 			menu.Registered(GET, "/detail/:id", menu2.Detail).Bind()
