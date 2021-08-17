@@ -3,6 +3,7 @@
 开箱即用的后台框架
 
 ### 在线demo
+
 http://www.peterdemo.net/login
 
 账号：test
@@ -80,11 +81,11 @@ func _init(_r group) {
 ```go
 func Session(c *contextPlus.Context) *response.Response {
 
-c.Session.Set("key", "value")
+    c.Session.Set("key", "value")
 
-c.Session.Get("key")
+    c.Session.Get("key")
 
-return nil
+    return nil
 }
 ```
 
@@ -95,11 +96,11 @@ return nil
 ```go
 func Captcha(c *contextPlus.Context) *response.Response {
 
-b := c.GetCaptcha()
+    b := c.GetCaptcha()
 
-c.Header("content-type", "image/png")
+    c.Header("content-type", "image/png")
 
-return response.Resp().Byte(b)
+    return response.Resp().Byte(b)
 }
 ```
 
@@ -108,11 +109,11 @@ return response.Resp().Byte(b)
 ```go
 func CheckCaptcha(c *contextPlus.Context) *response.Response {
 
-code := c.Query("code")
+    code := c.Query("code")
 
-bool:= c.CheckCaptcha(code)
+    bool:= c.CheckCaptcha(code)
 
-return response.Resp().Json(gin.H{"bool":code})
+    return response.Resp().Json(gin.H{"bool":code})
 
 }
 ```
@@ -238,19 +239,20 @@ func LoginLimiter(c *contextPlus.Context) {
 ```go
 func Index(c *contextPlus.Context) *response.Response {
 
-//申请一个锁，过期时间是10秒
-lock := redis.GetClient().Lock("lock", 10*time.Second)
+    //申请一个锁，过期时间是10秒
+    lock := redis.GetClient().Lock("lock", 10*time.Second)
 
-//释放锁
-defer lock.Release()
+    //释放锁
+    defer lock.Release()
 
-//是否拿到锁
-if lock.Get() {
+    //是否拿到锁
+    if lock.Get() {
 
-return response.Resp().Json(gin.H{"res": true})
-}
+        return response.Resp().Json(gin.H{"res": true})
+    
+    }
 
-return response.Resp().Json(gin.H{"res": false})
+    return response.Resp().Json(gin.H{"res": false})
 
 }
 ```
@@ -260,20 +262,20 @@ return response.Resp().Json(gin.H{"res": false})
 ```go
 func Index(c *contextPlus.Context) *response.Response {
 
-//申请一个锁，过期时间是10秒
-lock := redis.GetClient().Lock("lock", 10*time.Second)
+    //申请一个锁，过期时间是10秒
+    lock := redis.GetClient().Lock("lock", 10*time.Second)
 
-defer lock.Release()
+    defer lock.Release()
 
-//是否拿到锁
-if lock.Block(time.Second * 3) {
+    //是否拿到锁
+    if lock.Block(time.Second * 3) {
+    	
+    	time.Sleep(4 * time.Second)
 
-time.Sleep(4 * time.Second)
+        return response.Resp().Json(gin.H{"res": true})
+    }
 
-return response.Resp().Json(gin.H{"res": true})
-}
-
-return response.Resp().Json(gin.H{"res": false})
+    return response.Resp().Json(gin.H{"res": false})
 
 }
 ```
