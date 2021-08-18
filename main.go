@@ -27,7 +27,7 @@ func main() {
 
 	wait := sync.WaitGroup{}
 
-	go start(sigs, cxt, &wait)
+	go start()
 
 	//延迟队列的标记
 	wait.Add(1)
@@ -74,7 +74,7 @@ func logInit() {
 
 }
 
-func start(sigs chan os.Signal, cxt context.Context, wait *sync.WaitGroup) {
+func start() {
 
 	//日志文件夹初始化
 	logInit()
