@@ -2,6 +2,7 @@ package routes
 
 import (
 	"gin-web/controller"
+	access2 "gin-web/controller/access"
 	admin2 "gin-web/controller/admin"
 	"gin-web/controller/captcha"
 	category2 "gin-web/controller/category"
@@ -85,6 +86,12 @@ func _init(_r group) {
 
 			queue.Registered(POST, "/list", queue2.List).Bind()
 			queue.Registered(POST, "/delay_list", queue2.DelayList).Bind()
+
+		})
+
+		admin.Group("/access", func(access group) {
+
+			access.Registered(POST, "/list", access2.List).Bind()
 
 		})
 
