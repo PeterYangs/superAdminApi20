@@ -7,6 +7,7 @@ import (
 	"gin-web/component/logs"
 	"gin-web/interface/task"
 	"gin-web/redis"
+	"gin-web/task/access"
 	"gin-web/task/email"
 	"gin-web/task/sms"
 	"github.com/PeterYangs/tools"
@@ -36,6 +37,7 @@ func init() {
 
 	handles.Store("email", &email.TaskEmail{Parameters: &email.Parameter{}})
 	handles.Store("sms", &sms.TaskSms{Parameters: &sms.Parameter{}})
+	handles.Store("access", &access.TaskAccess{Parameters: &access.Parameter{}})
 
 }
 

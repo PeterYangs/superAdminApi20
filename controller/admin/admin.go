@@ -135,6 +135,7 @@ func GetMyMenu(c *contextPlus.Context) *response.Response {
 
 	database.GetDb().Where("id = ?", id).Preload("RoleDetail.Role").First(&r)
 
+	//超级管理员显示所有菜单
 	if r.RoleDetail.RoleId == 0 {
 
 		return response.Resp().Api(1, "success", list)

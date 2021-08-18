@@ -5,8 +5,6 @@ import (
 	"reflect"
 )
 
-//const Name taskName.TaskName = "email"
-
 type TaskEmail struct {
 	TaskName   string //处理器名称
 	Parameters *Parameter
