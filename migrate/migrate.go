@@ -156,7 +156,7 @@ func (c *Migrate) String(column string, length int) *field {
 
 func (c *Migrate) Text(column string) *field {
 
-	f := &field{column: column, types: String, tag: CREATE}
+	f := &field{column: column, types: Text, tag: CREATE}
 
 	c.fields = append(c.fields, f)
 
