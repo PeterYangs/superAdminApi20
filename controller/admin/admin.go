@@ -3,10 +3,12 @@ package admin
 import (
 	"gin-web/common"
 	"gin-web/contextPlus"
+	"gin-web/controller/menu"
 	"gin-web/database"
 	"gin-web/model"
 	"gin-web/response"
 	"gin-web/routes/allUrl"
+	"github.com/PeterYangs/tools"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 )
@@ -89,10 +91,6 @@ func SearchRule(c *contextPlus.Context) *response.Response {
 
 	}
 
-	//var rules = make([]*model.Rule, 0)
-	//
-	//database.GetDb().Model(model.Rule{}).Where("rule like ?", "%"+form.Keyword+"%").Limit(10).Find(&rules)
-
 	all := allUrl.NewAllUrl()
 
 	list := all.Search(form.Keyword)
@@ -121,4 +119,59 @@ func Destroy(c *contextPlus.Context) *response.Response {
 
 	return response.Resp().Api(1, "success", "")
 
+}
+
+func GetMyMenu(c *contextPlus.Context) *response.Response {
+
+	menus := make([]*model.Menu, 0)
+
+	list := menu.GetMenu(0, &menus)
+
+	admin, _ := c.Session().Get("admin")
+
+	id := admin.(map[string]interface{})["id"].(float64)
+
+	var r model.Admin
+
+	database.GetDb().Where("id = ?", id).Preload("RoleDetail.Role").First(&r)
+
+	//fmt.Println(r.RoleDetail.Role.Rules)
+
+	rules := make([]*model.Rule, 0)
+
+	var ids []string
+
+	for _, rule := range r.RoleDetail.Role.Rules {
+
+		ids = append(ids, cast.ToString(rule))
+	}
+
+	database.GetDb().Model(&model.Rule{}).Where("id in ?", ids).Find(&rules)
+
+	var rulesArray []string
+
+	for _, rule := range rules {
+
+		rulesArray = append(rulesArray, rule.Rule)
+	}
+
+	var temp []*model.Menu
+
+	for _, m := range *list {
+
+		if m.Pid == 0 {
+
+			temp = append(temp, m)
+
+			continue
+		}
+
+		if tools.InArray(rulesArray, m.Rule) {
+
+			temp = append(temp, m)
+		}
+
+	}
+
+	return response.Resp().Api(1, "success", temp)
 }

@@ -66,13 +66,11 @@ func List(c *contextPlus.Context) *response.Response {
 
 	menus := make([]*model.Menu, 0)
 
-	//database.GetDb().Model(&model.Menu{}).Find(&menus)
-
-	return response.Resp().Api(1, "success", getMenu(0, &menus))
+	return response.Resp().Api(1, "success", GetMenu(0, &menus))
 
 }
 
-func getMenu(pid int, m *[]*model.Menu) *[]*model.Menu {
+func GetMenu(pid int, m *[]*model.Menu) *[]*model.Menu {
 
 	menus := make([]*model.Menu, 0)
 
@@ -87,7 +85,7 @@ func getMenu(pid int, m *[]*model.Menu) *[]*model.Menu {
 
 		*m = append(*m, menu)
 
-		getMenu(int(menu.Id), m)
+		GetMenu(int(menu.Id), m)
 
 	}
 
