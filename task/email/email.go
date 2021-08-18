@@ -40,7 +40,7 @@ func (t *TaskEmail) GetName() string {
 	return t.TaskName
 }
 
-func (t *TaskEmail) BindParameters(p map[string]string) {
+func (t *TaskEmail) BindParameters(p map[string]interface{}) {
 
 	//t.Parameters= p
 

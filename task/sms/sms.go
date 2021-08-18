@@ -38,7 +38,7 @@ func (t *TaskSms) GetName() string {
 	return t.TaskName
 }
 
-func (t *TaskSms) BindParameters(p map[string]string) {
+func (t *TaskSms) BindParameters(p map[string]interface{}) {
 
 	s := reflect.ValueOf(t.Parameters).Elem()
 
