@@ -2,6 +2,6 @@ package task
 
 type Task interface {
 	Run()
-	BindParameters(map[string]string)
+	BindParameters(map[string]interface{})
 	GetName() string
 }

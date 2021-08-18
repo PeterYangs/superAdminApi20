@@ -145,7 +145,7 @@ func Run(cxt context.Context, wait *sync.WaitGroup) {
 		}
 
 		////绑定参数
-		h.BindParameters(cast.ToStringMapString(data["Parameters"]))
+		h.BindParameters(data["Parameters"].(map[string]interface{}))
 		//
 		////执行任务
 		h.Run()
