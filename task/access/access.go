@@ -4,12 +4,9 @@ import (
 	"gin-web/database"
 	"gin-web/model"
 	"gin-web/task"
-	"reflect"
 )
 
 type TaskAccess struct {
-	//TaskName   string //处理器名称
-	//Parameters *Parameter
 	task.BaseTask
 	Parameters *Parameter
 }
@@ -26,9 +23,6 @@ func NewTask(ip string, url string, params string, adminId float64) *TaskAccess 
 
 	return &TaskAccess{
 
-		//BaseTask.T
-
-		//task.BaseTask.
 		BaseTask: task.BaseTask{
 			TaskName: "access",
 		},
@@ -38,7 +32,6 @@ func NewTask(ip string, url string, params string, adminId float64) *TaskAccess 
 			Params:  params,
 			AdminId: adminId,
 		},
-		//TaskName: "access",
 	}
 }
 
@@ -53,27 +46,8 @@ func (t *TaskAccess) Run() {
 
 }
 
-//func (t *TaskAccess) GetName() string {
-//
-//	return t.TaskName
-//}
-
 func (t *TaskAccess) BindParameters(p map[string]interface{}) {
 
-	//t.BindParameters(p)
-
-	//t.Parameters= p
-
-	s := reflect.ValueOf(t.Parameters).Elem()
-
-	for key, value := range p {
-
-		if s.FieldByName(key).IsValid() {
-
-			s.FieldByName(key).Set(reflect.ValueOf(value))
-
-		}
-
-	}
+	t.BaseTask.Bind(t.Parameters, p)
 
 }

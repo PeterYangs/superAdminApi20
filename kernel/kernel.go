@@ -2,7 +2,6 @@ package kernel
 
 import (
 	"gin-web/contextPlus"
-	"gin-web/middleware/accessLog"
 	"gin-web/middleware/exception"
 	"gin-web/middleware/session"
 )
@@ -15,7 +14,7 @@ func Load() {
 	Middleware = []contextPlus.HandlerFunc{
 		exception.Exception,
 		session.StartSession,
-		accessLog.AccessLog,
+		//accessLog.AccessLog,
 		//middleware.GoOn,
 		//routeRegex.RouterRegex,
 	}

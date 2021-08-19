@@ -4,6 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"github.com/PeterYangs/tools"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -118,4 +119,24 @@ func MtRand(min, max int64) int64 {
 	n, _ := rand.Int(rand.Reader, big.NewInt(max-min+1))
 
 	return n.Int64() + min
+}
+
+// Capitalize 字符首字母大写转换
+func Capitalize(str string) string {
+	var upperStr string
+	vv := []rune(str) // 后文有介绍
+	for i := 0; i < len(vv); i++ {
+		if i == 0 {
+			if vv[i] >= 97 && vv[i] <= 122 { // 后文有介绍
+				vv[i] -= 32 // string的码表相差32位
+				upperStr += string(vv[i])
+			} else {
+				fmt.Println("Not begins with lowercase letter,")
+				return str
+			}
+		} else {
+			upperStr += string(vv[i])
+		}
+	}
+	return upperStr
 }

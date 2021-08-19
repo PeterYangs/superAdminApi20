@@ -1,7 +1,6 @@
 package task
 
 import (
-	"fmt"
 	"reflect"
 )
 
@@ -26,9 +25,23 @@ func (t *BaseTask) BindParameters(p map[string]interface{}) {
 
 	//t.Parameters= p
 
-	fmt.Println(t)
-
 	s := reflect.ValueOf(t.Parameters).Elem()
+
+	for key, value := range p {
+
+		if s.FieldByName(key).IsValid() {
+
+			s.FieldByName(key).Set(reflect.ValueOf(value))
+
+		}
+
+	}
+
+}
+
+func (t *BaseTask) Bind(taskParams interface{}, p map[string]interface{}) {
+
+	s := reflect.ValueOf(taskParams).Elem()
 
 	for key, value := range p {
 

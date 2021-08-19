@@ -4,13 +4,17 @@ import (
 	"gin-web/contextPlus"
 	"gin-web/queue"
 	"gin-web/response"
-	"gin-web/task/email"
+	"gin-web/task/demo"
 )
 
 func Task(c *contextPlus.Context) *response.Response {
 
 	//queue.Dispatch(email.NewTask(cast.ToString(tools.MtRand(10, 1000)), "title", "content")).Delay(100 * time.Hour).Queue("low").Run()
-	queue.Dispatch(email.NewTask("904801074@qq.com", "title", "content")).Queue("low").Run()
+	//queue.Dispatch(email.NewTask("904801074@qq.com", "title", "content")).Queue("low").Run()
+
+	queue.Dispatch(demo.NewTask()).Run()
+
+	//fmt.Println(123)
 
 	return response.Resp().Api(1, "123", "")
 

@@ -6,10 +6,8 @@ import (
 	"fmt"
 	"gin-web/component/logs"
 	"gin-web/interface/task"
+	"gin-web/queue/register"
 	"gin-web/redis"
-	"gin-web/task/access"
-	"gin-web/task/email"
-	"gin-web/task/sms"
 	"github.com/PeterYangs/tools"
 	redis2 "github.com/go-redis/redis/v8"
 	uuid "github.com/satori/go.uuid"
@@ -21,7 +19,7 @@ import (
 	"time"
 )
 
-var handles = sync.Map{}
+//var handles = sync.Map{}
 
 type job struct {
 	Delay_ time.Duration `json:"-"` //延迟
@@ -35,9 +33,10 @@ var once sync.Once
 
 func init() {
 
-	handles.Store("email", &email.TaskEmail{Parameters: &email.Parameter{}})
-	handles.Store("sms", &sms.TaskSms{Parameters: &sms.Parameter{}})
-	handles.Store("access", &access.TaskAccess{Parameters: &access.Parameter{}})
+	//handles.Store("email", &email.TaskEmail{Parameters: &email.Parameter{}})
+	//handles.Store("sms", &sms.TaskSms{Parameters: &sms.Parameter{}})
+	//handles.Store("access", &access.TaskAccess{Parameters: &access.Parameter{}})
+	register.Handles.Init()
 
 }
 
@@ -107,6 +106,8 @@ func Run(cxt context.Context, wait *sync.WaitGroup) {
 		//timeout为0则为永久超时
 		s, err := redis.GetClient().BLPop(queueContext, 0, queues...).Result()
 
+		//fmt.Println(s)
+
 		if err != nil {
 
 			log.Println(err)
@@ -132,7 +133,9 @@ func Run(cxt context.Context, wait *sync.WaitGroup) {
 		//fmt.Println(p)
 
 		////获取task
-		hh, ok := handles.Load(data["TaskName"].(string))
+		hh, ok := register.Handles.GetTask(data["TaskName"].(string))
+
+		//hh, ok := handles.Load(data["TaskName"].(string))
 		//hh, ok := handles.Load(jsons.Data_.GetName())
 		//
 		h := hh.(task.Task)
@@ -283,6 +286,8 @@ func (j *job) Queue(queue string) *job {
 
 func (j *job) Run() {
 
+	//fmt.Println(j)
+
 	queue := ""
 
 	if j.Delay_ == 0 {
@@ -300,8 +305,12 @@ func (j *job) Run() {
 
 		if err != nil {
 
+			fmt.Println(err)
+
 			return
 		}
+
+		//fmt.Println(string(data),"----------")
 
 		redis.GetClient().RPush(context.TODO(), queue, data)
 
