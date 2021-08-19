@@ -70,7 +70,7 @@ func (ls *logsService) MakeDir() {
 
 	for _, l2 := range ls.logLevels {
 
-		os.MkdirAll(l2.fileDir, 755)
+		os.MkdirAll(l2.fileDir, 0755)
 
 	}
 }
@@ -186,7 +186,7 @@ func (logs *logs) checkFileName(logLevel *logLevel) {
 		//关闭文件(由于文件是根据日期来着，过了一天要关闭上一天的文件流)
 		logLevel.file.Close()
 
-		f, e := os.OpenFile(logLevel.fileDir+"/"+name, os.O_RDWR|os.O_APPEND|os.O_CREATE, 644)
+		f, e := os.OpenFile(logLevel.fileDir+"/"+name, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
 
 		if e != nil {
 

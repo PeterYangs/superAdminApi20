@@ -40,7 +40,7 @@ func Upload(c *contextPlus.Context) *response.Response {
 
 		date := tools.Date("Ymd", time.Now().Unix())
 
-		os.MkdirAll("uploads/"+date, 755)
+		os.MkdirAll("uploads/"+date, 0755)
 
 		name := date + "/" + uuid.NewV4().String() + "." + ex
 

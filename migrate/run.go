@@ -143,7 +143,7 @@ func CreateMigration(table string, types string) {
 
 	name := "migrate_" + tools.Date("Y_m_d_His", time.Now().Unix()) + "_" + types + "_" + table + "_table"
 
-	os.Mkdir("./migrate/migrations/"+name, 755)
+	os.Mkdir("./migrate/migrations/"+name, 0755)
 
 	if types == "create" {
 
@@ -159,7 +159,7 @@ func CreateMigration(table string, types string) {
 
 func UpdateTable(pack string, table string) {
 
-	f, err := os.OpenFile("./migrate/migrations/"+pack+"/migrate.go", os.O_CREATE|os.O_TRUNC|os.O_RDWR, 644)
+	f, err := os.OpenFile("./migrate/migrations/"+pack+"/migrate.go", os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0644)
 
 	if err != nil {
 
@@ -203,7 +203,7 @@ func Down() {
 
 func CreateTable(pack string, table string) {
 
-	f, err := os.OpenFile("./migrate/migrations/"+pack+"/migrate.go", os.O_CREATE|os.O_TRUNC|os.O_RDWR, 644)
+	f, err := os.OpenFile("./migrate/migrations/"+pack+"/migrate.go", os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0644)
 
 	if err != nil {
 
@@ -255,7 +255,7 @@ func Up() {
 
 	//for _, info := range fileInfo {
 
-	f, _ := os.OpenFile("./migrate/bin/X.go", os.O_CREATE|os.O_TRUNC|os.O_RDWR, 644)
+	f, _ := os.OpenFile("./migrate/bin/X.go", os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0644)
 
 	f.Write([]byte(`package main
 
@@ -340,7 +340,7 @@ func Down() {
 
 	database.GetDb().Model(&model.Migrations{}).Where("batch = ?", batch).Find(&migrations)
 
-	f, _ := os.OpenFile("./migrate/bin/Y.go", os.O_CREATE|os.O_TRUNC|os.O_RDWR, 644)
+	f, _ := os.OpenFile("./migrate/bin/Y.go", os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0644)
 
 	f.Write([]byte(`package main
 

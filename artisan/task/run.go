@@ -42,9 +42,9 @@ func (t TaskCmd) Run() {
 
 	}
 
-	os.Mkdir("task/"+result, 755)
+	os.Mkdir("task/"+result, 0755)
 
-	f, err := os.OpenFile("task/"+result+"/"+result+".go", os.O_RDWR|os.O_CREATE|os.O_EXCL, 644)
+	f, err := os.OpenFile("task/"+result+"/"+result+".go", os.O_RDWR|os.O_CREATE|os.O_EXCL, 0644)
 
 	if err != nil {
 
@@ -118,7 +118,7 @@ func (t *Task` + common.Capitalize(result) + `) BindParameters(p map[string]inte
 
 	//fmt.Println(newScript)
 
-	ff, err := os.OpenFile("queue/register/register.go", os.O_CREATE, 644)
+	ff, err := os.OpenFile("queue/register/register.go", os.O_CREATE, 0644)
 
 	if err != nil {
 
