@@ -4,7 +4,7 @@
 
 ### 在线demo
 
-http://www.peterdemo.net/login
+https://www.peterdemo.net
 
 账号：test
 
