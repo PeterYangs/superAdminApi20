@@ -7,6 +7,7 @@ import (
 	"os"
 	"runtime"
 	"runtime/debug"
+	"sync"
 	"time"
 )
 
@@ -24,7 +25,7 @@ const (
 )
 
 type logsService struct {
-	queue     chan logs
+	queue     chan *logs
 	logLevels map[level]*logLevel
 }
 
@@ -37,6 +38,7 @@ type logs struct {
 	level   level
 	message string
 	time    time.Time
+	lock    sync.Mutex
 }
 
 var service *logsService
@@ -44,7 +46,7 @@ var service *logsService
 func CreateLogs() *logsService {
 
 	service = &logsService{
-		queue: make(chan logs, 10),
+		queue: make(chan *logs, 10),
 		logLevels: map[level]*logLevel{
 			Error: {
 				fileDir: "logs/error",
@@ -82,7 +84,7 @@ func (ls *logsService) Error(message string) *result {
 
 	m := logFormat(Error, message)
 
-	ls.queue <- logs{
+	ls.queue <- &logs{
 		level:   Error,
 		message: m,
 		time:    time.Now(),
@@ -97,7 +99,7 @@ func (ls *logsService) Info(message string) *result {
 
 	m := logFormat(Info, message)
 
-	ls.queue <- logs{
+	ls.queue <- &logs{
 		level:   Info,
 		message: m,
 		time:    time.Now(),
@@ -112,7 +114,7 @@ func (ls *logsService) Debug(message string) *result {
 
 	m := logFormat(Debug, message)
 
-	ls.queue <- logs{
+	ls.queue <- &logs{
 		level:   Debug,
 		message: m,
 		time:    time.Now(),
@@ -171,13 +173,17 @@ func logFormat(level level, message string) string {
 
 }
 
-func (logs logs) checkFileName(logLevel *logLevel) {
+func (logs *logs) checkFileName(logLevel *logLevel) {
+
+	logs.lock.Lock()
+
+	defer logs.lock.Unlock()
 
 	name := logs.fileFormat()
 
 	if logLevel.file == nil || logLevel.file.Name() != name {
 
-		//关闭文件
+		//关闭文件(由于文件是根据日期来着，过了一天要关闭上一天的文件流)
 		logLevel.file.Close()
 
 		f, e := os.OpenFile(logLevel.fileDir+"/"+name, os.O_RDWR|os.O_APPEND|os.O_CREATE, 644)
@@ -194,7 +200,7 @@ func (logs logs) checkFileName(logLevel *logLevel) {
 
 }
 
-func (logs logs) fileFormat() string {
+func (logs *logs) fileFormat() string {
 
 	return tools.Date("Y-m-d", logs.time.Unix()) + ".log"
 }
