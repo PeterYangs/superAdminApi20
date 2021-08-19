@@ -282,6 +282,76 @@ func Index(c *contextPlus.Context) *response.Response {
 
 **消息队列**
 
+生成任务类
+```shell
+[root@localhost superAdminApi20]# go run artisan/bin/artisan.go
+Use the arrow keys to navigate: ↓ ↑ → ←
+? 选择类型:
+    数据库迁移
+    数据填充
+    生成key
+  > 生成任务类
+```
+
+任务类
+```go
+package access
+
+import (
+	"gin-web/database"
+	"gin-web/model"
+	"gin-web/task"
+)
+
+type TaskAccess struct {
+	task.BaseTask
+	Parameters *Parameter
+}
+
+type Parameter struct {
+	task.Parameter
+	Ip      string
+	Url     string
+	Params  string
+	AdminId float64
+}
+
+func NewTask(ip string, url string, params string, adminId float64) *TaskAccess {
+
+	return &TaskAccess{
+
+		BaseTask: task.BaseTask{
+			TaskName: "access",
+		},
+		Parameters: &Parameter{
+			Ip:      ip,
+			Url:     url,
+			Params:  params,
+			AdminId: adminId,
+		},
+	}
+}
+
+func (t *TaskAccess) Run() {
+
+	database.GetDb().Create(&model.Access{
+		Ip:      t.Parameters.Ip,
+		Url:     t.Parameters.Url,
+		Params:  t.Parameters.Params,
+		AdminId: t.Parameters.AdminId,
+	})
+
+}
+
+func (t *TaskAccess) BindParameters(p map[string]interface{}) {
+
+	t.BaseTask.Bind(t.Parameters, p)
+
+}
+
+```
+
+
 即时任务
 
 ```go
