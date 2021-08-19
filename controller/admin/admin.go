@@ -2,6 +2,7 @@ package admin
 
 import (
 	"gin-web/common"
+	"gin-web/component/logs"
 	"gin-web/contextPlus"
 	"gin-web/controller/menu"
 	"gin-web/database"
@@ -29,6 +30,8 @@ func List(c *contextPlus.Context) *response.Response {
 	tx := database.GetDb().Model(&model.Admin{}).Order("id desc").Preload("RoleDetail.Role")
 
 	data := common.Paginate(tx, &roles, cast.ToInt(c.DefaultQuery("p", "1")), 10)
+
+	logs.NewLogs().Debug("test")
 
 	return response.Resp().Api(1, "success", data)
 
