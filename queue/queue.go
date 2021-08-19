@@ -33,9 +33,6 @@ var once sync.Once
 
 func init() {
 
-	//handles.Store("email", &email.TaskEmail{Parameters: &email.Parameter{}})
-	//handles.Store("sms", &sms.TaskSms{Parameters: &sms.Parameter{}})
-	//handles.Store("access", &access.TaskAccess{Parameters: &access.Parameter{}})
 	register.Handles.Init()
 
 }
@@ -286,8 +283,6 @@ func (j *job) Queue(queue string) *job {
 
 func (j *job) Run() {
 
-	//fmt.Println(j)
-
 	queue := ""
 
 	if j.Delay_ == 0 {
@@ -310,8 +305,6 @@ func (j *job) Run() {
 			return
 		}
 
-		//fmt.Println(string(data),"----------")
-
 		redis.GetClient().RPush(context.TODO(), queue, data)
 
 	} else {
@@ -325,20 +318,7 @@ func (j *job) Run() {
 			queue = os.Getenv("QUEUE_PREFIX") + "delay"
 		}
 
-		//queueName := os.Getenv("DEFAULT_QUEUE")
-		//
-		//if j.queue != "" {
-		//
-		//	queueName = j.queue
-		//}
-
-		//json.Marshal()
-
 		data, err := json.Marshal(j)
-
-		//fmt.Println()
-		//
-		//fmt.Println(string(data))
 
 		if err != nil {
 
