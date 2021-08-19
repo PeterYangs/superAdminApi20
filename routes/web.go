@@ -31,10 +31,10 @@ func _init(_r group) {
 
 		admin.Group("/rule", func(rule group) {
 
-			rule.Registered(ANY, "/update", rule2.Update).Bind()
+			rule.Registered(POST, "/update", rule2.Update).Bind()
 			rule.Registered(GET, "/list", rule2.List).Bind()
-			rule.Registered(ANY, "/detail/:id", rule2.Detail).Bind()
-			rule.Registered(ANY, "/destroy/:id", rule2.Destroy).Bind()
+			rule.Registered(GET, "/detail/:id", rule2.Detail).Bind()
+			rule.Registered(POST, "/destroy/:id", rule2.Destroy).Bind()
 
 		})
 
@@ -99,7 +99,7 @@ func _init(_r group) {
 
 	_r.Group("/captcha", func(g group) {
 
-		g.Registered(ANY, "/captcha", captcha.Captcha).Bind()
+		g.Registered(GET, "/captcha", captcha.Captcha).Bind()
 	})
 
 	_r.Registered(GET, "/task", controller.Task).Bind()
