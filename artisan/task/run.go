@@ -74,7 +74,7 @@ type Parameter struct {
 	
 }
 	
-func NewTask() *Task` + common.Capitalize(result) + ` {
+func NewTask` + common.Capitalize(result) + `() *Task` + common.Capitalize(result) + ` {
 	
 	return &Task` + common.Capitalize(result) + `{
 	
