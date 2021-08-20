@@ -154,14 +154,14 @@ func Regex(c *contextPlus.Context) *response.Response {
 **数据库迁移**
 
 ```shell
-[root@localhost ~]# go run migrate/bin/run.go
+
+[root@localhost ~]# go run  .\artisan\bin\artisan.go
 Use the arrow keys to navigate: ↓ ↑ → ←
 ? 选择类型:
-  > 创建数据库迁移
-    执行迁移
-    回滚迁移
-
-
+  > 数据库迁移
+    数据填充
+    生成key
+    生成任务类
 
 ```
 
