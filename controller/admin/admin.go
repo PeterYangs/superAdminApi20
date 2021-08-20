@@ -1,14 +1,15 @@
 package admin
 
 import (
+	"encoding/json"
 	"gin-web/common"
-	"gin-web/component/logs"
 	"gin-web/contextPlus"
 	"gin-web/controller/menu"
 	"gin-web/database"
 	"gin-web/model"
 	"gin-web/response"
 	"gin-web/routes/allUrl"
+	"gin-web/search"
 	"github.com/PeterYangs/tools"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
@@ -25,13 +26,26 @@ func GetRoleList(c *contextPlus.Context) *response.Response {
 
 func List(c *contextPlus.Context) *response.Response {
 
+	params := c.DefaultQuery("params", "")
+
+	paramsMap := make(map[string]interface{})
+
+	json.Unmarshal([]byte(params), &paramsMap)
+
+	//fmt.Println(paramsMap)
+
 	roles := make([]*model.Admin, 0)
 
-	tx := database.GetDb().Model(&model.Admin{}).Order("id desc").Preload("RoleDetail.Role")
+	tx := database.GetDb().Debug().Model(&model.Admin{}).Order("id desc").Preload("RoleDetail.Role")
+
+	if paramsMap["role_id"] != "" && len(paramsMap) > 0 {
+
+		tx.Where("EXISTS( select * from role_detail where role_id = ? and  role_detail.admin_id = admin.id )", paramsMap["role_id"])
+	}
+
+	search.NewSearch(tx, paramsMap, []search.Field{{Key: "username", Condition: "like"}})
 
 	data := common.Paginate(tx, &roles, cast.ToInt(c.DefaultQuery("p", "1")), 10)
-
-	logs.NewLogs().Debug("test")
 
 	return response.Resp().Api(1, "success", data)
 
@@ -181,4 +195,14 @@ func GetMyMenu(c *contextPlus.Context) *response.Response {
 	}
 
 	return response.Resp().Api(1, "success", temp)
+}
+
+func RoleList(c *contextPlus.Context) *response.Response {
+
+	roles := make([]*model.Role, 0)
+
+	database.GetDb().Model(&model.Role{}).Find(&roles)
+
+	return response.Resp().Api(1, "success", roles)
+
 }

@@ -58,6 +58,7 @@ func _init(_r group) {
 			admins.Registered(GET, "/SearchRule", admin2.SearchRule).SetTag("skip_auth").Bind()
 			admins.Registered(POST, "/destroy/:id", admin2.Destroy).Bind()
 			admins.Registered(POST, "/getMyMenu", admin2.GetMyMenu).SetTag("skip_auth").Bind()
+			admins.Registered(POST, "/roleList", admin2.RoleList).Bind()
 
 		})
 
