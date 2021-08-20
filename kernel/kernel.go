@@ -16,8 +16,6 @@ func Load() {
 		exception.Exception,
 		session.StartSession,
 		accessLog.AccessLog,
-		//middleware.GoOn,
-		//routeRegex.RouterRegex,
 	}
 
 }

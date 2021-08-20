@@ -89,6 +89,34 @@ func Session(c *contextPlus.Context) *response.Response {
 }
 ```
 
+**全局中间件**
+
+```go
+package kernel
+
+import (
+	"gin-web/contextPlus"
+	"gin-web/middleware/accessLog"
+	"gin-web/middleware/exception"
+	"gin-web/middleware/session"
+)
+
+// Middleware 全局中间件
+var Middleware []contextPlus.HandlerFunc
+
+func Load() {
+
+	Middleware = []contextPlus.HandlerFunc{
+		exception.Exception,
+		session.StartSession,
+		accessLog.AccessLog,
+	}
+
+}
+```
+
+
+
 **验证码**
 
 获取验证码
