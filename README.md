@@ -10,6 +10,9 @@ https://www.peterdemo.net
 
 密码：Aa123456
 
+### 前端仓库
+https://github.com/PeterYangs/superAdminPage20
+
 ### 环境要求
 
 redis
