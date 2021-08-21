@@ -61,7 +61,7 @@ func StartSession(c *contextPlus.Context) {
 
 	//life, _ := strconv.Atoi(os.Getenv("SESSION_LIFETIME"))
 
-	c.SetCookie(conf.Get("cookie_name").(string), u, 0, "/", c.Domain(), false, true)
+	c.SetCookie(conf.Get("cookie_name").(string), u, 10000000, "/", c.Domain(), false, true)
 
 	session := contextPlus.Session{
 		Cookie:      u,
