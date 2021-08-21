@@ -49,5 +49,5 @@ func (c *crontab) hourlyAt(minute int) *crontab {
 
 func (c *crontab) function(fun func()) {
 
-	fun()
+	go fun()
 }
