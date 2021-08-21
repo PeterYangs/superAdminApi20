@@ -18,6 +18,8 @@ func Run() {
 			fmt.Println(s)
 		}
 
+		fmt.Println("---------------")
+
 		time.Sleep(1 * time.Second)
 
 	}
