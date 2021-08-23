@@ -1,7 +1,6 @@
 package crontab
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -11,72 +10,193 @@ func Run() {
 
 	Registered(_crontab)
 
+	start := true
+
+	delay := true
+
 	for {
+
+		if delay {
+
+			for {
+
+				if time.Now().Second() == 0 {
+
+					//fmt.Println("do")
+
+					delay = false
+
+					break
+				}
+
+				//fmt.Println(now.Second())
+
+				time.Sleep(1 * time.Second)
+
+			}
+
+		}
+
+		if !start {
+
+			time.Sleep(1 * time.Minute)
+		}
+
+		now := time.Now()
 
 		for _, s := range _crontab.schedules {
 
-			now := time.Now()
+			if s.day != nil {
 
-			if s.month != nil {
+				dealDay(s, now)
 
 				continue
 			}
 
 			if s.hour != nil {
 
-				if now.Minute() == 0 {
-
-					if s.hour.every {
-
-						if now.Hour()%s.hour.value == 0 {
-
-							go s.fn()
-						}
-
-					} else {
-
-						if now.Hour() == s.hour.value {
-
-							go s.fn()
-						}
-
-					}
-
-				}
+				dealHour(s, now)
 
 				continue
 			}
 
 			if s.minute != nil {
 
-				if now.Second() == 0 {
-
-					if s.minute.every {
-
-						if now.Minute()%s.minute.value == 0 {
-
-							go s.fn()
-						}
-
-					} else {
-
-						if now.Minute() == s.minute.value {
-
-							go s.fn()
-						}
-
-					}
-
-				}
+				dealMinute(s, now)
 
 				continue
 			}
 
 		}
 
-		fmt.Println("---------------")
+		//fmt.Println("")
+		//fmt.Println("")
+		//fmt.Println("")
+		//fmt.Println("")
 
-		time.Sleep(1 * time.Second)
+		start = false
+
+	}
+
+}
+
+func dealMinute(s *schedule, now time.Time) {
+
+	if s.minute.every {
+
+		if now.Minute()%s.minute.value == 0 {
+
+			go s.fn()
+		}
+
+	} else {
+
+		if now.Minute() == s.minute.value {
+
+			go s.fn()
+		}
+
+	}
+
+}
+
+func dealHour(s *schedule, now time.Time) {
+
+	if s.minute == nil {
+
+		if now.Minute() == 0 {
+
+			if s.hour.every {
+
+				if now.Hour()%s.hour.value == 0 {
+
+					go s.fn()
+				}
+
+			} else {
+
+				if now.Hour() == s.hour.value {
+
+					go s.fn()
+				}
+
+			}
+
+		}
+
+	} else {
+
+		if s.hour.every {
+
+			if now.Hour()%s.hour.value == 0 {
+
+				//go s.fn()
+
+				dealMinute(s, now)
+
+			}
+
+		} else {
+
+			if now.Hour() == s.hour.value {
+
+				//go s.fn()
+
+				dealMinute(s, now)
+			}
+
+		}
+
+	}
+
+}
+
+func dealDay(s *schedule, now time.Time) {
+
+	if s.hour == nil {
+
+		if now.Hour() == 0 {
+
+			if s.hour.every {
+
+				if now.Day()%s.day.value == 0 {
+
+					go s.fn()
+				}
+
+			} else {
+
+				if now.Day() == s.day.value {
+
+					go s.fn()
+				}
+
+			}
+
+		}
+
+	} else {
+
+		if s.day.every {
+
+			if now.Day()%s.day.value == 0 {
+
+				//go s.fn()
+
+				dealMinute(s, now)
+
+			}
+
+		} else {
+
+			if now.Day() == s.day.value {
+
+				//go s.fn()
+
+				dealMinute(s, now)
+			}
+
+		}
 
 	}
 

@@ -10,6 +10,8 @@ func main() {
 	//
 	//	now:=time.Now()
 	//
+	//	fmt.Println(now.Day())
+	//
 	//
 	//	fmt.Println(now.Second())
 	//
