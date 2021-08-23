@@ -16,7 +16,8 @@ func Run() {
 
 	for {
 
-		if delay {
+		//每小时校对一下时间
+		if delay || time.Now().Minute() == 0 {
 
 			for {
 
@@ -68,11 +69,6 @@ func Run() {
 			}
 
 		}
-
-		//fmt.Println("")
-		//fmt.Println("")
-		//fmt.Println("")
-		//fmt.Println("")
 
 		start = false
 
