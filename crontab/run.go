@@ -183,7 +183,7 @@ func dealDay(s *schedule, now time.Time) {
 
 				//go s.fn()
 
-				dealMinute(s, now)
+				dealHour(s, now)
 
 			}
 
@@ -193,7 +193,7 @@ func dealDay(s *schedule, now time.Time) {
 
 				//go s.fn()
 
-				dealMinute(s, now)
+				dealHour(s, now)
 			}
 
 		}

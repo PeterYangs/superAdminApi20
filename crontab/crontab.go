@@ -65,9 +65,9 @@ func Registered(c *crontab) {
 
 	})
 
-	c.newSchedule().dayAt(23).hourlyAt(16).minuteAt(40).function(func() {
+	c.newSchedule().dayAt(23).hourlyAt(16).minuteAt(50).function(func() {
 
-		fmt.Println("23号16点40分")
+		fmt.Println("23号16点50分")
 
 	})
 
