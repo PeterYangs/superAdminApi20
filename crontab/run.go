@@ -22,6 +22,31 @@ func Run() {
 				continue
 			}
 
+			if s.hour != nil {
+
+				if now.Minute() == 0 {
+
+					if s.hour.every {
+
+						if now.Hour()%s.hour.value == 0 {
+
+							go s.fn()
+						}
+
+					} else {
+
+						if now.Hour() == s.hour.value {
+
+							go s.fn()
+						}
+
+					}
+
+				}
+
+				continue
+			}
+
 			if s.minute != nil {
 
 				if now.Second() == 0 {

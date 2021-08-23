@@ -28,7 +28,7 @@ type number struct {
 
 func Registered(c *crontab) {
 
-	c.newSchedule().hourly().function(func() {
+	c.newSchedule().everyHour().function(func() {
 
 	})
 
@@ -57,11 +57,13 @@ func (c *crontab) newSchedule() *schedule {
 	}
 }
 
-func (s *schedule) hourly() *schedule {
+//每小时
+func (s *schedule) everyHour() *schedule {
 
 	sc := &schedule{
 		hour: &number{
 			every: true,
+			value: 1,
 		},
 	}
 
@@ -70,6 +72,7 @@ func (s *schedule) hourly() *schedule {
 	return sc
 }
 
+//某一个小时
 func (s *schedule) hourlyAt(minute int) *schedule {
 
 	sc := &schedule{
