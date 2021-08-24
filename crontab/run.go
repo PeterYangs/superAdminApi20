@@ -16,8 +16,7 @@ func Run() {
 
 	for {
 
-		//每小时校对一下时间
-		if delay || time.Now().Minute() == 0 {
+		if delay {
 
 			for {
 
@@ -41,32 +40,38 @@ func Run() {
 
 		now := time.Now()
 
-		for _, s := range _crontab.schedules {
-
-			if s.day != nil {
-
-				dealDay(s, now)
-
-				continue
-			}
-
-			if s.hour != nil {
-
-				dealHour(s, now)
-
-				continue
-			}
-
-			if s.minute != nil {
-
-				dealMinute(s, now)
-
-				continue
-			}
-
-		}
+		go deal(_crontab.schedules, now)
 
 		start = false
+
+	}
+
+}
+
+func deal(schedules []*schedule, now time.Time) {
+
+	for _, s := range schedules {
+
+		if s.day != nil {
+
+			dealDay(s, now)
+
+			continue
+		}
+
+		if s.hour != nil {
+
+			dealHour(s, now)
+
+			continue
+		}
+
+		if s.minute != nil {
+
+			dealMinute(s, now)
+
+			continue
+		}
 
 	}
 
