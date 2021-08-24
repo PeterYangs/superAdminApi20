@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gin-web/component/logs"
 	"gin-web/conf"
+	"gin-web/crontab"
 	"gin-web/kernel"
 	"gin-web/queue"
 	"gin-web/routes"
@@ -92,6 +93,9 @@ func start() {
 
 	//启动消息队列
 	//queueStart()
+
+	//开启任务调度
+	go crontab.Run()
 
 	//设置端口
 	port := os.Getenv("PORT")

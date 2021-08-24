@@ -23,14 +23,10 @@ func Run() {
 
 				if time.Now().Second() == 0 {
 
-					//fmt.Println("do")
-
 					delay = false
 
 					break
 				}
-
-				//fmt.Println(now.Second())
 
 				time.Sleep(1 * time.Second)
 
@@ -187,11 +183,6 @@ func dealDay(s *schedule, now time.Time) {
 
 			} else {
 
-				//if now.Day() == s.day.value {
-				//
-				//	go s.fn()
-				//}
-
 				//时间区间
 				if s.day.between != nil {
 
@@ -225,13 +216,6 @@ func dealDay(s *schedule, now time.Time) {
 			}
 
 		} else {
-
-			//if now.Day() == s.day.value {
-			//
-			//	//go s.fn()
-			//
-			//	dealHour(s, now)
-			//}
 
 			//时间区间
 			if s.day.between != nil {
