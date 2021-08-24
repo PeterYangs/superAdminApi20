@@ -111,9 +111,20 @@ func dealHour(s *schedule, now time.Time) {
 
 			} else {
 
-				if now.Hour() == s.hour.value {
+				//时间区间
+				if s.hour.between != nil {
 
-					go s.fn()
+					if now.Hour() >= s.hour.between.min && now.Hour() <= s.hour.between.max {
+
+						go s.fn()
+					}
+
+				} else {
+
+					if now.Hour() == s.hour.value {
+
+						go s.fn()
+					}
 				}
 
 			}
@@ -134,11 +145,25 @@ func dealHour(s *schedule, now time.Time) {
 
 		} else {
 
-			if now.Hour() == s.hour.value {
+			//时间区间
+			if s.hour.between != nil {
 
-				//go s.fn()
+				if now.Hour() >= s.hour.between.min && now.Hour() <= s.hour.between.max {
 
-				dealMinute(s, now)
+					//go s.fn()
+
+					dealMinute(s, now)
+				}
+
+			} else {
+
+				if now.Hour() == s.hour.value {
+
+					//go s.fn()
+
+					dealMinute(s, now)
+
+				}
 			}
 
 		}
@@ -162,9 +187,25 @@ func dealDay(s *schedule, now time.Time) {
 
 			} else {
 
-				if now.Day() == s.day.value {
+				//if now.Day() == s.day.value {
+				//
+				//	go s.fn()
+				//}
 
-					go s.fn()
+				//时间区间
+				if s.day.between != nil {
+
+					if now.Day() >= s.day.between.min && now.Day() <= s.day.between.max {
+
+						go s.fn()
+					}
+
+				} else {
+
+					if now.Day() == s.day.value {
+
+						go s.fn()
+					}
 				}
 
 			}
@@ -185,11 +226,32 @@ func dealDay(s *schedule, now time.Time) {
 
 		} else {
 
-			if now.Day() == s.day.value {
+			//if now.Day() == s.day.value {
+			//
+			//	//go s.fn()
+			//
+			//	dealHour(s, now)
+			//}
 
-				//go s.fn()
+			//时间区间
+			if s.day.between != nil {
 
-				dealHour(s, now)
+				if now.Day() >= s.day.between.min && now.Day() <= s.day.between.max {
+
+					//go s.fn()
+
+					dealHour(s, now)
+				}
+
+			} else {
+
+				if now.Day() == s.day.value {
+
+					//go s.fn()
+
+					dealHour(s, now)
+
+				}
 			}
 
 		}

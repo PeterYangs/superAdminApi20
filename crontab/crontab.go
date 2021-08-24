@@ -1,6 +1,9 @@
 package crontab
 
-import "fmt"
+import (
+	"fmt"
+	"runtime/debug"
+)
 
 type crontab struct {
 	schedules []*schedule
@@ -23,8 +26,14 @@ type schedule struct {
 }
 
 type number struct {
-	every bool //每
-	value int  //数值
+	every   bool //每
+	value   int  //数值
+	between *between
+}
+
+type between struct {
+	min int
+	max int
 }
 
 func Registered(c *crontab) {
@@ -49,6 +58,8 @@ func Registered(c *crontab) {
 
 	c.newSchedule().everyMinute().function(func() {
 
+		panic("模拟报错")
+
 		fmt.Println("每分钟")
 
 	})
@@ -68,6 +79,24 @@ func Registered(c *crontab) {
 	c.newSchedule().dayAt(23).hourlyAt(16).minuteAt(50).function(func() {
 
 		fmt.Println("23号16点50分")
+
+	})
+
+	c.newSchedule().dayAt(24).hourBetween(8, 10).function(func() {
+
+		fmt.Println("24号8点-10点")
+
+	})
+
+	c.newSchedule().hourBetween(8, 9).everyMinute().function(func() {
+
+		fmt.Println("24号8点-9点每分钟")
+
+	})
+
+	c.newSchedule().dayBetween(22, 24).everyHour().everyMinute().function(func() {
+
+		fmt.Println("22号-24号每分钟")
 
 	})
 
@@ -137,6 +166,67 @@ func (s *schedule) dayAt(day int) *schedule {
 
 }
 
+//每几天
+func (s *schedule) everyDayAt(day int) *schedule {
+
+	if s.first {
+
+		sc := &schedule{
+
+			day: &number{
+				value: day,
+				every: true,
+			},
+			first: false,
+		}
+
+		s.crontab.schedules = append(s.crontab.schedules, sc)
+
+		return sc
+
+	}
+
+	s.day = &number{
+		value: day,
+		every: true,
+	}
+
+	return s
+
+}
+
+//天，时间区间
+func (s *schedule) dayBetween(min, max int) *schedule {
+
+	if s.first {
+
+		sc := &schedule{
+			day: &number{
+				between: &between{
+					min: min,
+					max: max,
+				},
+			},
+			first: false,
+		}
+
+		s.crontab.schedules = append(s.crontab.schedules, sc)
+
+		return sc
+
+	}
+
+	s.day = &number{
+		between: &between{
+			min: min,
+			max: max,
+		},
+	}
+
+	return s
+
+}
+
 //每小时
 func (s *schedule) everyHour() *schedule {
 
@@ -188,6 +278,67 @@ func (s *schedule) hourlyAt(hour int) *schedule {
 	}
 
 	return s
+}
+
+//每几个小时
+func (s *schedule) everyHourAt(hour int) *schedule {
+
+	if s.first {
+
+		sc := &schedule{
+
+			hour: &number{
+				value: hour,
+				every: true,
+			},
+			first: false,
+		}
+
+		s.crontab.schedules = append(s.crontab.schedules, sc)
+
+		return sc
+
+	}
+
+	s.hour = &number{
+		value: hour,
+		every: true,
+	}
+
+	return s
+
+}
+
+//小时，时间区间
+func (s *schedule) hourBetween(min, max int) *schedule {
+
+	if s.first {
+
+		sc := &schedule{
+			hour: &number{
+				between: &between{
+					min: min,
+					max: max,
+				},
+			},
+			first: false,
+		}
+
+		s.crontab.schedules = append(s.crontab.schedules, sc)
+
+		return sc
+
+	}
+
+	s.hour = &number{
+		between: &between{
+			min: min,
+			max: max,
+		},
+	}
+
+	return s
+
 }
 
 //每分钟
@@ -279,5 +430,24 @@ func (s *schedule) function(fun func()) {
 
 	//fmt.Println(fun)
 
-	s.fn = fun
+	f := func() {
+
+		//捕获协程异常
+		defer func() {
+
+			if r := recover(); r != nil {
+
+				fmt.Println(r)
+
+				fmt.Println(debug.Stack())
+
+			}
+
+		}()
+
+		fun()
+
+	}
+
+	s.fn = f
 }
