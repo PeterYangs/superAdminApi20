@@ -22,12 +22,14 @@ func main() {
 
 	sigs := make(chan os.Signal, 1)
 
+	//退出信号
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	cxt, cancel := context.WithCancel(context.Background())
 
 	wait := sync.WaitGroup{}
 
+	//启动http服务
 	go start()
 
 	//延迟队列的标记
@@ -51,6 +53,7 @@ func main() {
 		cancel()
 	}()
 
+	//等待队列退出
 	wait.Wait()
 
 	fmt.Println("finish")
@@ -91,9 +94,6 @@ func start() {
 	//加载路由
 	routes.Load(r)
 
-	//启动消息队列
-	//queueStart()
-
 	//开启任务调度
 	go crontab.Run()
 
@@ -104,19 +104,6 @@ func start() {
 
 		port = "8887"
 	}
-
-	//sysType := runtime.GOOS
-
-	////支持平滑重启，kill -1 pid
-	//if sysType == "linux" {
-	//	// LINUX系统
-	//
-	//	endless.ListenAndServe(":"+port, r)
-	//}
-
-	//windows只做开发测试
-	//if sysType == "windows" {
-	// windows系统
 
 	r.Run(":" + port)
 
