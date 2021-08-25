@@ -12,7 +12,6 @@ import (
 	redis2 "github.com/go-redis/redis/v8"
 	uuid "github.com/satori/go.uuid"
 	"github.com/spf13/cast"
-	"log"
 	"os"
 	"runtime/debug"
 	"sync"
@@ -107,7 +106,9 @@ func Run(cxt context.Context, wait *sync.WaitGroup) {
 
 		if err != nil {
 
-			log.Println(err)
+			//log.Println(err)
+
+			fmt.Println(err)
 
 			fmt.Println("队列退出")
 

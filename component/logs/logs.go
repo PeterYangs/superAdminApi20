@@ -1,6 +1,7 @@
 package logs
 
 import (
+	"context"
 	"fmt"
 	"github.com/PeterYangs/tools"
 	"github.com/spf13/cast"
@@ -139,9 +140,21 @@ func (r *result) Stdout() {
 	fmt.Println(r.message)
 }
 
-func (ls *logsService) Task() {
+func (ls *logsService) Task(cxt context.Context, wait *sync.WaitGroup) {
 
-	defer close(ls.queue)
+	defer wait.Done()
+
+	go func() {
+
+		select {
+
+		case <-cxt.Done():
+
+			close(ls.queue)
+
+		}
+
+	}()
 
 	for message := range ls.queue {
 
@@ -155,6 +168,8 @@ func (ls *logsService) Task() {
 		ls.logLevels[message.level].file.Write([]byte(message.message))
 
 	}
+
+	fmt.Println("日志模块安全退出")
 
 }
 

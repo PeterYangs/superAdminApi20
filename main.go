@@ -44,6 +44,9 @@ func main() {
 
 	}
 
+	//日志模块初始化
+	logInit(cxt, &wait)
+
 	go func() {
 
 		sig := <-sigs
@@ -70,18 +73,19 @@ func init() {
 
 }
 
-func logInit() {
+func logInit(cxt context.Context, wait *sync.WaitGroup) {
+
+	//日志退出标记
+	wait.Add(1)
 
 	l := logs.CreateLogs()
 
-	go l.Task()
+	//日志写入任务
+	go l.Task(cxt, wait)
 
 }
 
 func start() {
-
-	//日志文件夹初始化
-	logInit()
 
 	r := gin.Default()
 
