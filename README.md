@@ -2,6 +2,8 @@
 
 开箱即用的后台框架
 
+[中文文档](https://www.kancloud.cn/peter_yang/v001/2401726)
+
 ### 在线demo
 
 https://www.peterdemo.net
