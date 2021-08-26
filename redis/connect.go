@@ -20,12 +20,14 @@ type _connect struct {
 }
 
 type lock struct {
-	key         string
-	expiration  time.Duration
-	connect     *_connect
-	requestId   string
-	checkCancel chan bool
-	mu          sync.Mutex
+	key        string
+	expiration time.Duration
+	connect    *_connect
+	requestId  string
+	//checkCancel chan bool
+	mu         sync.Mutex
+	cancelCxt  context.Context
+	cancelFunc context.CancelFunc
 }
 
 var Client *_connect
@@ -216,7 +218,18 @@ func (cc *_connect) Lock(key string, expiration time.Duration) *lock {
 
 	lockId := uuid.NewV4().String()
 
-	return &lock{key: conf.Get("lock_prefix").(string) + key, expiration: expiration, connect: cc, requestId: lockId, mu: sync.Mutex{}}
+	//取消提醒context
+	cxt, cancelCxt := context.WithCancel(context.Background())
+
+	return &lock{
+		key:        conf.Get("lock_prefix").(string) + key,
+		expiration: expiration,
+		connect:    cc,
+		requestId:  lockId,
+		mu:         sync.Mutex{},
+		cancelCxt:  cxt,
+		cancelFunc: cancelCxt,
+	}
 }
 
 // Get 获取锁
@@ -284,6 +297,8 @@ func (lk *lock) Release() error {
 
 	lk.mu.Lock()
 
+	defer lk.mu.Unlock()
+
 	cxt, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 
 	defer cancel()
@@ -297,7 +312,7 @@ func (lk *lock) Release() error {
 	`
 	res, err := redis.NewScript(luaScript).Run(cxt, GetClient().connect, []string{conf.Get("redis_prefix").(string) + lk.key}, lk.requestId).Result()
 
-	lk.mu.Unlock()
+	//lk.mu.Unlock()
 
 	if err != nil {
 
@@ -306,7 +321,8 @@ func (lk *lock) Release() error {
 
 	if res.(int64) != 0 {
 
-		lk.checkCancel <- true
+		lk.cancelFunc()
+
 	}
 
 	return err
@@ -320,12 +336,9 @@ func (lk *lock) ForceRelease() error {
 
 	defer func() {
 
+		lk.cancelFunc()
+
 		lk.mu.Unlock()
-
-		if lk.checkCancel != nil {
-
-			lk.checkCancel <- true
-		}
 
 	}()
 
@@ -344,11 +357,19 @@ func (lk *lock) checkLockIsRelease() {
 
 	for {
 
-		checkCxt, _ := context.WithTimeout(context.Background(), time.Millisecond*time.Duration(lk.expiration.Milliseconds()-lk.expiration.Milliseconds()/10))
-
-		lk.checkCancel = make(chan bool)
+		//需要提前一段时间验证锁是否还存在，否则锁会被redis释放
+		checkCxt, c := context.WithTimeout(context.Background(), time.Millisecond*time.Duration(lk.expiration.Milliseconds()-lk.expiration.Milliseconds()/5))
 
 		select {
+
+		//被手动释放锁
+		case <-lk.cancelCxt.Done():
+
+			//fmt.Println("手动释放1111")
+
+			c()
+
+			return
 
 		case <-checkCxt.Done():
 
@@ -357,25 +378,30 @@ func (lk *lock) checkLockIsRelease() {
 
 			if !isContinue {
 
+				c()
+
 				return
 			}
-
-		//取消
-		case <-lk.checkCancel:
-
-			//fmt.Println("释放")
-
-			return
 
 		}
 
 	}
 }
 
-//判断锁是否已被释放
+//判断锁是否已被释放，还未释放就续期
 func (lk *lock) done() bool {
 
 	lk.mu.Lock()
+
+	select {
+
+	case <-lk.cancelCxt.Done():
+
+		return false
+
+	default:
+
+	}
 
 	defer lk.mu.Unlock()
 

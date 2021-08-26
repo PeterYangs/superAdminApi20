@@ -195,6 +195,7 @@ func checkDelay(cxt context.Context, wait *sync.WaitGroup) {
 
 }
 
+//延迟任务检查
 func push() {
 
 	//分布式锁

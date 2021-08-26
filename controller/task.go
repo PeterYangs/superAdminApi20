@@ -1,8 +1,11 @@
 package controller
 
 import (
+	"fmt"
 	"gin-web/contextPlus"
+	"gin-web/redis"
 	"gin-web/response"
+	"time"
 )
 
 func Task(c *contextPlus.Context) *response.Response {
@@ -12,7 +15,20 @@ func Task(c *contextPlus.Context) *response.Response {
 
 	//fmt.Println(123)
 
-	return response.Resp().Api(1, "123", "")
+	lock := redis.GetClient().Lock("test", 3*time.Second)
+
+	defer lock.Release()
+
+	if lock.Block(3 * time.Second) {
+
+		time.Sleep(5 * time.Second)
+
+		fmt.Println("拿锁成功")
+
+		return response.Resp().Api(1, "123", "拿锁成功")
+	}
+
+	return response.Resp().Api(1, "123", "fail")
 
 }
 
