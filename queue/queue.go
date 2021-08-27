@@ -18,8 +18,6 @@ import (
 	"time"
 )
 
-//var handles = sync.Map{}
-
 type job struct {
 	Delay_ time.Duration `json:"-"` //延迟
 	Data_  task.Task     `json:"data"`
@@ -75,8 +73,6 @@ func Run(cxt context.Context, wait *sync.WaitGroup) {
 
 		case <-cxt.Done():
 
-			//fmt.Println("即时队列退出")
-
 			queueCancel()
 
 			return
@@ -102,11 +98,7 @@ func Run(cxt context.Context, wait *sync.WaitGroup) {
 		//timeout为0则为永久超时
 		s, err := redis.GetClient().BLPop(queueContext, 0, queues...).Result()
 
-		//fmt.Println(s)
-
 		if err != nil {
-
-			//log.Println(err)
 
 			fmt.Println(err)
 
@@ -128,14 +120,9 @@ func Run(cxt context.Context, wait *sync.WaitGroup) {
 
 		data := jsons["data"].(map[string]interface{})
 
-		//fmt.Println(p)
-
-		////获取task
+		//获取task
 		hh, ok := register.Handles.GetTask(data["TaskName"].(string))
 
-		//hh, ok := handles.Load(data["TaskName"].(string))
-		//hh, ok := handles.Load(jsons.Data_.GetName())
-		//
 		h := hh.(task.Task)
 
 		if !ok {
@@ -145,10 +132,10 @@ func Run(cxt context.Context, wait *sync.WaitGroup) {
 			continue
 		}
 
-		////绑定参数
+		//绑定参数
 		h.BindParameters(data["Parameters"].(map[string]interface{}))
-		//
-		////执行任务
+
+		//执行任务
 		h.Run()
 
 	}
