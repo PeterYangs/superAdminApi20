@@ -2,7 +2,6 @@ package crontab
 
 import (
 	"fmt"
-	"time"
 )
 
 func Registered(c *crontab) {
@@ -31,8 +30,8 @@ func Registered(c *crontab) {
 
 		//panic("模拟报错")
 		fmt.Println("每分钟")
-		time.Sleep(5 * time.Second)
-		fmt.Println("结束")
+		//time.Sleep(5 * time.Second)
+		//fmt.Println("结束")
 
 	})
 	//
