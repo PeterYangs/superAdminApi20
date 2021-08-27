@@ -81,6 +81,11 @@ func GetClient() *_connect {
 
 }
 
+func (cc *_connect) Ping(cxt context.Context) *redis.StatusCmd {
+
+	return cc.connect.Ping(cxt)
+}
+
 func (cc *_connect) Get(cxt context.Context, key string) *redis.StringCmd {
 
 	return cc.connect.Get(cxt, conf.Get("redis_prefix").(string)+key)
