@@ -16,6 +16,7 @@ func Run() {
 
 	for {
 
+		//准点校对
 		if delay {
 
 			for {
