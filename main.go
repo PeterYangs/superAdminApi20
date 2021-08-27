@@ -30,7 +30,7 @@ func main() {
 	wait := sync.WaitGroup{}
 
 	//启动http服务
-	go start()
+	go start(&wait)
 
 	//延迟队列的标记
 	wait.Add(1)
@@ -85,7 +85,7 @@ func logInit(cxt context.Context, wait *sync.WaitGroup) {
 
 }
 
-func start() {
+func start(wait *sync.WaitGroup) {
 
 	r := gin.Default()
 
@@ -99,7 +99,7 @@ func start() {
 	routes.Load(r)
 
 	//开启任务调度
-	go crontab.Run()
+	go crontab.Run(wait)
 
 	//设置端口
 	port := os.Getenv("PORT")

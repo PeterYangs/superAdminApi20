@@ -1,12 +1,15 @@
 package crontab
 
 import (
+	"sync"
 	"time"
 )
 
-func Run() {
+func Run(wait *sync.WaitGroup) {
 
-	_crontab := &crontab{}
+	_crontab := &crontab{
+		quitWait: wait,
+	}
 
 	Registered(_crontab)
 
@@ -41,7 +44,7 @@ func Run() {
 
 		now := time.Now()
 
-		go deal(_crontab.schedules, now)
+		go deal(_crontab, now)
 
 		start = false
 
@@ -49,9 +52,9 @@ func Run() {
 
 }
 
-func deal(schedules []*schedule, now time.Time) {
+func deal(crontab *crontab, now time.Time) {
 
-	for _, s := range schedules {
+	for _, s := range crontab.schedules {
 
 		if s.day != nil {
 

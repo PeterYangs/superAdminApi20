@@ -3,10 +3,12 @@ package crontab
 import (
 	"fmt"
 	"gin-web/component/logs"
+	"sync"
 )
 
 type crontab struct {
 	schedules []*schedule
+	quitWait  *sync.WaitGroup
 }
 
 type schedule struct {
@@ -49,17 +51,9 @@ func (s *schedule) everyDay() *schedule {
 
 	if s.first {
 
-		sc := &schedule{
-			day: &number{
-				every: true,
-				value: 1,
-			},
-			first: false,
-		}
+		s.first = false
 
-		s.crontab.schedules = append(s.crontab.schedules, sc)
-
-		return sc
+		s.crontab.schedules = append(s.crontab.schedules, s)
 
 	}
 
@@ -77,22 +71,14 @@ func (s *schedule) dayAt(day int) *schedule {
 
 	if s.first {
 
-		sc := &schedule{
-			day: &number{
-				//every: true,
-				value: day,
-			},
-			first: false,
-		}
+		s.first = false
 
-		s.crontab.schedules = append(s.crontab.schedules, sc)
-
-		return sc
+		s.crontab.schedules = append(s.crontab.schedules, s)
 
 	}
 
 	s.day = &number{
-		//every: true,
+
 		value: day,
 	}
 
@@ -105,18 +91,9 @@ func (s *schedule) everyDayAt(day int) *schedule {
 
 	if s.first {
 
-		sc := &schedule{
+		s.first = false
 
-			day: &number{
-				value: day,
-				every: true,
-			},
-			first: false,
-		}
-
-		s.crontab.schedules = append(s.crontab.schedules, sc)
-
-		return sc
+		s.crontab.schedules = append(s.crontab.schedules, s)
 
 	}
 
@@ -134,19 +111,9 @@ func (s *schedule) dayBetween(min, max int) *schedule {
 
 	if s.first {
 
-		sc := &schedule{
-			day: &number{
-				between: &between{
-					min: min,
-					max: max,
-				},
-			},
-			first: false,
-		}
+		s.first = false
 
-		s.crontab.schedules = append(s.crontab.schedules, sc)
-
-		return sc
+		s.crontab.schedules = append(s.crontab.schedules, s)
 
 	}
 
@@ -166,17 +133,9 @@ func (s *schedule) everyHour() *schedule {
 
 	if s.first {
 
-		sc := &schedule{
-			hour: &number{
-				every: true,
-				value: 1,
-			},
-			first: false,
-		}
+		s.first = false
 
-		s.crontab.schedules = append(s.crontab.schedules, sc)
-
-		return sc
+		s.crontab.schedules = append(s.crontab.schedules, s)
 
 	}
 
@@ -194,16 +153,9 @@ func (s *schedule) hourlyAt(hour int) *schedule {
 
 	if s.first {
 
-		sc := &schedule{
-			hour: &number{
-				value: hour,
-			},
-			first: false,
-		}
+		s.first = false
 
-		s.crontab.schedules = append(s.crontab.schedules, sc)
-
-		return sc
+		s.crontab.schedules = append(s.crontab.schedules, s)
 
 	}
 
@@ -219,18 +171,9 @@ func (s *schedule) everyHourAt(hour int) *schedule {
 
 	if s.first {
 
-		sc := &schedule{
+		s.first = false
 
-			hour: &number{
-				value: hour,
-				every: true,
-			},
-			first: false,
-		}
-
-		s.crontab.schedules = append(s.crontab.schedules, sc)
-
-		return sc
+		s.crontab.schedules = append(s.crontab.schedules, s)
 
 	}
 
@@ -248,19 +191,9 @@ func (s *schedule) hourBetween(min, max int) *schedule {
 
 	if s.first {
 
-		sc := &schedule{
-			hour: &number{
-				between: &between{
-					min: min,
-					max: max,
-				},
-			},
-			first: false,
-		}
+		s.first = false
 
-		s.crontab.schedules = append(s.crontab.schedules, sc)
-
-		return sc
+		s.crontab.schedules = append(s.crontab.schedules, s)
 
 	}
 
@@ -280,18 +213,9 @@ func (s *schedule) everyMinute() *schedule {
 
 	if s.first {
 
-		sc := &schedule{
+		s.first = false
 
-			minute: &number{
-				value: 1,
-				every: true,
-			},
-			first: false,
-		}
-
-		s.crontab.schedules = append(s.crontab.schedules, sc)
-
-		return sc
+		s.crontab.schedules = append(s.crontab.schedules, s)
 
 	}
 
@@ -308,18 +232,9 @@ func (s *schedule) everyMinuteAt(minute int) *schedule {
 
 	if s.first {
 
-		sc := &schedule{
+		s.first = false
 
-			minute: &number{
-				value: minute,
-				every: true,
-			},
-			first: false,
-		}
-
-		s.crontab.schedules = append(s.crontab.schedules, sc)
-
-		return sc
+		s.crontab.schedules = append(s.crontab.schedules, s)
 
 	}
 
@@ -336,17 +251,9 @@ func (s *schedule) minuteAt(minute int) *schedule {
 
 	if s.first {
 
-		sc := &schedule{
+		s.first = false
 
-			minute: &number{
-				value: minute,
-			},
-			first: false,
-		}
-
-		s.crontab.schedules = append(s.crontab.schedules, sc)
-
-		return sc
+		s.crontab.schedules = append(s.crontab.schedules, s)
 
 	}
 
@@ -360,20 +267,15 @@ func (s *schedule) minuteAt(minute int) *schedule {
 
 func (s *schedule) function(fun func()) {
 
-	//go fun()
-
-	//fmt.Println(fun)
-
 	f := func() {
+
+		//定时任务安全退出
+		s.crontab.quitWait.Add(1)
 
 		//捕获协程异常
 		defer func() {
 
 			if r := recover(); r != nil {
-
-				//fmt.Println(r)
-
-				//fmt.Println(debug.Stack())
 
 				msg := fmt.Sprint(r)
 
@@ -382,6 +284,8 @@ func (s *schedule) function(fun func()) {
 				fmt.Println(msg)
 
 			}
+
+			s.crontab.quitWait.Done()
 
 		}()
 
