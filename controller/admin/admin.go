@@ -36,7 +36,7 @@ func List(c *contextPlus.Context) *response.Response {
 
 	roles := make([]*model.Admin, 0)
 
-	tx := database.GetDb().Debug().Model(&model.Admin{}).Order("id desc").Preload("RoleDetail.Role")
+	tx := database.GetDb().Model(&model.Admin{}).Order("id desc").Preload("RoleDetail.Role")
 
 	if paramsMap["role_id"] != "" && len(paramsMap) > 0 {
 
@@ -204,5 +204,43 @@ func RoleList(c *contextPlus.Context) *response.Response {
 	database.GetDb().Model(&model.Role{}).Find(&roles)
 
 	return response.Resp().Api(1, "success", roles)
+
+}
+
+func GetAllRule(c *contextPlus.Context) *response.Response {
+
+	admin, _ := c.Session().Get("admin")
+
+	id := admin.(map[string]interface{})["id"].(float64)
+
+	var r model.Admin
+
+	database.GetDb().Where("id = ?", id).Preload("RoleDetail.Role").First(&r)
+
+	if r.RoleDetail.RoleId == 0 {
+
+		return response.Resp().Api(1, "success", true)
+	}
+
+	rules := make([]*model.Rule, 0)
+
+	ids := make([]string, len(r.RoleDetail.Role.Rules))
+
+	for i, rule := range r.RoleDetail.Role.Rules {
+
+		ids[i] = cast.ToString(rule)
+	}
+
+	database.GetDb().Where("id in ?", ids).Find(&rules)
+
+	list := make([]string, len(r.RoleDetail.Role.Rules))
+
+	for i, rule := range rules {
+
+		list[i] = rule.Rule
+
+	}
+
+	return response.Resp().Api(1, "success", list)
 
 }
