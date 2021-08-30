@@ -19,7 +19,7 @@ func StartSession(c *contextPlus.Context) {
 	//获取浏览器中的cookie
 	cookie, err := c.Cookie(conf.Get("cookie_name").(string))
 
-	//配置中读取session的存活时间
+	//从配置中读取session的存活时间
 	sessionLifetime_, _ := strconv.Atoi(os.Getenv("SESSION_LIFETIME"))
 
 	sessionLifetime := int64(sessionLifetime_)
