@@ -63,6 +63,17 @@ func CreateLogs() *logsService {
 
 	service.MakeDir()
 
+	f, err := os.OpenFile("logs/run.pid", os.O_RDWR|os.O_CREATE, 0664)
+
+	if err != nil {
+
+		panic(err)
+	}
+
+	f.Write([]byte(cast.ToString(os.Getpid())))
+
+	f.Close()
+
 	return service
 
 }
@@ -205,7 +216,9 @@ func (logs *logs) checkFileName(logLevel *logLevel) {
 
 		if e != nil {
 
-			panic(e)
+			return
+
+			//panic(e)
 
 		}
 

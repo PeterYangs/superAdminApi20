@@ -11,6 +11,7 @@ require (
 	github.com/go-redis/redis/v8 v8.10.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/joho/godotenv v1.3.0
+	github.com/kardianos/service v1.2.0
 	github.com/manifoldco/promptui v0.8.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/cast v1.3.1

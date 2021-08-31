@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"gin-web/contextPlus"
 	access2 "gin-web/controller/access"
 	admin2 "gin-web/controller/admin"
 	"gin-web/controller/captcha"
@@ -11,9 +12,11 @@ import (
 	role2 "gin-web/controller/role"
 	rule2 "gin-web/controller/rule"
 	upload2 "gin-web/controller/upload"
+	"gin-web/kernel"
 	"gin-web/middleware/authCheck"
 	"gin-web/middleware/loginCheck"
 	"gin-web/middleware/loginLimiter"
+	"gin-web/response"
 )
 
 func _init(_r group) {
@@ -102,6 +105,22 @@ func _init(_r group) {
 
 		g.Registered(GET, "/captcha", captcha.Captcha).Bind()
 	})
+
+	//判断http服务已启动接口
+	_r.Registered(GET, "/ping/:id", func(c *contextPlus.Context) *response.Response {
+
+		id := c.Param("id")
+
+		//判断服务id
+		if id == kernel.Id {
+
+			return response.Resp().String("success")
+		}
+
+		return response.Resp().String("fail")
+
+	}).Bind()
+
 	//
 	//_r.Registered(GET, "/task", controller.Task).Bind()
 	//_r.Registered(GET, "/task2", controller.Task2).Bind()
