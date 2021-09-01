@@ -21,6 +21,47 @@ redis
 
 mysql
 
+
+### 开发模式
+```shell
+go run main.go
+```
+
+### 编译&部署
+编译二进制文件
+```
+go build main.go
+```
+
+直接运行
+```
+./main
+
+或者
+
+./main start
+```
+
+后台运行(目前仅支持Linux平台)
+```
+./main start -d
+```
+
+停止(目前仅支持Linux平台)
+```
+./main stop
+```
+
+重启(目前仅支持Linux平台)
+```
+./main restart
+```
+
+
+
+
+
+
 ### Quick start
 
 **controller**

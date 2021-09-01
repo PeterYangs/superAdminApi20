@@ -2,19 +2,24 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"gin-web/common"
 	"gin-web/component/logs"
 	"gin-web/conf"
 	"gin-web/crontab"
 	"gin-web/kernel"
 	"gin-web/queue"
 	"gin-web/routes"
+	"github.com/PeterYangs/tools/file/read"
 	"github.com/PeterYangs/tools/http"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/spf13/cast"
 	"log"
+	http_ "net/http"
 	"os"
+	"os/exec"
 	"os/signal"
 	"sync"
 	"syscall"
@@ -22,6 +27,82 @@ import (
 )
 
 func main() {
+
+	args := os.Args
+	daemon := false
+	for k, v := range args {
+		if v == "-d" {
+			daemon = true
+			args[k] = ""
+		}
+	}
+
+	//直接运行则为阻塞模式，用于开发模式
+	if len(args) == 1 {
+
+		serverStart()
+
+		return
+	}
+
+	switch args[1] {
+
+	case "start":
+
+		//后台运行模式
+		if daemon {
+			daemonize(args...)
+			return
+		}
+
+		serverStart()
+
+	case "stop":
+
+		err := stop()
+
+		if err != nil {
+
+			log.Println(err)
+
+		}
+
+	case "restart":
+
+		err := stop()
+
+		if err != nil {
+
+			log.Println(err)
+
+			return
+
+		}
+
+		cmdLine, err := read.Open("logs/cmd").Read()
+
+		if err != nil {
+
+			log.Println(err)
+
+			return
+		}
+
+		cmd := exec.Command("bash", "-c", string(cmdLine)+" start")
+		//cmd.Env = os.Environ()
+		err = cmd.Start()
+
+		if err != nil {
+
+			log.Println(err)
+
+		}
+
+	}
+
+}
+
+func serverStart() {
 
 	kernel.IdInit()
 
@@ -38,6 +119,8 @@ func main() {
 
 	httpFail := make(chan bool)
 
+	srv := &http_.Server{}
+
 	go func() {
 
 		sig := <-sigs
@@ -45,13 +128,31 @@ func main() {
 		fmt.Println()
 		fmt.Println(sig)
 
+		//删除pid文件
+		os.Remove("logs/run.pid")
+
+		//删除运行命令
+		//os.Remove("logs/cmd")
+
+		c, e := context.WithTimeout(context.Background(), 3*time.Second)
+
+		defer e()
+
+		//关闭http服务
+		err := srv.Shutdown(c)
+
+		if err != nil {
+
+			log.Println(err)
+		}
+
 		cancel()
 	}()
 
 	go boot(cxt, &wait, httpOk, httpFail)
 
 	//启动http服务
-	go httpStart(httpFail)
+	go httpStart(httpFail, srv)
 
 	<-httpOk
 
@@ -59,7 +160,6 @@ func main() {
 	wait.Wait()
 
 	fmt.Println("finish")
-
 }
 
 func init() {
@@ -84,7 +184,7 @@ func logInit(cxt context.Context, wait *sync.WaitGroup) {
 
 }
 
-func httpStart(httpFail chan bool) {
+func httpStart(httpFail chan bool, srv *http_.Server) {
 
 	r := gin.Default()
 
@@ -105,13 +205,15 @@ func httpStart(httpFail chan bool) {
 		port = "8887"
 	}
 
-	err := r.Run(":" + port)
+	srv.Addr = ":" + port
 
-	if err != nil {
+	srv.Handler = r
 
-		log.Println(err)
+	if err := srv.ListenAndServe(); err != nil && err != http_.ErrServerClosed {
 
 		httpFail <- true
+
+		log.Println(err)
 	}
 
 }
@@ -160,8 +262,6 @@ func boot(cxt context.Context, wait *sync.WaitGroup, httpOk chan bool, httpFail 
 
 			str, err := client.Request().GetToString("http://127.0.0.1:" + os.Getenv("PORT") + "/ping/" + kernel.Id)
 
-			//fmt.Println(str, err)
-
 			if err == nil && str == "success" {
 
 				//开启任务调度
@@ -173,11 +273,107 @@ func boot(cxt context.Context, wait *sync.WaitGroup, httpOk chan bool, httpFail 
 				//日志模块初始化
 				logInit(cxt, wait)
 
+				//记录pid和启动命令
+				runInit()
+
 				return
 
 			}
 		}
 
 	}
+
+}
+
+func daemonize(args ...string) {
+	var arg []string
+	if len(args) > 1 {
+		arg = args[1:]
+	}
+	cmd := exec.Command(args[0], arg...)
+	cmd.Env = os.Environ()
+	err := cmd.Start()
+
+	if err != nil {
+
+		fmt.Println(err)
+	}
+}
+
+func stop() error {
+
+	b, err := common.PathExists("logs/run.pid")
+
+	if err != nil {
+
+		//log.Println(err)
+
+		return err
+	}
+
+	if b {
+
+		pid, err := read.Open("logs/run.pid").Read()
+
+		if err != nil {
+
+			//log.Println(err)
+
+			return err
+
+		}
+
+		cmd := exec.Command("bash", "-c", "kill "+string(pid))
+
+		err = cmd.Start()
+
+		cmd.Wait()
+
+		if err != nil {
+
+			//log.Println(err)
+
+			return err
+
+		}
+
+	} else {
+
+		//fmt.Println("run.pid文件不存在")
+
+		return errors.New("run.pid文件不存在")
+	}
+
+	return nil
+}
+
+//记录pid和启动命令
+func runInit() {
+
+	f, err := os.OpenFile("logs/run.pid", os.O_RDWR|os.O_CREATE, 0664)
+
+	if err != nil {
+
+		panic(err)
+	}
+
+	//记录pid
+	f.Write([]byte(cast.ToString(os.Getpid())))
+
+	f.Close()
+
+	args := os.Args
+
+	f, err = os.OpenFile("logs/cmd", os.O_RDWR|os.O_CREATE, 0664)
+
+	if err != nil {
+
+		panic(err)
+	}
+
+	//记录启动命令
+	f.Write([]byte(args[0]))
+
+	f.Close()
 
 }
