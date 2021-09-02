@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"errors"
 	"fmt"
@@ -11,11 +12,13 @@ import (
 	"gin-web/kernel"
 	"gin-web/queue"
 	"gin-web/routes"
+	"github.com/PeterYangs/tools"
 	"github.com/PeterYangs/tools/file/read"
 	"github.com/PeterYangs/tools/http"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/spf13/cast"
+	"io"
 	"log"
 	http_ "net/http"
 	"os"
@@ -41,7 +44,9 @@ func main() {
 	//直接运行则为阻塞模式，用于开发模式
 	if len(args) == 1 {
 
-		serverStart()
+		args = append(args, "block")
+
+		block(args...)
 
 		return
 	}
@@ -52,11 +57,14 @@ func main() {
 
 		//后台运行模式
 		if daemon {
+
+			args[1] = "block"
 			daemonize(args...)
 			return
 		}
 
-		serverStart()
+		args[1] = "block"
+		block(args...)
 
 	case "stop":
 
@@ -89,7 +97,7 @@ func main() {
 			return
 		}
 
-		cmd := exec.Command(string(cmdLine), "start")
+		cmd := exec.Command(string(cmdLine), "block")
 		cmd.Env = os.Environ()
 		err = cmd.Start()
 
@@ -98,6 +106,10 @@ func main() {
 			log.Println(err)
 
 		}
+
+	case "block":
+
+		serverStart()
 
 	}
 
@@ -124,10 +136,10 @@ func serverStart() {
 
 	go func() {
 
-		<-sigs
+		sig := <-sigs
 
-		//fmt.Println()
-		//fmt.Println(sig)
+		fmt.Println()
+		fmt.Println(sig)
 
 		//删除pid文件
 		os.Remove("logs/run.pid")
@@ -146,6 +158,13 @@ func serverStart() {
 
 			log.Println(err)
 		}
+
+		//退出测试
+		//f, err := os.OpenFile("logs/quit.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0664)
+		//
+		//f.Write([]byte("http服务已结束," + tools.Date("Y-m-d", time.Now().Unix()) + "\n"))
+		//
+		//f.Close()
 
 		cancel()
 	}()
@@ -287,6 +306,7 @@ func boot(cxt context.Context, wait *sync.WaitGroup, httpOk chan bool, httpFail 
 
 }
 
+//后台运行
 func daemonize(args ...string) {
 	var arg []string
 	if len(args) > 1 {
@@ -300,6 +320,218 @@ func daemonize(args ...string) {
 
 		fmt.Println(err)
 	}
+}
+
+//阻塞运行
+func block(args ...string) {
+
+	sysType := runtime.GOOS
+
+	sigs := make(chan os.Signal, 1)
+
+	//退出信号
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	if sysType == `linux` {
+
+		runUser := os.Getenv("RUN_USER")
+
+		if runUser == "" || runUser == "nobody" {
+
+			normal(args...)
+
+			return
+
+		}
+
+		cmd := exec.Command("bash", "-c", "sudo -u "+runUser+" "+tools.Join(" ", args))
+
+		piperr, err := cmd.StderrPipe()
+
+		if err != nil {
+
+			fmt.Println(err)
+		}
+
+		readserr := bufio.NewReader(piperr)
+
+		go func() {
+
+			buf := make([]byte, 1024)
+
+			for {
+
+				n, eee := readserr.Read(buf)
+
+				if eee != nil {
+
+					if eee == io.EOF {
+
+						return
+					}
+
+					fmt.Println(eee)
+				}
+
+				fmt.Print(string(buf[:n]))
+
+			}
+
+		}()
+
+		piplog, err := cmd.StdoutPipe()
+
+		if err != nil {
+
+			fmt.Println(err)
+		}
+
+		readslog := bufio.NewReader(piplog)
+
+		go func() {
+
+			buf := make([]byte, 1024)
+
+			for {
+
+				n, eee := readslog.Read(buf)
+
+				if eee != nil {
+
+					if eee == io.EOF {
+
+						return
+					}
+
+					fmt.Println(eee)
+				}
+
+				fmt.Print(string(buf[:n]))
+
+			}
+
+		}()
+
+		err = cmd.Start()
+
+		if err != nil {
+
+			fmt.Println(err)
+		}
+
+		err = cmd.Wait()
+
+		if err != nil {
+
+			fmt.Println(err)
+		}
+
+	}
+
+	if sysType == `windows` {
+
+		normal(args...)
+
+		return
+	}
+
+}
+
+func normal(args ...string) {
+
+	//fmt.Println("-------------------")
+
+	var arg []string
+	if len(args) > 1 {
+		arg = args[1:]
+	}
+	cmd := exec.Command(args[0], arg...)
+	cmd.Env = os.Environ()
+
+	//cmd.
+
+	piperr, err := cmd.StderrPipe()
+
+	if err != nil {
+
+		fmt.Println(err)
+	}
+
+	readserr := bufio.NewReader(piperr)
+
+	go func() {
+
+		buf := make([]byte, 1024)
+
+		for {
+
+			n, eee := readserr.Read(buf)
+
+			//fmt.Println(eee,"------------")
+
+			if eee != nil {
+
+				if eee == io.EOF {
+
+					return
+				}
+
+				fmt.Println(eee)
+			}
+
+			fmt.Print(string(buf[:n]))
+
+		}
+
+	}()
+
+	piplog, err := cmd.StdoutPipe()
+
+	if err != nil {
+
+		fmt.Println(err)
+	}
+
+	readslog := bufio.NewReader(piplog)
+
+	go func() {
+
+		buf := make([]byte, 1024)
+
+		for {
+
+			n, eee := readslog.Read(buf)
+
+			if eee != nil {
+
+				if eee == io.EOF {
+
+					return
+				}
+
+				fmt.Println(eee)
+			}
+
+			fmt.Print(string(buf[:n]))
+
+		}
+
+	}()
+
+	er := cmd.Start()
+
+	if er != nil {
+
+		fmt.Println(er)
+	}
+
+	werr := cmd.Wait()
+
+	if werr != nil {
+
+		fmt.Println(werr)
+	}
+
 }
 
 func stop() error {
@@ -333,8 +565,6 @@ func stop() error {
 
 			cmd = exec.Command("cmd", "/c", "taskkill /f /pid "+string(pid))
 
-			//fmt.Println("hi you")
-
 		}
 
 		if sysType == `linux` {
@@ -342,12 +572,11 @@ func stop() error {
 			cmd = exec.Command("bash", "-c", "kill "+string(pid))
 		}
 
-		//cmd.Env = os.Environ()
-
 		err = cmd.Start()
 
 		cmd.Wait()
 
+		//cmd.
 		if err != nil {
 
 			//log.Println(err)
@@ -357,8 +586,6 @@ func stop() error {
 		}
 
 	} else {
-
-		//fmt.Println("run.pid文件不存在")
 
 		return errors.New("run.pid文件不存在")
 	}
