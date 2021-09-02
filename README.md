@@ -42,17 +42,17 @@ go build main.go
 ./main start
 ```
 
-后台运行(目前仅支持Linux平台)
+后台运行
 ```
 ./main start -d
 ```
 
-停止(目前仅支持Linux平台)
+停止
 ```
 ./main stop
 ```
 
-重启(目前仅支持Linux平台)
+重启
 ```
 ./main restart
 ```

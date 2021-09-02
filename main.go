@@ -21,6 +21,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"runtime"
 	"sync"
 	"syscall"
 	"time"
@@ -88,8 +89,8 @@ func main() {
 			return
 		}
 
-		cmd := exec.Command("bash", "-c", string(cmdLine)+" start")
-		//cmd.Env = os.Environ()
+		cmd := exec.Command(string(cmdLine), "start")
+		cmd.Env = os.Environ()
 		err = cmd.Start()
 
 		if err != nil {
@@ -123,10 +124,10 @@ func serverStart() {
 
 	go func() {
 
-		sig := <-sigs
+		<-sigs
 
-		fmt.Println()
-		fmt.Println(sig)
+		//fmt.Println()
+		//fmt.Println(sig)
 
 		//删除pid文件
 		os.Remove("logs/run.pid")
@@ -323,7 +324,24 @@ func stop() error {
 
 		}
 
-		cmd := exec.Command("bash", "-c", "kill "+string(pid))
+		sysType := runtime.GOOS
+
+		var cmd *exec.Cmd
+
+		if sysType == `windows` {
+
+			cmd = exec.Command("cmd", "/c", "taskkill /f /pid "+string(pid))
+
+			//fmt.Println("hi you")
+
+		}
+
+		if sysType == `linux` {
+
+			cmd = exec.Command("bash", "-c", "kill "+string(pid))
+		}
+
+		//cmd.Env = os.Environ()
 
 		err = cmd.Start()
 
@@ -350,7 +368,7 @@ func stop() error {
 //记录pid和启动命令
 func runInit() {
 
-	f, err := os.OpenFile("logs/run.pid", os.O_RDWR|os.O_CREATE, 0664)
+	f, err := os.OpenFile("logs/run.pid", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0664)
 
 	if err != nil {
 
@@ -364,7 +382,7 @@ func runInit() {
 
 	args := os.Args
 
-	f, err = os.OpenFile("logs/cmd", os.O_RDWR|os.O_CREATE, 0664)
+	f, err = os.OpenFile("logs/cmd", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0664)
 
 	if err != nil {
 
