@@ -212,9 +212,10 @@ func httpStart(httpFail chan bool, srv *http_.Server) {
 
 	if err := srv.ListenAndServe(); err != nil && err != http_.ErrServerClosed {
 
+		log.Println(err)
+
 		httpFail <- true
 
-		log.Println(err)
 	}
 
 }
