@@ -17,6 +17,8 @@ func Run(wait *sync.WaitGroup) {
 
 	delay := true
 
+	var diff time.Duration
+
 	for {
 
 		//准点校对
@@ -39,14 +41,22 @@ func Run(wait *sync.WaitGroup) {
 
 		if !start {
 
-			time.Sleep(1 * time.Minute)
+			//消除时间误差
+			time.Sleep(1*time.Minute - diff)
 		}
+
+		startTime := time.Now()
 
 		now := time.Now()
 
 		go deal(_crontab, now)
 
 		start = false
+
+		//计算时间误差
+		diff = time.Now().Sub(startTime)
+
+		//fmt.Println(diff)
 
 	}
 

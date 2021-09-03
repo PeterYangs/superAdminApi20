@@ -301,18 +301,52 @@ func boot(cxt context.Context, wait *sync.WaitGroup, httpOk chan bool, httpFail 
 
 //后台运行
 func daemonize(args ...string) {
-	var arg []string
-	if len(args) > 1 {
-		arg = args[1:]
-	}
-	cmd := exec.Command(args[0], arg...)
-	cmd.Env = os.Environ()
-	err := cmd.Start()
 
-	if err != nil {
+	//后台运行模式记录重定向输出
 
-		fmt.Println(err)
+	sysType := runtime.GOOS
+
+	if sysType == `windows` {
+
+		cmd := gcmd2.NewCommand(tools.Join(" ", args)+" > logs/outLog.log", context.TODO())
+
+		err := cmd.StartNoWait()
+
+		if err != nil {
+
+			log.Println(err)
+		}
+
+		return
 	}
+
+	if sysType == "linux" || sysType == "darwin" {
+
+		runUser := os.Getenv("RUN_USER")
+
+		if runUser == "" || runUser == "nobody" {
+
+			normal(args...)
+
+			return
+
+		}
+
+		//以其他用户运行服务，源命令(sudo -u nginx ./main start)
+		cmd := gcmd2.NewCommand("sudo -u "+runUser+" "+tools.Join(" ", args)+" > logs/outLog.log 2>&1", context.TODO())
+
+		err := cmd.StartNoWait()
+
+		if err != nil {
+
+			log.Println(err)
+		}
+
+		return
+	}
+
+	fmt.Println("平台暂不支持")
+
 }
 
 //阻塞运行
