@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"errors"
 	"fmt"
@@ -12,13 +11,13 @@ import (
 	"gin-web/kernel"
 	"gin-web/queue"
 	"gin-web/routes"
+	"github.com/PeterYangs/gcmd2"
 	"github.com/PeterYangs/tools"
 	"github.com/PeterYangs/tools/file/read"
 	"github.com/PeterYangs/tools/http"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/spf13/cast"
-	"io"
 	"log"
 	http_ "net/http"
 	"os"
@@ -241,8 +240,6 @@ func httpStart(httpFail chan bool, srv *http_.Server) {
 
 func queueInit(cxt context.Context, wait *sync.WaitGroup) {
 
-	//fmt.Println("哈哈哈")
-
 	//延迟队列的标记
 	wait.Add(1)
 
@@ -344,86 +341,16 @@ func block(args ...string) {
 
 		}
 
-		cmd := exec.Command("bash", "-c", "sudo -u "+runUser+" "+tools.Join(" ", args))
+		cmd := gcmd2.NewCommand("sudo -u "+runUser+" "+tools.Join(" ", args), context.TODO())
 
-		piperr, err := cmd.StderrPipe()
-
-		if err != nil {
-
-			fmt.Println(err)
-		}
-
-		readserr := bufio.NewReader(piperr)
-
-		go func() {
-
-			buf := make([]byte, 1024)
-
-			for {
-
-				n, eee := readserr.Read(buf)
-
-				if eee != nil {
-
-					if eee == io.EOF {
-
-						return
-					}
-
-					fmt.Println(eee)
-				}
-
-				fmt.Print(string(buf[:n]))
-
-			}
-
-		}()
-
-		piplog, err := cmd.StdoutPipe()
+		err := cmd.Start()
 
 		if err != nil {
 
-			fmt.Println(err)
-		}
+			log.Println(err)
 
-		readslog := bufio.NewReader(piplog)
+			return
 
-		go func() {
-
-			buf := make([]byte, 1024)
-
-			for {
-
-				n, eee := readslog.Read(buf)
-
-				if eee != nil {
-
-					if eee == io.EOF {
-
-						return
-					}
-
-					fmt.Println(eee)
-				}
-
-				fmt.Print(string(buf[:n]))
-
-			}
-
-		}()
-
-		err = cmd.Start()
-
-		if err != nil {
-
-			fmt.Println(err)
-		}
-
-		err = cmd.Wait()
-
-		if err != nil {
-
-			fmt.Println(err)
 		}
 
 	}
@@ -439,95 +366,13 @@ func block(args ...string) {
 
 func normal(args ...string) {
 
-	var arg []string
-	if len(args) > 1 {
-		arg = args[1:]
-	}
-	cmd := exec.Command(args[0], arg...)
-	cmd.Env = os.Environ()
+	cmd := gcmd2.NewCommand(tools.Join(" ", args), context.TODO())
 
-	//cmd.
-
-	piperr, err := cmd.StderrPipe()
+	err := cmd.Start()
 
 	if err != nil {
 
-		fmt.Println(err)
-	}
-
-	readserr := bufio.NewReader(piperr)
-
-	go func() {
-
-		buf := make([]byte, 1024)
-
-		for {
-
-			n, eee := readserr.Read(buf)
-
-			//fmt.Println(eee,"------------")
-
-			if eee != nil {
-
-				if eee == io.EOF {
-
-					return
-				}
-
-				fmt.Println(eee)
-			}
-
-			fmt.Print(string(buf[:n]))
-
-		}
-
-	}()
-
-	piplog, err := cmd.StdoutPipe()
-
-	if err != nil {
-
-		fmt.Println(err)
-	}
-
-	readslog := bufio.NewReader(piplog)
-
-	go func() {
-
-		buf := make([]byte, 1024)
-
-		for {
-
-			n, eee := readslog.Read(buf)
-
-			if eee != nil {
-
-				if eee == io.EOF {
-
-					return
-				}
-
-				fmt.Println(eee)
-			}
-
-			fmt.Print(string(buf[:n]))
-
-		}
-
-	}()
-
-	er := cmd.Start()
-
-	if er != nil {
-
-		fmt.Println(er)
-	}
-
-	werr := cmd.Wait()
-
-	if werr != nil {
-
-		fmt.Println(werr)
+		log.Println(err)
 	}
 
 }

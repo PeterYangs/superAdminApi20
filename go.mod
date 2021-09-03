@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/PeterYangs/gcmd v0.0.4
+	github.com/PeterYangs/gcmd2 v0.0.1 // indirect
 	github.com/PeterYangs/tools v0.2.32
 	github.com/dlclark/regexp2 v1.4.0
 	github.com/fogleman/gg v1.3.0
