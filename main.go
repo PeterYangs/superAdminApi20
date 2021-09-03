@@ -439,8 +439,6 @@ func block(args ...string) {
 
 func normal(args ...string) {
 
-	//fmt.Println("-------------------")
-
 	var arg []string
 	if len(args) > 1 {
 		arg = args[1:]
