@@ -337,6 +337,7 @@ func block(args ...string) {
 
 		}
 
+		//以其他用户运行服务，源命令(sudo -u nginx ./main start)
 		cmd := gcmd2.NewCommand("sudo -u "+runUser+" "+tools.Join(" ", args), context.TODO())
 
 		err := cmd.Start()
@@ -360,6 +361,7 @@ func block(args ...string) {
 
 }
 
+//常规当前用户运行模式
 func normal(args ...string) {
 
 	cmd := gcmd2.NewCommand(tools.Join(" ", args), context.TODO())
@@ -432,7 +434,7 @@ func stop() error {
 	return nil
 }
 
-//记录pid和启动命令
+//记录pid
 func runInit() {
 
 	f, err := os.OpenFile("logs/run.pid", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0664)
