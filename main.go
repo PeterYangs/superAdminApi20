@@ -88,16 +88,7 @@ func main() {
 
 		}
 
-		cmdLine, err := read.Open("logs/cmd").Read()
-
-		if err != nil {
-
-			log.Println(err)
-
-			return
-		}
-
-		cmd := exec.Command(string(cmdLine), "block")
+		cmd := exec.Command(args[0], "block")
 		cmd.Env = os.Environ()
 		err = cmd.Start()
 
@@ -453,20 +444,6 @@ func runInit() {
 
 	//记录pid
 	f.Write([]byte(cast.ToString(os.Getpid())))
-
-	f.Close()
-
-	args := os.Args
-
-	f, err = os.OpenFile("logs/cmd", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0664)
-
-	if err != nil {
-
-		panic(err)
-	}
-
-	//记录启动命令
-	f.Write([]byte(args[0]))
 
 	f.Close()
 
