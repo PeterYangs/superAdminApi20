@@ -57,7 +57,10 @@ go build main.go
 ./main restart
 ```
 
-
+运行内置命令
+```shell
+./main artisan
+```
 
 
 

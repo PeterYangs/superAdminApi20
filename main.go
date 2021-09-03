@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"gin-web/artisan"
 	"gin-web/common"
 	"gin-web/component/logs"
 	"gin-web/conf"
@@ -109,6 +110,10 @@ func main() {
 	case "block":
 
 		serverStart()
+
+	case "artisan":
+
+		artisan.Artisan()
 
 	}
 
