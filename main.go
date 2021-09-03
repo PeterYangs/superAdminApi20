@@ -386,6 +386,11 @@ func stop() error {
 		return err
 	}
 
+	if !b {
+
+		return errors.New("run.pid文件不存在")
+	}
+
 	if b {
 
 		pid, err := read.Open("logs/run.pid").Read()
@@ -426,9 +431,6 @@ func stop() error {
 
 		}
 
-	} else {
-
-		return errors.New("run.pid文件不存在")
 	}
 
 	return nil
