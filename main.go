@@ -143,7 +143,7 @@ func serverStart() {
 		fmt.Println(sig)
 
 		//删除pid文件
-		os.Remove("logs/run.pid")
+		_ = os.Remove("logs/run.pid")
 
 		c, e := context.WithTimeout(context.Background(), 3*time.Second)
 
@@ -537,8 +537,8 @@ func runInit() {
 	}
 
 	//记录pid
-	f.Write([]byte(cast.ToString(os.Getpid())))
+	_, _ = f.Write([]byte(cast.ToString(os.Getpid())))
 
-	f.Close()
+	_ = f.Close()
 
 }
