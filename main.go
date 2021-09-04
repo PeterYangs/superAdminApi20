@@ -89,7 +89,8 @@ func main() {
 		}
 
 		args[1] = "block"
-		block(args...)
+		daemonize(args...)
+		return
 
 	case "block":
 
@@ -98,6 +99,10 @@ func main() {
 	case "artisan":
 
 		artisan.Artisan()
+
+	default:
+
+		fmt.Println("命令不存在")
 
 	}
 
