@@ -88,15 +88,8 @@ func main() {
 
 		}
 
-		cmd := exec.Command(args[0], "block")
-		cmd.Env = os.Environ()
-		err = cmd.Start()
-
-		if err != nil {
-
-			log.Println(err)
-
-		}
+		args[1] = "block"
+		block(args...)
 
 	case "block":
 
