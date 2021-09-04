@@ -108,15 +108,19 @@ func main() {
 
 }
 
+//主服务函数
 func serverStart() {
 
+	//生成服务id
 	kernel.IdInit()
 
+	//检测退出信号
 	sigs := make(chan os.Signal, 1)
 
 	//退出信号
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
+	//服务退出上下文，主要作用是让其他子组件协程安全退出
 	cxt, cancel := context.WithCancel(context.Background())
 
 	wait := sync.WaitGroup{}
@@ -137,9 +141,6 @@ func serverStart() {
 		//删除pid文件
 		os.Remove("logs/run.pid")
 
-		//删除运行命令
-		//os.Remove("logs/cmd")
-
 		c, e := context.WithTimeout(context.Background(), 3*time.Second)
 
 		defer e()
@@ -152,24 +153,20 @@ func serverStart() {
 			log.Println(err)
 		}
 
-		//退出测试
-		//f, err := os.OpenFile("logs/quit.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0664)
-		//
-		//f.Write([]byte("http服务已结束," + tools.Date("Y-m-d", time.Now().Unix()) + "\n"))
-		//
-		//f.Close()
-
+		//通知子组件协程退出
 		cancel()
 	}()
 
+	//启动子组件服务
 	go boot(cxt, &wait, httpOk, httpFail)
 
 	//启动http服务
 	go httpStart(httpFail, srv)
 
+	//等待http服务启动完成（不论成功或者失败）
 	<-httpOk
 
-	//等待其他服务退出
+	//等待其他子组件服务退出
 	wait.Wait()
 
 	fmt.Println("finish")
@@ -185,6 +182,7 @@ func init() {
 
 }
 
+//启动日志服务
 func logInit(cxt context.Context, wait *sync.WaitGroup) {
 
 	//日志退出标记
@@ -197,6 +195,7 @@ func logInit(cxt context.Context, wait *sync.WaitGroup) {
 
 }
 
+//启动http服务
 func httpStart(httpFail chan bool, srv *http_.Server) {
 
 	r := gin.Default()
@@ -226,12 +225,14 @@ func httpStart(httpFail chan bool, srv *http_.Server) {
 
 		log.Println(err)
 
+		//http服务启动失败
 		httpFail <- true
 
 	}
 
 }
 
+//启动消息队列服务
 func queueInit(cxt context.Context, wait *sync.WaitGroup) {
 
 	//延迟队列的标记
@@ -248,6 +249,7 @@ func queueInit(cxt context.Context, wait *sync.WaitGroup) {
 
 }
 
+//所有子服务启动项函数
 func boot(cxt context.Context, wait *sync.WaitGroup, httpOk chan bool, httpFail chan bool) {
 
 	defer func() {
@@ -262,6 +264,7 @@ func boot(cxt context.Context, wait *sync.WaitGroup, httpOk chan bool, httpFail 
 
 		select {
 
+		//如http服务启动失败，其他子服务无需启动
 		case <-httpFail:
 
 			fmt.Println("退出")
@@ -272,8 +275,10 @@ func boot(cxt context.Context, wait *sync.WaitGroup, httpOk chan bool, httpFail 
 
 			time.Sleep(200 * time.Millisecond)
 
+			//验证http服务已启动完成
 			str, err := client.Request().GetToString("http://127.0.0.1:" + os.Getenv("PORT") + "/ping/" + kernel.Id)
 
+			//http服务启动完成后再启动子服务
 			if err == nil && str == "success" {
 
 				//开启任务调度
