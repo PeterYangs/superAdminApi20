@@ -25,6 +25,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"runtime"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -90,6 +91,9 @@ func main() {
 
 		args[1] = "block"
 		daemonize(args...)
+
+		fmt.Println("starting")
+
 		return
 
 	case "block":
@@ -414,6 +418,8 @@ func normal(args ...string) {
 
 func stop() error {
 
+	fmt.Println("stopping!!")
+
 	b, err := common.PathExists("logs/run.pid")
 
 	if err != nil {
@@ -457,14 +463,61 @@ func stop() error {
 
 		err = cmd.Start()
 
-		cmd.Wait()
-
-		//cmd.
 		if err != nil {
 
 			//log.Println(err)
 
 			return err
+
+		}
+
+		err = cmd.Wait()
+
+		if err != nil {
+
+			//log.Println(err)
+
+			return err
+
+		}
+
+		if sysType == `linux` {
+
+			//等待进程退出
+			for {
+
+				time.Sleep(200 * time.Millisecond)
+
+				wait := gcmd2.NewCommand("ps -p "+string(pid)+" | wc -l", context.TODO())
+
+				num, waitErr := wait.CombinedOutput()
+
+				str := strings.Replace(string(num), " ", "", -1)
+				// 去除换行符
+				str = strings.Replace(str, "\n", "", -1)
+
+				if waitErr != nil {
+
+					//fmt.Println()
+
+					return waitErr
+
+				}
+
+				if str == "2" {
+
+					continue
+
+				}
+
+				if str == "1" {
+
+					fmt.Println("stopped!!")
+
+					return nil
+				}
+
+			}
 
 		}
 
