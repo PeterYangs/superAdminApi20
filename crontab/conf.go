@@ -1,9 +1,5 @@
 package crontab
 
-import (
-	"fmt"
-)
-
 func Registered(c *crontab) {
 
 	//fmt.Println(c.quitWait)
@@ -26,20 +22,20 @@ func Registered(c *crontab) {
 	//
 	//})
 	//
-	c.newSchedule().everyMinute().function(func() {
-
-		//panic("模拟报错")
-		fmt.Println("每分钟")
-		//time.Sleep(5 * time.Second)
-		//fmt.Println("结束")
-
-	})
+	//c.newSchedule().everyMinute().function(func() {
 	//
-	c.newSchedule().everyMinuteAt(2).function(func() {
-
-		fmt.Println("每2分钟")
-
-	})
+	//	//panic("模拟报错")
+	//	fmt.Println("每分钟")
+	//	//time.Sleep(5 * time.Second)
+	//	//fmt.Println("结束")
+	//
+	//})
+	////
+	//c.newSchedule().everyMinuteAt(2).function(func() {
+	//
+	//	fmt.Println("每2分钟")
+	//
+	//})
 	//
 	//c.newSchedule().everyDay().hourlyAt(16).minuteAt(36).function(func() {
 	//
