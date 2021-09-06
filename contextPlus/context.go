@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"gin-web/component/captcha"
+	"gin-web/component/logs"
 	"gin-web/conf"
 	"gin-web/redis"
 	"gin-web/response"
@@ -294,6 +295,8 @@ func (s *Session) Exist(key string) bool {
 	sessionString, err := redis.GetClient().Get(context.TODO(), GetRedisSessionKey(s.Cookie)).Result()
 
 	if err != nil {
+
+		logs.NewLogs().Error(err.Error())
 
 		return false
 	}

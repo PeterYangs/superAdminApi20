@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	"gin-web/component/logs"
 	"gin-web/conf"
 	"github.com/go-redis/redis/v8"
 	uuid "github.com/satori/go.uuid"
@@ -56,7 +57,11 @@ func connect() {
 
 	if re.Err() != nil {
 
-		panic(re.Err())
+		//panic(re.Err())
+
+		logs.NewLogs().Error(re.Err().Error())
+
+		//return
 
 	}
 

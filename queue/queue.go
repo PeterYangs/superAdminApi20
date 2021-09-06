@@ -81,6 +81,12 @@ func Run(cxt context.Context, wait *sync.WaitGroup) {
 
 	}()
 
+	//错误等待时间
+	sleepTime := 0
+
+	//最大等待时间
+	maxSleepTime := 1000 * 60
+
 	for {
 
 		select {
@@ -100,12 +106,22 @@ func Run(cxt context.Context, wait *sync.WaitGroup) {
 
 		if err != nil {
 
-			fmt.Println(err)
+			if err.Error() != "context canceled" {
 
-			fmt.Println("队列退出")
+				fmt.Println(err)
+			}
 
-			break
+			time.Sleep(time.Duration(sleepTime) * time.Millisecond)
+
+			if sleepTime < maxSleepTime {
+
+				sleepTime += 100
+			}
+
+			continue
 		}
+
+		sleepTime = 0
 
 		var jsons map[string]interface{}
 
