@@ -354,7 +354,7 @@ func daemonize(args ...string) {
 
 		if runUser == "" || runUser == "nobody" {
 
-			cmd := gcmd2.NewCommand(tools.Join(" ", args)+" > logs/outLog.log", context.TODO())
+			cmd := gcmd2.NewCommand(tools.Join(" ", args)+" > logs/outLog.log 2>&1", context.TODO())
 
 			err := cmd.StartNoWait()
 
