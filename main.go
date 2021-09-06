@@ -264,7 +264,7 @@ func boot(cxt context.Context, wait *sync.WaitGroup, httpOk chan bool, httpFail 
 
 	defer func() {
 
-		fmt.Println("boot完成！")
+		//fmt.Println("boot完成！")
 
 		httpOk <- true
 
@@ -281,6 +281,7 @@ func boot(cxt context.Context, wait *sync.WaitGroup, httpOk chan bool, httpFail 
 
 		fmt.Println("redis连接失败，请检查")
 
+		//发送信号让程序退出
 		sigs <- syscall.SIGTERM
 
 		return
@@ -295,7 +296,10 @@ func boot(cxt context.Context, wait *sync.WaitGroup, httpOk chan bool, httpFail 
 		//如http服务启动失败，其他子服务无需启动
 		case <-httpFail:
 
-			fmt.Println("退出")
+			fmt.Println("http启动失败")
+
+			//发送信号让程序退出
+			sigs <- syscall.SIGTERM
 
 			return
 
