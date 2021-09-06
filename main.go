@@ -32,6 +32,8 @@ import (
 	"time"
 )
 
+var isRun = false
+
 func main() {
 
 	args := os.Args
@@ -143,8 +145,12 @@ func serverStart() {
 		fmt.Println()
 		fmt.Println(sig)
 
-		//删除pid文件
-		_ = os.Remove("logs/run.pid")
+		if isRun {
+
+			//删除pid文件
+			_ = os.Remove("logs/run.pid")
+
+		}
 
 		c, e := context.WithTimeout(context.Background(), 3*time.Second)
 
@@ -583,7 +589,12 @@ func runInit() {
 	}
 
 	//记录pid
-	_, _ = f.Write([]byte(cast.ToString(os.Getpid())))
+	_, err = f.Write([]byte(cast.ToString(os.Getpid())))
+
+	if err == nil {
+
+		isRun = true
+	}
 
 	_ = f.Close()
 
