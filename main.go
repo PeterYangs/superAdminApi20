@@ -166,7 +166,7 @@ func serverStart() {
 	logInit(cxt, &wait)
 
 	//启动子组件服务
-	go boot(cxt, &wait, httpOk, httpFail)
+	go boot(cxt, &wait, httpOk, httpFail, sigs)
 
 	//启动http服务
 	go httpStart(httpFail, srv)
@@ -258,9 +258,17 @@ func queueInit(cxt context.Context, wait *sync.WaitGroup) {
 }
 
 //所有子服务启动项函数
-func boot(cxt context.Context, wait *sync.WaitGroup, httpOk chan bool, httpFail chan bool) {
+func boot(cxt context.Context, wait *sync.WaitGroup, httpOk chan bool, httpFail chan bool, sigs chan os.Signal) {
 
 	//log.Println("哈哈哈！！！！！！！！")
+
+	defer func() {
+
+		fmt.Println("boot完成！")
+
+		httpOk <- true
+
+	}()
 
 	//检查redis
 	pingTimeoutCxt, c := context.WithTimeout(context.Background(), 1*time.Second)
@@ -273,18 +281,10 @@ func boot(cxt context.Context, wait *sync.WaitGroup, httpOk chan bool, httpFail 
 
 		fmt.Println("redis连接失败，请检查")
 
-		os.Exit(1)
+		sigs <- syscall.SIGTERM
 
 		return
 	}
-
-	defer func() {
-
-		fmt.Println("boot完成！")
-
-		httpOk <- true
-
-	}()
 
 	client := http.Client().SetTimeout(1 * time.Second)
 
