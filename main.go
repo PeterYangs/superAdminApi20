@@ -469,7 +469,8 @@ func stop() error {
 
 		if sysType == `windows` {
 
-			cmd = exec.Command("cmd", "/c", "taskkill /f /pid "+string(pid))
+			//cmd = exec.Command("cmd", "/c", "taskkill /f /pid "+string(pid))
+			cmd = exec.Command("cmd", "/c", ".\\lib\\windows-kill.exe -SIGINT "+string(pid))
 
 		}
 
@@ -522,6 +523,29 @@ func stop() error {
 				}
 
 				if str == "1" {
+
+					fmt.Println("stopped!!")
+
+					return nil
+				}
+
+			}
+
+		}
+
+		if sysType == `windows` {
+
+			for {
+
+				time.Sleep(200 * time.Millisecond)
+
+				wait := gcmd2.NewCommand("tasklist|findstr   "+string(pid), context.TODO())
+
+				_, waitErr := wait.CombinedOutput()
+
+				if waitErr != nil {
+
+					//signal.
 
 					fmt.Println("stopped!!")
 
