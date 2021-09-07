@@ -232,7 +232,7 @@ func Regex(c *contextPlus.Context) *response.Response {
 
 ```shell
 
-[root@localhost ~]# go run  .\artisan\bin\artisan.go
+[root@localhost ~]# ./main artisan
 Use the arrow keys to navigate: ↓ ↑ → ←
 ? 选择类型:
   > 数据库迁移
@@ -361,7 +361,7 @@ func Index(c *contextPlus.Context) *response.Response {
 
 生成任务类
 ```shell
-[root@localhost superAdminApi20]# go run artisan/bin/artisan.go
+[root@localhost superAdminApi20]# ./main artisan
 Use the arrow keys to navigate: ↓ ↑ → ←
 ? 选择类型:
     数据库迁移
@@ -535,7 +535,7 @@ func Registered(c *crontab) {
 
 	c.newSchedule().hourBetween(8, 9).everyMinute().function(func() {
 
-		fmt.Println("24号8点-9点每分钟")
+		fmt.Println("每天8点-9点每分钟")
 
 	})
 
