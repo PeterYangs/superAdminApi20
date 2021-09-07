@@ -8,9 +8,12 @@ import (
 	"github.com/PeterYangs/tools"
 	"github.com/joho/godotenv"
 	"github.com/spf13/cast"
+	"sync"
 )
 
 var batch = 1
+
+var once sync.Once
 
 func init() {
 
@@ -18,17 +21,6 @@ func init() {
 	err := godotenv.Load("./.env")
 	if err != nil {
 		panic("配置文件加载失败")
-	}
-
-	var migrations model.Migrations
-
-	re := database.GetDb().Order("id desc").First(&migrations)
-
-	if re.Error == nil {
-
-		batch = migrations.Batch + 1
-
-		//batch=1
 	}
 
 }
@@ -80,8 +72,28 @@ type field struct {
 	unique       bool //唯一索引
 }
 
+func getBatch() {
+
+	once.Do(func() {
+
+		var migrations model.Migrations
+
+		re := database.GetDb().Order("id desc").First(&migrations)
+
+		if re.Error == nil {
+
+			batch = migrations.Batch + 1
+
+		}
+
+	})
+
+}
+
 // Create 创建表
 func Create(table string, callback func(*Migrate)) {
+
+	getBatch()
 
 	m := &Migrate{
 		Table: table,
@@ -99,6 +111,8 @@ func Create(table string, callback func(*Migrate)) {
 }
 
 func Table(table string, callback func(*Migrate)) {
+
+	getBatch()
 
 	m := &Migrate{
 		Table: table,

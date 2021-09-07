@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"github.com/spf13/cast"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -28,7 +29,8 @@ func connect() {
 
 	if err != nil {
 
-		panic(err)
+		//panic(err)
+		fmt.Println(err)
 
 	}
 
