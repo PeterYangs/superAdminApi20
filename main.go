@@ -266,11 +266,7 @@ func queueInit(cxt context.Context, wait *sync.WaitGroup) {
 //所有子服务启动项函数
 func boot(cxt context.Context, wait *sync.WaitGroup, httpOk chan bool, httpFail chan bool, sigs chan os.Signal) {
 
-	//log.Println("哈哈哈！！！！！！！！")
-
 	defer func() {
-
-		//fmt.Println("boot完成！")
 
 		httpOk <- true
 

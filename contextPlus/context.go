@@ -21,18 +21,16 @@ import (
 
 type Context struct {
 	*gin.Context
-	//Lock    *sync.Mutex
 	Handler *Handler
 }
 
 type Handler struct {
 	HandlerFunc func(*Context) *response.Response
-	//Middlewares []HandlerFunc
-	Engine *gin.Engine
-	Url    string
-	Method int
-	Regex  map[string]string //路由正则表达式
-	Tag    string            //函数标记
+	Engine      *gin.Engine
+	Url         string
+	Method      int
+	Regex       map[string]string //路由正则表达式
+	Tag         string            //函数标记
 }
 
 type HandlerFunc func(*Context)
