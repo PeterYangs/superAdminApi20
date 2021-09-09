@@ -40,6 +40,16 @@ func (c *Context) Domain() string {
 	return tools.Explode(":", c.Request.Host)[0]
 }
 
+// GetAdminId 获取管理员id
+func (c *Context) GetAdminId() int {
+
+	admin, _ := c.Session().Get("admin")
+
+	adminId := admin.(map[string]interface{})["id"].(float64)
+
+	return int(adminId)
+}
+
 func (c *Context) Session() *Session {
 
 	var session Session

@@ -41,6 +41,7 @@ type Types string
 
 const (
 	Int       Types = "int"
+	Bigint    Types = "bigint"
 	String    Types = "varchar"
 	Text      Types = "text"
 	Timestamp Types = "timestamp"
@@ -156,6 +157,17 @@ func (c *Migrate) Integer(column string) *field {
 	c.fields = append(c.fields, f)
 
 	return f
+}
+
+// BigInteger bigint
+func (c *Migrate) BigInteger(column string) *field {
+
+	f := &field{column: column, types: Bigint, length: 15, tag: CREATE}
+
+	c.fields = append(c.fields, f)
+
+	return f
+
 }
 
 func (c *Migrate) String(column string, length int) *field {

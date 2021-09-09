@@ -19,6 +19,7 @@ func List(c *contextPlus.Context) *response.Response {
 
 }
 
+//递归查询
 func getMenu(pid int, m *[]*model.Category) *[]*model.Category {
 
 	menus := make([]*model.Category, 0)

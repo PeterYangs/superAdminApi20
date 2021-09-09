@@ -39,6 +39,14 @@ func (r *Response) Byte(data []byte) *Response {
 	return r
 }
 
+// Nil 返回空消息
+func (r *Response) Nil() *Response {
+
+	r.data = nil
+
+	return r
+}
+
 func (r *Response) GetData() interface{} {
 
 	return r.data

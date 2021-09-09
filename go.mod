@@ -11,6 +11,7 @@ require (
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-redis/redis/v8 v8.10.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
+	github.com/gorilla/websocket v1.4.2
 	github.com/joho/godotenv v1.3.0
 	github.com/manifoldco/promptui v0.8.0
 	github.com/satori/go.uuid v1.2.0
