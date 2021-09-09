@@ -104,14 +104,14 @@ import (
 func _init(_r group) {
 
 	//路由组，支持嵌套
-	_r.Group("/api", func(g group) {
+	_r.Group("/api", func(api group) {
 
-		g.Registered(GET, "/", controller.Index).Bind()
-		g.Registered(GET, "/gg", controller.Index).Bind()
+		
+		api.Registered(GET, "/user", controller.Index).Bind()
 
-		g.Group("/login", func(g2 group) {
+		api.Group("/login", func(login group) {
 
-			g2.Registered(GET, "/", controller.Index).Bind()
+			login.Registered(GET, "/", controller.Index).Bind()
 		})
 
 	}, middleware.GoOn)
