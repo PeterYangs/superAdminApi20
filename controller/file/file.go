@@ -1,7 +1,6 @@
 package file
 
 import (
-	"fmt"
 	"gin-web/common"
 	"gin-web/contextPlus"
 	"gin-web/database"
@@ -82,10 +81,7 @@ func Destroy(c *contextPlus.Context) *response.Response {
 	database.GetDb().Delete(&model.File{}, form.Id)
 
 	//删除对应文件
-	err = os.Remove("uploads/" + file.Path)
-
-	fmt.Println(err)
-	fmt.Println("uploads/" + file.Path)
+	os.Remove("uploads/" + file.Path)
 
 	return response.Resp().Api(1, "success", "")
 
