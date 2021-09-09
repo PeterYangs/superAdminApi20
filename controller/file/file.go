@@ -1,6 +1,7 @@
 package file
 
 import (
+	"fmt"
 	"gin-web/common"
 	"gin-web/contextPlus"
 	"gin-web/database"
@@ -8,6 +9,7 @@ import (
 	"gin-web/response"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
+	"os"
 )
 
 func Update(c *contextPlus.Context) *response.Response {
@@ -55,4 +57,36 @@ func List(c *contextPlus.Context) *response.Response {
 	data := common.Paginate(tx, &files, cast.ToInt(c.DefaultQuery("p", "1")), 10)
 
 	return response.Resp().Api(1, "success", data)
+}
+
+func Destroy(c *contextPlus.Context) *response.Response {
+
+	type Form struct {
+		Id int `json:"id" uri:"id"`
+	}
+
+	var form Form
+
+	err := c.ShouldBindPlus(&form)
+
+	if err != nil {
+
+		return response.Resp().Json(gin.H{"code": 2, "msg": err.Error()})
+
+	}
+
+	var file model.File
+
+	database.GetDb().First(&file, form.Id)
+
+	database.GetDb().Delete(&model.File{}, form.Id)
+
+	//删除对应文件
+	err = os.Remove("uploads/" + file.Path)
+
+	fmt.Println(err)
+	fmt.Println("uploads/" + file.Path)
+
+	return response.Resp().Api(1, "success", "")
+
 }

@@ -105,6 +105,7 @@ func _init(_r group) {
 
 			file.Registered(POST, "/update", file2.Update).Bind()
 			file.Registered(POST, "/list", file2.List).Bind()
+			file.Registered(POST, "/destroy/:id", file2.Destroy).Bind()
 
 		})
 
