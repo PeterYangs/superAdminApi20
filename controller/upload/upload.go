@@ -116,7 +116,7 @@ func BigFile(c *contextPlus.Context) *response.Response {
 			// Read message from browser
 			msgType, msg, err := conn.ReadMessage()
 
-			fmt.Println(msgType)
+			//fmt.Println(msgType)
 
 			if err != nil {
 
@@ -155,7 +155,7 @@ func BigFile(c *contextPlus.Context) *response.Response {
 
 				if !tools.InArray(tools.Explode(",", os.Getenv("ALLOW_UPLOAD_TYPE")), exName) {
 
-					re, _ := json.Marshal(map[string]interface{}{"code": 2, "msg": "不允许上传该类型", "data": ""})
+					re, _ := json.Marshal(map[string]interface{}{"code": 3, "msg": "不允许上传该类型", "data": ""})
 
 					conn.WriteMessage(1, re)
 
@@ -177,9 +177,20 @@ func BigFile(c *contextPlus.Context) *response.Response {
 
 				f.Close()
 
-				tempListName = append(tempListName, tempName)
-
 				currentNum++
+
+				re, err := json.Marshal(map[string]interface{}{"code": 2, "msg": "success", "data": currentNum})
+
+				if err != nil {
+
+					fmt.Println(err)
+
+					return
+				}
+
+				conn.WriteMessage(1, re)
+
+				tempListName = append(tempListName, tempName)
 
 				if currentNum == info.Nums {
 
