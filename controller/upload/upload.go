@@ -76,6 +76,7 @@ func Upload(c *contextPlus.Context) *response.Response {
 	return response.Resp().Api(1, "success", path[0])
 }
 
+// BigFile 大文件上传
 func BigFile(c *contextPlus.Context) *response.Response {
 
 	conn, err := upload.Upgrade(c.Writer, c.Request, nil)
@@ -116,8 +117,6 @@ func BigFile(c *contextPlus.Context) *response.Response {
 			// Read message from browser
 			msgType, msg, err := conn.ReadMessage()
 
-			//fmt.Println(msgType)
-
 			if err != nil {
 
 				fmt.Println(err)
@@ -155,13 +154,12 @@ func BigFile(c *contextPlus.Context) *response.Response {
 
 				if !tools.InArray(tools.Explode(",", os.Getenv("ALLOW_UPLOAD_TYPE")), exName) {
 
-					re, _ := json.Marshal(map[string]interface{}{"code": 3, "msg": "不允许上传该类型", "data": ""})
-
-					conn.WriteMessage(1, re)
+					conn.WriteJSON(map[string]interface{}{"code": 3, "msg": "不允许上传该类型", "data": ""})
 
 					return
 				}
 
+				//临时文件名称
 				tempName := uuid.NewV4().String() + ".temp"
 
 				f, err := os.OpenFile("uploads/temp/"+tempDir+"/"+tempName, os.O_CREATE|os.O_RDWR, 0644)
@@ -179,16 +177,7 @@ func BigFile(c *contextPlus.Context) *response.Response {
 
 				currentNum++
 
-				re, err := json.Marshal(map[string]interface{}{"code": 2, "msg": "success", "data": currentNum})
-
-				if err != nil {
-
-					fmt.Println(err)
-
-					return
-				}
-
-				conn.WriteMessage(1, re)
+				conn.WriteJSON(map[string]interface{}{"code": 2, "msg": "success", "data": currentNum})
 
 				tempListName = append(tempListName, tempName)
 
@@ -199,15 +188,6 @@ func BigFile(c *contextPlus.Context) *response.Response {
 					dir := "uploads/" + date
 
 					os.MkdirAll(dir, 0775)
-
-					//exName, err := tools.GetExtensionName(info.Name)
-					//
-					//if err != nil {
-					//
-					//	fmt.Println(err)
-					//
-					//	return
-					//}
 
 					fileName := uuid.NewV4().String() + "." + exName
 
@@ -240,16 +220,7 @@ func BigFile(c *contextPlus.Context) *response.Response {
 
 					}
 
-					re, err := json.Marshal(map[string]interface{}{"code": 1, "msg": "success", "data": map[string]interface{}{"path": date + "/" + fileName, "name": info.Name, "size": info.Size}})
-
-					if err != nil {
-
-						fmt.Println(err)
-
-						return
-					}
-
-					conn.WriteMessage(1, re)
+					conn.WriteJSON(map[string]interface{}{"code": 1, "msg": "success", "data": map[string]interface{}{"path": date + "/" + fileName, "name": info.Name, "size": info.Size}})
 
 					ff.Close()
 
