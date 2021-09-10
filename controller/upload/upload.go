@@ -126,6 +126,7 @@ func BigFile(c *contextPlus.Context) *response.Response {
 
 			if msgType == 1 {
 
+				//设置文件信息
 				err := json.Unmarshal(msg, &info)
 
 				if err != nil {
@@ -137,12 +138,14 @@ func BigFile(c *contextPlus.Context) *response.Response {
 
 				tempDir = uuid.NewV4().String()
 
+				//生成临时文件夹
 				os.MkdirAll("uploads/temp/"+tempDir, 0755)
 
 			}
 
 			if msgType == 2 {
 
+				//获取文件拓展名
 				exName, err := tools.GetExtensionName(info.Name)
 
 				if err != nil {
@@ -152,6 +155,7 @@ func BigFile(c *contextPlus.Context) *response.Response {
 					return
 				}
 
+				//过滤非法文件
 				if !tools.InArray(tools.Explode(",", os.Getenv("ALLOW_UPLOAD_TYPE")), exName) {
 
 					conn.WriteJSON(map[string]interface{}{"code": 3, "msg": "不允许上传该类型", "data": ""})
@@ -177,21 +181,26 @@ func BigFile(c *contextPlus.Context) *response.Response {
 
 				currentNum++
 
+				//发送给客户端进度
 				conn.WriteJSON(map[string]interface{}{"code": 2, "msg": "success", "data": currentNum})
 
+				//将临时文件写入到数组
 				tempListName = append(tempListName, tempName)
 
+				//当发送到最后一块时
 				if currentNum == info.Nums {
 
 					date := tools.Date("Ymd", time.Now().Unix())
 
 					dir := "uploads/" + date
 
+					//生成上传文件夹
 					os.MkdirAll(dir, 0775)
 
+					//生成文件名称
 					fileName := uuid.NewV4().String() + "." + exName
 
-					//最终文件
+					//文件完整路径
 					path := dir + "/" + fileName
 
 					ff, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR, 0664)
@@ -203,6 +212,7 @@ func BigFile(c *contextPlus.Context) *response.Response {
 						return
 					}
 
+					//拼接临时文件到目标文件
 					for _, s := range tempListName {
 
 						data, err := read.Open("uploads/temp/" + tempDir + "/" + s).Read()
@@ -220,8 +230,10 @@ func BigFile(c *contextPlus.Context) *response.Response {
 
 					}
 
+					//发送文件上传完毕通知
 					conn.WriteJSON(map[string]interface{}{"code": 1, "msg": "success", "data": map[string]interface{}{"path": date + "/" + fileName, "name": info.Name, "size": info.Size}})
 
+					//关闭文件流
 					ff.Close()
 
 				}
