@@ -165,29 +165,19 @@ func getDataType(data interface{}, c *contextPlus.Context) {
 
 	case map[string]interface{}:
 
-		//fmt.Println("map")
-
 		c.JSON(200, item)
 
 	case string:
-
-		//fmt.Println("string")
 
 		c.String(200, item)
 
 	case []byte:
 
-		//fmt.Println("[]byte")
-
 		c.String(200, string(item))
 	case gin.H:
 
-		//fmt.Println("gin.H")
-
 		c.JSON(200, item)
 	case nil:
-
-		//fmt.Println("xxxxxxxxxxxx")
 
 	}
 }
