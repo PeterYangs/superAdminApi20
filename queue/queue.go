@@ -139,14 +139,14 @@ func Run(cxt context.Context, wait *sync.WaitGroup) {
 		//获取task
 		hh, ok := register.Handles.GetTask(data["TaskName"].(string))
 
-		h := hh.(task.Task)
-
 		if !ok {
 
 			fmt.Println("获取task失败")
 
 			continue
 		}
+
+		h := hh.(task.Task)
 
 		//绑定参数
 		h.BindParameters(data["Parameters"].(map[string]interface{}))
