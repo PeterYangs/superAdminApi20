@@ -7,6 +7,6 @@ import (
 
 func Routes(r route.Group) {
 
-	r.Registered(route.GET, "/index", controller.Index)
+	r.Registered(route.GET, "/index", controller.Index).Bind()
 
 }
