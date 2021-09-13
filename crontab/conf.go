@@ -2,6 +2,12 @@ package crontab
 
 func Registered(c *crontab) {
 
+	//c.newSchedule().everyDayAt(3).function(func() {
+	//
+	//	fmt.Println("每三天")
+	//
+	//})
+
 	//fmt.Println(c.quitWait)
 
 	//c.newSchedule().everyHour().function(func() {

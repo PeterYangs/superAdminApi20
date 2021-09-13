@@ -42,6 +42,7 @@ func Run(wait *sync.WaitGroup) {
 		if !start {
 
 			//消除时间误差
+			//time.Sleep(1*time.Minute)
 			time.Sleep(1*time.Minute - diff)
 		}
 
@@ -49,14 +50,14 @@ func Run(wait *sync.WaitGroup) {
 
 		now := time.Now()
 
+		//now:=time.Date(2021,9,12,0,1,0,0,time.Local)
+
 		go deal(_crontab, now)
 
 		start = false
 
 		//计算时间误差
 		diff = time.Now().Sub(startTime)
-
-		//fmt.Println(diff)
 
 	}
 
@@ -191,7 +192,7 @@ func dealDay(s *schedule, now time.Time) {
 
 	if s.hour == nil {
 
-		if now.Hour() == 0 {
+		if now.Hour() == 0 && now.Minute() == 0 {
 
 			if s.day.every {
 
