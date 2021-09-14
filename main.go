@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/PeterYangs/superAdminCore/core"
+	"superadmin/artisan"
 	"superadmin/conf"
 	"superadmin/crontab"
 	"superadmin/middleware"
@@ -26,6 +27,9 @@ func main() {
 
 	//加载消息队列
 	c.LoadQueues(queue.Queues)
+
+	//加载自定义命令
+	c.LoadArtisan(artisan.Load)
 
 	//启动
 	c.Start()
