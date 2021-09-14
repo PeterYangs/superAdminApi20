@@ -4,6 +4,7 @@ import (
 	"github.com/PeterYangs/superAdminCore/core"
 	"superadmin/conf"
 	"superadmin/crontab"
+	"superadmin/middleware"
 	"superadmin/queue"
 	"superadmin/routes"
 )
@@ -14,6 +15,8 @@ func main() {
 
 	//加载配置
 	c.LoadConf(conf.Conf)
+
+	c.LoadMiddleware(middleware.Load)
 
 	//加载路由
 	c.LoadRoute(routes.Routes)
