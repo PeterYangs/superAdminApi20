@@ -73,56 +73,33 @@ go build main.go
 package controller
 
 import (
-	"gin-web/contextPlus"
-	"github.com/gin-gonic/gin"
-	"gin-web/response"
+	"github.com/PeterYangs/superAdminCore/contextPlus"
+	"github.com/PeterYangs/superAdminCore/response"
 )
 
-// Index 主页
 func Index(c *contextPlus.Context) *response.Response {
 
-	return response.Resp().Json(gin.H{"data": "hello world"})
+	return response.Resp().Api(1, "success", "index")
 }
 ```
 
 **route**
 
-route/web.go
+routes/routes.go
 
 ```go
-package routes
+func Routes(_r route.Group) {
 
-import (
-	"gin-web/controller"
-	"gin-web/controller/file"
-	"gin-web/controller/regex"
-	"gin-web/kernel"
-	"gin-web/middleware"
-	"github.com/gin-gonic/gin"
-)
+    _r.Registered(route.GET, "/index", controller.Index).Bind()
 
-func _init(_r group) {
+    _r.Group("/login", func (_login route.Group) {
 
-	//路由组，支持嵌套
-	_r.Group("/api", func(api group) {
+        _login.Registered(route.POST, "/login", login.Login, loginLimiter.LoginLimiter).Bind()
 
-		
-		api.Registered(GET, "/user", controller.Index).Bind()
+        _login.Registered(route.POST, "/logout", login.Logout).Bind()
 
-		api.Group("/login", func(login group) {
-
-			login.Registered(GET, "/", controller.Index).Bind()
-		})
-
-	}, middleware.GoOn)
-
-	//单路由
-	_r.Registered(GET, "/", controller.Index).Bind()
-
-	_r.Registered(GET, "/check", controller.CheckCaptcha).Bind()
-
+    })
 }
-
 ```
 
 **session**
@@ -140,28 +117,25 @@ func Session(c *contextPlus.Context) *response.Response {
 
 **全局中间件**
 
+middleware/global.go
 ```go
-package kernel
+package middleware
 
 import (
-	"gin-web/contextPlus"
-	"gin-web/middleware/accessLog"
-	"gin-web/middleware/exception"
-	"gin-web/middleware/session"
+	"github.com/PeterYangs/superAdminCore/contextPlus"
+	"github.com/PeterYangs/superAdminCore/middleware/session"
+	"superadmin/middleware/accessLog"
 )
 
-// Middleware 全局中间件
-var Middleware []contextPlus.HandlerFunc
+func Load() []contextPlus.HandlerFunc {
 
-func Load() {
+	return []contextPlus.HandlerFunc{
 
-	Middleware = []contextPlus.HandlerFunc{
-		exception.Exception,
 		session.StartSession,
 		accessLog.AccessLog,
 	}
-
 }
+
 ```
 
 
@@ -475,13 +449,13 @@ func Task(c *contextPlus.Context) *response.Response {
 ```
 **任务调度**
 
-crontab/conf.go
+crontab/crontabs.go
 ```go
 package crontab
 
 import "fmt"
 
-func Registered(c *crontab) {
+func Crontab(c *crontab) {
 
 	c.newSchedule().everyHour().function(func() {
 

@@ -23,11 +23,11 @@ func Routes(_r route.Group) {
 
 	_r.Registered(route.GET, "/index", controller.Index).Bind()
 
-	_r.Group("/login", func(g route.Group) {
+	_r.Group("/login", func(_login route.Group) {
 
-		g.Registered(route.POST, "/login", login.Login, loginLimiter.LoginLimiter).Bind()
+		_login.Registered(route.POST, "/login", login.Login, loginLimiter.LoginLimiter).Bind()
 
-		g.Registered(route.POST, "/logout", login.Logout).Bind()
+		_login.Registered(route.POST, "/logout", login.Logout).Bind()
 
 	})
 
