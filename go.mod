@@ -6,7 +6,7 @@ require (
 	github.com/PeterYangs/superAdminCore v0.0.8
 	github.com/PeterYangs/tools v0.2.32
 	github.com/dlclark/regexp2 v1.4.0
-	github.com/gin-gonic/gin v1.7.4
+	github.com/gin-gonic/gin v1.6.3
 	github.com/gorilla/websocket v1.4.2
 	github.com/manifoldco/promptui v0.8.0
 	github.com/satori/go.uuid v1.2.0
