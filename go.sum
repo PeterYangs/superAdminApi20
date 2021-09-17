@@ -1,7 +1,7 @@
 github.com/PeterYangs/gcmd2 v0.0.3 h1:rpqbT1X8m+cQV3JxovEhkuJ/l71sdJXE42I/93659lU=
 github.com/PeterYangs/gcmd2 v0.0.3/go.mod h1:xuuql5mIrLbEJ3iiF0qNRy5lJj1C16xR+ENylaMTv24=
-github.com/PeterYangs/superAdminCore v0.0.8 h1:UGG6GFf5ZURICIk+3MqgLoAI8iXO6YeYpAlOpBbKE7I=
-github.com/PeterYangs/superAdminCore v0.0.8/go.mod h1:4bayV7um12kHRh9MEi2ypyS8Z6lkuYTun0a6jopNuvI=
+github.com/PeterYangs/superAdminCore v0.0.9 h1:jLUVlAVOLf41funXBOF0WVN0ifuCB68GGv8HHgVqa+0=
+github.com/PeterYangs/superAdminCore v0.0.9/go.mod h1:4bayV7um12kHRh9MEi2ypyS8Z6lkuYTun0a6jopNuvI=
 github.com/PeterYangs/tools v0.2.32 h1:pDe4CHOuIhCOzTreLF0JBt5qmpFBEYsjmjBrAU29y+M=
 github.com/PeterYangs/tools v0.2.32/go.mod h1:VMrlLNpXOuQBkHmZjH7HPMUFMd9JyvT/amjxICvlOfQ=
 github.com/axgle/mahonia v0.0.0-20180208002826-3358181d7394 h1:OYA+5W64v3OgClL+IrOD63t4i/RW7RqrAVl9LTZ9UqQ=

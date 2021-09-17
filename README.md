@@ -523,6 +523,40 @@ func Crontab(c *crontab) {
 
 ```
 
+命令行
+
+需要实现
+```go
+type Artisan interface {
+	ArtisanRun()
+	GetName() string
+}
+```
+一个例子
+```go
+package demo
+
+import "github.com/PeterYangs/superAdminCore/component/logs"
+
+type Demo struct {
+}
+
+func (d Demo) GetName() string {
+
+	return "demo"
+}
+
+func (d Demo) ArtisanRun() {
+
+	logs.NewLogs().Debug("demo")
+}
+
+```
+运行
+```shell
+./main artisan
+```
+
 
 
 
