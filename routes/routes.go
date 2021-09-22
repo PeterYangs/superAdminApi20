@@ -5,6 +5,7 @@ import (
 	"superadmin/controller"
 	"superadmin/controller/access"
 	"superadmin/controller/admin"
+	"superadmin/controller/broadcast"
 	"superadmin/controller/captcha"
 	"superadmin/controller/category"
 	"superadmin/controller/file"
@@ -107,6 +108,12 @@ func Routes(_r route.Group) {
 			_file.Registered(route.POST, "/update", file.Update).Bind()
 			_file.Registered(route.POST, "/list", file.List).Bind()
 			_file.Registered(route.POST, "/destroy/:id", file.Destroy).Bind()
+
+		})
+
+		_admin.Group("/broadcast", func(_broadcast route.Group) {
+
+			_broadcast.Registered(route.ANY, "/broadcast", broadcast.Broadcast).Bind()
 
 		})
 

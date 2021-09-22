@@ -6,25 +6,14 @@ import (
 	"github.com/PeterYangs/superAdminCore/response"
 	"github.com/gorilla/websocket"
 	"net/http"
-	"sync"
+	"superadmin/util/online"
+	"time"
 )
 
 var broadcast = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 	CheckOrigin:     checkOrigin,
-}
-
-type Online struct {
-	Total int64
-	List  sync.Map
-	Lock  sync.Mutex
-}
-
-var Onlines Online
-
-func (o *Online) Add() {
-
 }
 
 func Broadcast(c *contextPlus.Context) *response.Response {
@@ -38,9 +27,40 @@ func Broadcast(c *contextPlus.Context) *response.Response {
 		return response.Resp().Api(1, err.Error(), "")
 	}
 
+	on := online.NewOnline()
+
+	onlineConn := online.NewConn(conn)
+
+	id := on.Add(onlineConn)
+
 	go func() {
 
-		defer conn.Close()
+		//defer
+
+		defer func() {
+
+			on.Del(id)
+
+			conn.Close()
+		}()
+
+		go func() {
+
+			for {
+
+				time.Sleep(1 * time.Second)
+
+				//wErr := conn.WriteJSON(map[string]interface{}{"ping": "ping"})
+				wErr := onlineConn.SendMessage("ping")
+
+				if wErr != nil {
+
+					return
+				}
+
+			}
+
+		}()
 
 		for {
 
