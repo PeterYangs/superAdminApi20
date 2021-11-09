@@ -31,8 +31,13 @@ func Broadcast(c *contextPlus.Context) *response.Response {
 	//实例化一个新连接对象
 	onlineConn := online.NewConn(conn)
 
+	onlineConn.SetAdminId(c.GetAdminId())
+
 	//添加一个新连接
 	id := on.Add(onlineConn)
+
+	//上线后发送一个在线人数数据
+	onlineConn.SendJson(1, "total", "success", on.GetTotal())
 
 	go func() {
 
@@ -57,8 +62,6 @@ func Broadcast(c *contextPlus.Context) *response.Response {
 
 				return
 			}
-
-			//fmt.Println(string(msg))
 
 			//重置上次访问时间
 			onlineConn.SetReplyTime()

@@ -25,6 +25,7 @@ type Conn struct {
 	id        string          //连接id
 	conn      *websocket.Conn //websocket连接对象
 	lastReply time.Time       //上一次回复时间
+	adminId   int             //账号id
 }
 
 type Message struct {
@@ -45,6 +46,8 @@ func NewOnline() *online {
 		}
 
 		go Online.checkTime()
+
+		go Online.pushTotal()
 	})
 
 	return Online
@@ -92,6 +95,19 @@ func (o *online) GetConnById(id string) (bool, *Conn) {
 	return ok, nil
 }
 
+// SendAllMessage 群发
+func (o *online) SendAllMessage(message Message) {
+
+	o.list.Range(func(key, value interface{}) bool {
+
+		con := value.(*Conn)
+
+		con.SendMessage(message)
+
+		return true
+	})
+}
+
 //心跳检测
 func (o *online) checkTime() {
 
@@ -117,17 +133,30 @@ func (o *online) checkTime() {
 
 }
 
-// SendAllMessage 群发
-func (o *online) SendAllMessage(message Message) {
+//群发在线连接数
+func (o *online) pushTotal() {
 
-	o.list.Range(func(key, value interface{}) bool {
+	for {
 
-		con := value.(*Conn)
+		time.Sleep(15 * time.Second)
 
-		con.SendMessage(message)
+		o.list.Range(func(key, value interface{}) bool {
 
-		return true
-	})
+			con := value.(*Conn)
+
+			con.SendJson(1, "total", "success", o.total)
+
+			return true
+		})
+
+	}
+
+}
+
+// GetTotal 获取在线人数
+func (o *online) GetTotal() int64 {
+
+	return o.total
 }
 
 //------------------------------------------------------------------------------------
@@ -135,6 +164,13 @@ func (o *online) SendAllMessage(message Message) {
 func NewConn(conn *websocket.Conn) *Conn {
 
 	return &Conn{id: uuid.NewV4().String(), conn: conn, lastReply: time.Now()}
+}
+
+// SetAdminId 设置账号id
+func (c *Conn) SetAdminId(adminId int) {
+
+	c.adminId = adminId
+
 }
 
 // SendMessage 结构体式
