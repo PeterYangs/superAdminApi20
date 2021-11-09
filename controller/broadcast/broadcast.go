@@ -7,7 +7,6 @@ import (
 	"github.com/gorilla/websocket"
 	"net/http"
 	"superadmin/util/online"
-	"time"
 )
 
 var broadcast = websocket.Upgrader{
@@ -29,8 +28,10 @@ func Broadcast(c *contextPlus.Context) *response.Response {
 
 	on := online.NewOnline()
 
+	//实例化一个新连接对象
 	onlineConn := online.NewConn(conn)
 
+	//添加一个新连接
 	id := on.Add(onlineConn)
 
 	go func() {
@@ -44,27 +45,11 @@ func Broadcast(c *contextPlus.Context) *response.Response {
 			conn.Close()
 		}()
 
-		go func() {
-
-			for {
-
-				time.Sleep(1 * time.Second)
-
-				//wErr := conn.WriteJSON(map[string]interface{}{"ping": "ping"})
-				wErr := onlineConn.SendMessage("ping")
-
-				if wErr != nil {
-
-					return
-				}
-
-			}
-
-		}()
-
 		for {
 
 			_, msg, err := conn.ReadMessage()
+
+			//msg.
 
 			if err != nil {
 
@@ -73,13 +58,38 @@ func Broadcast(c *contextPlus.Context) *response.Response {
 				return
 			}
 
-			conn.WriteJSON(map[string]interface{}{"data": msg})
+			//fmt.Println(string(msg))
+
+			//重置上次访问时间
+			onlineConn.SetReplyTime()
+
+			message := online.NewMessage(msg)
+
+			switch message.Types {
+
+			case "ping":
+
+				onlineConn.SendJson(1, "ping", "", []string{})
+
+			}
+
+			//conn.WriteJSON(map[string]interface{}{"data": msg})
 
 		}
 
 	}()
 
 	return response.Resp().Nil()
+}
+
+// GroupMessage 群发测试
+func GroupMessage(c *contextPlus.Context) *response.Response {
+
+	on := online.NewOnline()
+
+	on.SendAllMessage(online.Message{Code: 1, Types: "group_test", Message: "群发测试"})
+
+	return response.Resp().Api(1, "success", []string{})
 }
 
 func checkOrigin(r *http.Request) bool {

@@ -1,6 +1,7 @@
 package online
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
 	uuid "github.com/satori/go.uuid"
@@ -8,9 +9,10 @@ import (
 	"time"
 )
 
+//所有连接处理结构体
 type online struct {
-	total int64
-	list  sync.Map
+	total int64    //在线连接数
+	list  sync.Map //所有连接存放
 	lock  sync.Mutex
 }
 
@@ -18,10 +20,18 @@ var Online *online
 
 var once sync.Once
 
+// Conn 单个连接结构体
 type Conn struct {
-	id        string
-	conn      *websocket.Conn
-	lastReply time.Time //上一次回复时间
+	id        string          //连接id
+	conn      *websocket.Conn //websocket连接对象
+	lastReply time.Time       //上一次回复时间
+}
+
+type Message struct {
+	Code    int         `json:"code"`
+	Types   string      `json:"types"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
 }
 
 func NewOnline() *online {
@@ -34,13 +44,13 @@ func NewOnline() *online {
 			lock:  sync.Mutex{},
 		}
 
+		go Online.checkTime()
 	})
-
-	go Online.checkTime()
 
 	return Online
 }
 
+// Add 添加一个连接
 func (o *online) Add(c *Conn) string {
 
 	o.total++
@@ -51,6 +61,7 @@ func (o *online) Add(c *Conn) string {
 
 }
 
+// Del 删除一个连接
 func (o *online) Del(id string) {
 
 	o.total--
@@ -65,6 +76,7 @@ func (o *online) Total() int64 {
 	return o.total
 }
 
+// GetConnById 根据id获取连接
 func (o *online) GetConnById(id string) (bool, *Conn) {
 
 	c, ok := o.list.Load(id)
@@ -80,6 +92,7 @@ func (o *online) GetConnById(id string) (bool, *Conn) {
 	return ok, nil
 }
 
+//心跳检测
 func (o *online) checkTime() {
 
 	for {
@@ -104,6 +117,19 @@ func (o *online) checkTime() {
 
 }
 
+// SendAllMessage 群发
+func (o *online) SendAllMessage(message Message) {
+
+	o.list.Range(func(key, value interface{}) bool {
+
+		con := value.(*Conn)
+
+		con.SendMessage(message)
+
+		return true
+	})
+}
+
 //------------------------------------------------------------------------------------
 
 func NewConn(conn *websocket.Conn) *Conn {
@@ -111,8 +137,33 @@ func NewConn(conn *websocket.Conn) *Conn {
 	return &Conn{id: uuid.NewV4().String(), conn: conn, lastReply: time.Now()}
 }
 
-// SendMessage 发送字符串消息
-func (c *Conn) SendMessage(message string) error {
+// SendMessage 结构体式
+func (c *Conn) SendMessage(message Message) error {
 
-	return c.conn.WriteJSON(map[string]interface{}{"type": "message", "content": message})
+	return c.conn.WriteJSON(message)
+}
+
+// SendJson 函数式
+func (c *Conn) SendJson(code int, types string, message string, data interface{}) error {
+
+	return c.conn.WriteJSON(Message{Code: code, Types: types, Message: message, Data: data})
+	//return c.conn.WriteJSON(map[string]interface{}{"code": code, "type": types, "message": message, "data": data})
+}
+
+// SetReplyTime 设置上一次回复时间
+func (c *Conn) SetReplyTime() {
+
+	c.lastReply = time.Now()
+}
+
+//---------------------------------------------------------------------------------------
+
+func NewMessage(message []byte) Message {
+
+	var m Message
+
+	_ = json.Unmarshal(message, &m)
+
+	return m
+
 }
