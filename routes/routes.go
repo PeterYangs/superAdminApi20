@@ -113,8 +113,8 @@ func Routes(_r route.Group) {
 
 		_admin.Group("/broadcast", func(_broadcast route.Group) {
 
-			_broadcast.Registered(route.ANY, "/broadcast", broadcast.Broadcast).Bind()
-			_broadcast.Registered(route.POST, "/groupMessage", broadcast.GroupMessage).Bind()
+			_broadcast.Registered(route.ANY, "/broadcast", broadcast.Broadcast).SetTag("skip_auth").Bind()
+			_broadcast.Registered(route.POST, "/groupMessage", broadcast.GroupMessage).SetTag("skip_auth").Bind()
 
 		})
 
