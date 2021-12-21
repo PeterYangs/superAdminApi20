@@ -559,7 +559,7 @@ func (d Demo) ArtisanRun() {
 ```
 **缓存**
 
-缓存支持两种驱动file和redis，在`.env`文件中设置`CACHE_DRIVER=redis`
+缓存支持两种驱动`file`和`redis`，在`.env`文件中设置`CACHE_DRIVER=redis`
 ```go
 package test
 
