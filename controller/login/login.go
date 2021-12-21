@@ -36,11 +36,27 @@ func Login(c *contextPlus.Context) *response.Response {
 
 	var admin model.Admin
 
-	re := database.GetDb().Where("username = ?", strings.TrimSpace(form.Username)).Where("password = ?", common.HmacSha256(strings.TrimSpace(form.Password))).First(&admin)
+	//hash,err:=common.Ch
+
+	if err != nil {
+
+		return response.Resp().Api(2, err.Error(), "")
+	}
+
+	re := database.GetDb().Where("username = ?", strings.TrimSpace(form.Username)).First(&admin)
 
 	if re.Error != nil {
 
-		return response.Resp().Json(gin.H{"code": 2, "msg": "密码错误"})
+		return response.Resp().Json(gin.H{"code": 2, "msg": "用户不存在"})
+	}
+
+	hash := admin.Password
+
+	ok := common.CheckPasswordHash(form.Password, hash)
+
+	if !ok {
+
+		return response.Resp().Api(2, "密码错误", "")
 	}
 
 	c.Session().Set("admin", admin)
@@ -116,9 +132,16 @@ func Registered(c *contextPlus.Context) *response.Response {
 
 	tx := database.GetDb().Begin()
 
+	hash, err := common.HashPassword(form.Password)
+
+	if err != nil {
+
+		return response.Resp().Api(2, err.Error(), "")
+	}
+
 	admin := model.Admin{
 		Username: form.Username,
-		Password: common.HmacSha256(form.Password),
+		Password: hash,
 		Email:    form.Email,
 		Id:       uint(form.Id),
 	}
