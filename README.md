@@ -560,7 +560,26 @@ func (d Demo) ArtisanRun() {
 **缓存**
 
 缓存支持两种驱动file和redis，在`.env`文件中设置`CACHE_DRIVER=redis`
+```go
+package test
 
+import (
+	"fmt"
+	"github.com/PeterYangs/superAdminCore/cache"
+	"github.com/PeterYangs/superAdminCore/contextPlus"
+	"github.com/PeterYangs/superAdminCore/response"
+)
+
+func Cache(c *contextPlus.Context) *response.Response {
+
+	cache.Cache().Put("nice", "0", 0)
+
+	fmt.Println(cache.Cache().Get("nice"))
+
+	return response.Resp().Api(1, "success", "")
+}
+
+```
 
 
 
