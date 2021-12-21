@@ -60,7 +60,7 @@ func (s Seeds) resetRoot() {
 
 		admin.Email = "root@superadmin.com"
 
-		admin.Password = common.HmacSha256(password)
+		admin.Password, _ = common.HashPassword(password)
 
 		admin.Status = 1
 
@@ -70,7 +70,7 @@ func (s Seeds) resetRoot() {
 
 	} else {
 
-		admin.Password = common.HmacSha256(password)
+		admin.Password, _ = common.HashPassword(password)
 
 		admin.Status = 1
 
