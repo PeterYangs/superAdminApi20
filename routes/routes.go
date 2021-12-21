@@ -14,6 +14,7 @@ import (
 	"superadmin/controller/queue"
 	"superadmin/controller/role"
 	"superadmin/controller/rule"
+	"superadmin/controller/test"
 	"superadmin/controller/upload"
 	"superadmin/middleware/authCheck"
 	"superadmin/middleware/loginCheck"
@@ -123,6 +124,12 @@ func Routes(_r route.Group) {
 	_r.Group("/captcha", func(g route.Group) {
 
 		g.Registered(route.GET, "/captcha", captcha.Captcha).Bind()
+	})
+
+	_r.Group("/test", func(_test route.Group) {
+
+		_test.Registered(route.GET, "/cache", test.Cache).Bind()
+
 	})
 
 }

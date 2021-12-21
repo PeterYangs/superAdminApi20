@@ -14,6 +14,6 @@ func Conf() map[string]interface{} {
 		"captcha_lifetime":    os.Getenv("CAPTCHA_LIFETIME"),      //验证码过期时间
 		"lock_prefix":         os.Getenv("LOCK_PREFIX"),           //锁前缀
 		"queue_register_path": "queue/queue.go",                   //消息队列配置路径
-
+		"file_cache_path":     "storage",
 	}
 }

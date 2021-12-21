@@ -557,6 +557,9 @@ func (d Demo) ArtisanRun() {
 ```shell
 ./main artisan
 ```
+**缓存**
+
+缓存支持两种驱动file和redis，在`.env`文件中设置`CACHE_DRIVER=redis`
 
 
 
