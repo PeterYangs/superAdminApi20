@@ -26,6 +26,7 @@ type Conn struct {
 	conn      *websocket.Conn //websocket连接对象
 	lastReply time.Time       //上一次回复时间
 	adminId   int             //账号id
+	lock      sync.Mutex
 }
 
 type Message struct {
@@ -163,7 +164,7 @@ func (o *online) GetTotal() int64 {
 
 func NewConn(conn *websocket.Conn) *Conn {
 
-	return &Conn{id: uuid.NewV4().String(), conn: conn, lastReply: time.Now()}
+	return &Conn{id: uuid.NewV4().String(), conn: conn, lastReply: time.Now(), lock: sync.Mutex{}}
 }
 
 // SetAdminId 设置账号id
@@ -176,11 +177,19 @@ func (c *Conn) SetAdminId(adminId int) {
 // SendMessage 结构体式
 func (c *Conn) SendMessage(message Message) error {
 
+	c.lock.Lock()
+
+	defer c.lock.Unlock()
+
 	return c.conn.WriteJSON(message)
 }
 
 // SendJson 函数式
 func (c *Conn) SendJson(code int, types string, message string, data interface{}) error {
+
+	c.lock.Lock()
+
+	defer c.lock.Unlock()
 
 	return c.conn.WriteJSON(Message{Code: code, Types: types, Message: message, Data: data})
 	//return c.conn.WriteJSON(map[string]interface{}{"code": code, "type": types, "message": message, "data": data})
