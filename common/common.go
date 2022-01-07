@@ -1,6 +1,7 @@
 package common
 
 import (
+	"context"
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha256"
@@ -24,13 +25,15 @@ func HmacSha256(data string) string {
 
 func Paginate(tx *gorm.DB, dest interface{}, page int, size int) gin.H {
 
+	db := tx.WithContext(context.TODO())
+
 	offset := (page - 1) * size
 
 	var count int64
 
-	tx.Count(&count)
+	db.Count(&count)
 
-	tx.Offset(offset).Limit(size).Find(dest)
+	db.Offset(offset).Limit(size).Find(dest)
 
 	return gin.H{"total": count, "data": dest, "page": page, "size": size}
 
@@ -51,7 +54,7 @@ func UpdateOrCreateOne(tx *gorm.DB, model interface{}, where map[string]interfac
 
 	re := tt.First(model)
 
-	id := reflect.ValueOf(model).Elem().FieldByName("Id").Interface()
+	//id := reflect.ValueOf(model).Elem().FieldByName("Id").Interface()
 
 	if re.Error == gorm.ErrRecordNotFound {
 
@@ -70,7 +73,7 @@ func UpdateOrCreateOne(tx *gorm.DB, model interface{}, where map[string]interfac
 
 		//fmt.Println(id)
 
-		up := tx.Model(model).Where("id=?", id)
+		up := tx.Model(model)
 
 		if len(Omits) > 0 {
 
