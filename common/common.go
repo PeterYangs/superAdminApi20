@@ -59,7 +59,7 @@ func UpdateOrCreateOne(tx *gorm.DB, model interface{}, where map[string]interfac
 
 	if re.Error == gorm.ErrRecordNotFound {
 
-		fmt.Println("你xx")
+		//fmt.Println("你xx")
 
 		cRe := tx.Create(modelData)
 
