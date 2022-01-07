@@ -50,15 +50,18 @@ func UpdateOrCreateOne(tx *gorm.DB, model interface{}, where map[string]interfac
 	for s, i := range where {
 
 		tt.Where(s+"=?", i)
+
 	}
 
-	re := tt.First(model)
+	re := tt.First(map[string]interface{}{})
 
 	//id := reflect.ValueOf(model).Elem().FieldByName("Id").Interface()
 
 	if re.Error == gorm.ErrRecordNotFound {
 
-		cRe := tx.Model(model).Create(modelData)
+		fmt.Println("你xx")
+
+		cRe := tx.Create(modelData)
 
 		if cRe.Error != nil {
 
@@ -71,9 +74,12 @@ func UpdateOrCreateOne(tx *gorm.DB, model interface{}, where map[string]interfac
 
 	if re.Error == nil {
 
-		//fmt.Println(id)
-
 		up := tx.Model(model)
+
+		for s, i := range where {
+
+			up.Where(s+"=?", i)
+		}
 
 		if len(Omits) > 0 {
 
@@ -85,6 +91,7 @@ func UpdateOrCreateOne(tx *gorm.DB, model interface{}, where map[string]interfac
 
 		ss, b := s.FieldByName("Id")
 
+		//需要更新的字段
 		if b {
 
 			fillable := ss.Tag.Get("fillable")
@@ -93,7 +100,7 @@ func UpdateOrCreateOne(tx *gorm.DB, model interface{}, where map[string]interfac
 
 				f := tools.Explode(",", fillable)
 
-				up = up.Select(f)
+				up.Select(f)
 			}
 
 		}
