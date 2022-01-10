@@ -1,7 +1,6 @@
 package common
 
 import (
-	"context"
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha256"
@@ -25,15 +24,23 @@ func HmacSha256(data string) string {
 
 func Paginate(tx *gorm.DB, dest interface{}, page int, size int) gin.H {
 
-	db := tx.WithContext(context.TODO())
+	if page <= 0 {
+
+		page = 1
+	}
+
+	if size <= 0 {
+
+		size = 10
+	}
 
 	offset := (page - 1) * size
 
 	var count int64
 
-	db.Count(&count)
+	tx.Offset(offset).Limit(size).Find(dest)
 
-	db.Offset(offset).Limit(size).Find(dest)
+	tx.Count(&count)
 
 	return gin.H{"total": count, "data": dest, "page": page, "size": size}
 
