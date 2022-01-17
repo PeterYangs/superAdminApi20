@@ -1,6 +1,7 @@
 package common
 
 import (
+	"context"
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha256"
@@ -38,9 +39,11 @@ func Paginate(tx *gorm.DB, dest interface{}, page int, size int) gin.H {
 
 	var count int64
 
+	c := tx.WithContext(context.TODO())
+
 	tx.Offset(offset).Limit(size).Find(dest)
 
-	tx.Count(&count)
+	c.Count(&count)
 
 	return gin.H{"total": count, "data": dest, "page": page, "size": size}
 
