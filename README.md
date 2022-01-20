@@ -47,7 +47,7 @@ go build main.go
 ./main start -d
 ```
 
-安全停止(Windows平台需要将windows-kill.exe放在当前的lib目录)
+安全停止
 ```
 ./main stop
 ```
