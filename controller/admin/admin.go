@@ -6,14 +6,12 @@ import (
 	"github.com/PeterYangs/superAdminCore/database"
 	"github.com/PeterYangs/superAdminCore/response"
 	"github.com/PeterYangs/superAdminCore/route/allUrl"
+	"github.com/PeterYangs/tools"
+	"github.com/spf13/cast"
 	"superadmin/common"
 	"superadmin/controller/menu"
 	"superadmin/model"
 	"superadmin/search"
-
-	"github.com/PeterYangs/tools"
-	"github.com/gin-gonic/gin"
-	"github.com/spf13/cast"
 )
 
 func GetRoleList(c *contextPlus.Context) *response.Response {
@@ -64,7 +62,7 @@ func Detail(c *contextPlus.Context) *response.Response {
 
 	if err != nil {
 
-		return response.Resp().Json(gin.H{"code": 2, "msg": err.Error()})
+		return response.Resp().Api(2, err.Error(), "")
 
 	}
 
@@ -82,8 +80,7 @@ func Detail(c *contextPlus.Context) *response.Response {
 		RoleId: r.RoleDetail.RoleId,
 	}
 
-	return response.Resp().Json(gin.H{"data": rr, "code": 1})
-
+	return response.Resp().Api(1, "success", rr)
 }
 
 func Info(c *contextPlus.Context) *response.Response {
@@ -129,8 +126,7 @@ func Destroy(c *contextPlus.Context) *response.Response {
 
 	if err != nil {
 
-		return response.Resp().Json(gin.H{"code": 2, "msg": err.Error()})
-
+		return response.Resp().Api(2, err.Error(), "")
 	}
 
 	database.GetDb().Delete(&model.Admin{}, form.Id)

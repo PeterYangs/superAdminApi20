@@ -4,7 +4,6 @@ import (
 	"github.com/PeterYangs/superAdminCore/contextPlus"
 	"github.com/PeterYangs/superAdminCore/database"
 	"github.com/PeterYangs/superAdminCore/response"
-	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 	"superadmin/common"
 	"superadmin/model"
@@ -41,7 +40,7 @@ func Update(c *contextPlus.Context) *response.Response {
 
 	if err != nil {
 
-		return response.Resp().Json(gin.H{"code": 2, "msg": err.Error()})
+		return response.Resp().Api(2, err.Error(), "")
 
 	}
 
@@ -89,7 +88,7 @@ func Detail(c *contextPlus.Context) *response.Response {
 
 	if err != nil {
 
-		return response.Resp().Json(gin.H{"code": 2, "msg": err.Error()})
+		return response.Resp().Api(2, err.Error(), "")
 
 	}
 
@@ -97,8 +96,7 @@ func Detail(c *contextPlus.Context) *response.Response {
 
 	database.GetDb().Where("id = ?", form.Id).First(&r)
 
-	return response.Resp().Json(gin.H{"data": r, "code": 1})
-
+	return response.Resp().Api(1, "success", r)
 }
 
 func Destroy(c *contextPlus.Context) *response.Response {
@@ -113,7 +111,7 @@ func Destroy(c *contextPlus.Context) *response.Response {
 
 	if err != nil {
 
-		return response.Resp().Json(gin.H{"code": 2, "msg": err.Error()})
+		return response.Resp().Api(2, err.Error(), "")
 
 	}
 

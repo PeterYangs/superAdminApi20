@@ -8,7 +8,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/PeterYangs/tools"
-	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"math/big"
@@ -23,7 +22,7 @@ func HmacSha256(data string) string {
 	return hex.EncodeToString(hash.Sum([]byte("")))
 }
 
-func Paginate(tx *gorm.DB, dest interface{}, page int, size int) gin.H {
+func Paginate(tx *gorm.DB, dest interface{}, page int, size int) map[string]interface{} {
 
 	if page <= 0 {
 
@@ -45,7 +44,8 @@ func Paginate(tx *gorm.DB, dest interface{}, page int, size int) gin.H {
 
 	c.Count(&count)
 
-	return gin.H{"total": count, "data": dest, "page": page, "size": size}
+	//return gin.H{"total": count, "data": dest, "page": page, "size": size}
+	return map[string]interface{}{"total": count, "data": dest, "page": page, "size": size}
 
 }
 

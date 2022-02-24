@@ -6,7 +6,6 @@ import (
 	"github.com/PeterYangs/superAdminCore/contextPlus"
 	"github.com/PeterYangs/superAdminCore/redis"
 	"github.com/PeterYangs/superAdminCore/response"
-	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 	"os"
 )
@@ -23,14 +22,13 @@ func List(c *contextPlus.Context) *response.Response {
 
 	stop := start + size
 
-	//os.MkdirAll()
 	list, _ := redis.GetClient().LRange(context.TODO(), os.Getenv("QUEUE_PREFIX")+queue, int64(start), int64(stop)).Result()
 
 	count, _ := redis.GetClient().LLen(context.TODO(), os.Getenv("QUEUE_PREFIX")+queue).Result()
 
 	if len(list) <= 0 {
 
-		return response.Resp().Api(1, "success", gin.H{"total": 0, "data": []string{}, "page": 1, "size": size})
+		return response.Resp().Api(1, "success", map[string]interface{}{"total": 0, "data": []string{}, "page": 1, "size": size})
 	}
 
 	jList := make([]map[string]interface{}, len(list))
@@ -44,8 +42,7 @@ func List(c *contextPlus.Context) *response.Response {
 		jList[i] = temp
 	}
 
-	return response.Resp().Api(1, "success", gin.H{"total": count, "data": jList, "page": p, "size": size})
-
+	return response.Resp().Api(1, "success", map[string]interface{}{"total": count, "data": jList, "page": p, "size": size})
 }
 
 func DelayList(c *contextPlus.Context) *response.Response {
@@ -66,7 +63,7 @@ func DelayList(c *contextPlus.Context) *response.Response {
 
 	if len(list) <= 0 {
 
-		return response.Resp().Api(1, "success", gin.H{"total": 0, "data": []string{}, "page": 1, "size": size})
+		return response.Resp().Api(1, "success", map[string]interface{}{"total": 0, "data": []string{}, "page": 1, "size": size})
 	}
 
 	jList := make([]map[string]interface{}, len(list))
@@ -80,6 +77,5 @@ func DelayList(c *contextPlus.Context) *response.Response {
 		jList[i] = temp
 	}
 
-	return response.Resp().Api(1, "success", gin.H{"total": count, "data": jList, "page": p, "size": size})
-
+	return response.Resp().Api(1, "success", map[string]interface{}{"total": count, "data": jList, "page": p, "size": size})
 }

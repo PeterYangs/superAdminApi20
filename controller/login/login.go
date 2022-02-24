@@ -5,7 +5,6 @@ import (
 	"github.com/PeterYangs/superAdminCore/database"
 	"github.com/PeterYangs/superAdminCore/response"
 	regexp "github.com/dlclark/regexp2"
-	"github.com/gin-gonic/gin"
 	"strings"
 	"superadmin/common"
 	"superadmin/model"
@@ -25,13 +24,13 @@ func Login(c *contextPlus.Context) *response.Response {
 
 	if err != nil {
 
-		return response.Resp().Json(gin.H{"code": 2, "msg": err.Error()})
+		return response.Resp().Api(2, err.Error(), "")
 
 	}
 
 	if !c.CheckCaptcha(form.Captcha) {
 
-		return response.Resp().Json(gin.H{"code": 2, "msg": "验证码错误"})
+		return response.Resp().Api(2, "验证码错误", "")
 	}
 
 	var admin model.Admin
@@ -47,7 +46,7 @@ func Login(c *contextPlus.Context) *response.Response {
 
 	if re.Error != nil {
 
-		return response.Resp().Json(gin.H{"code": 2, "msg": "用户不存在"})
+		return response.Resp().Api(2, "用户不存在", "")
 	}
 
 	hash := admin.Password
@@ -61,7 +60,7 @@ func Login(c *contextPlus.Context) *response.Response {
 
 	c.Session().Set("admin", admin)
 
-	return response.Resp().Json(gin.H{"code": 1, "msg": "success"})
+	return response.Resp().Api(1, "success", "")
 }
 
 // Registered 后台管理员添加
@@ -82,7 +81,7 @@ func Registered(c *contextPlus.Context) *response.Response {
 
 	if err != nil {
 
-		return response.Resp().Json(gin.H{"code": 2, "msg": err.Error()})
+		return response.Resp().Api(2, err.Error(), "")
 
 	}
 
@@ -91,20 +90,20 @@ func Registered(c *contextPlus.Context) *response.Response {
 
 		if form.Password == "" {
 
-			return response.Resp().Json(gin.H{"code": 2, "msg": "密码不能为空"})
+			return response.Resp().Api(2, "密码不能为空", "")
 
 		}
 
 		if form.Password != form.RePassword {
 
-			return response.Resp().Json(gin.H{"code": 2, "msg": "两次密码不一致"})
+			return response.Resp().Api(2, "两次密码不一致", "")
 		}
 
 		ok := database.GetDb().Where("username = ?", form.Username).Or("email = ?", form.Email).First(&model.Admin{})
 
 		if ok.Error == nil {
 
-			return response.Resp().Json(gin.H{"code": 2, "msg": "用户名已被注册"})
+			return response.Resp().Api(2, "用户名已被注册", "")
 
 		}
 
@@ -112,7 +111,7 @@ func Registered(c *contextPlus.Context) *response.Response {
 
 		if form.Password != form.RePassword {
 
-			return response.Resp().Json(gin.H{"code": 2, "msg": "两次密码不一致"})
+			return response.Resp().Api(2, "两次密码不一致", "")
 		}
 
 	}
@@ -180,7 +179,7 @@ func Registered(c *contextPlus.Context) *response.Response {
 
 	tx.Commit()
 
-	return response.Resp().Json(gin.H{"code": 1, "msg": "success"})
+	return response.Resp().Api(1, "success", "")
 
 }
 
@@ -188,5 +187,5 @@ func Logout(c *contextPlus.Context) *response.Response {
 
 	c.Session().Remove("admin")
 
-	return response.Resp().Json(gin.H{"code": 1, "msg": "success"})
+	return response.Resp().Api(1, "success", "")
 }
