@@ -3,7 +3,7 @@ module superadmin
 go 1.16
 
 require (
-	github.com/PeterYangs/superAdminCore v0.0.23
+	github.com/PeterYangs/superAdminCore v0.0.24
 	github.com/PeterYangs/tools v0.2.38
 	github.com/dlclark/regexp2 v1.4.0
 	github.com/gorilla/websocket v1.4.2
