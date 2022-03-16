@@ -1,10 +1,14 @@
 package login
 
 import (
+	"context"
 	"github.com/PeterYangs/superAdminCore/contextPlus"
 	"github.com/PeterYangs/superAdminCore/database"
+	"github.com/PeterYangs/superAdminCore/redis"
 	"github.com/PeterYangs/superAdminCore/response"
 	regexp "github.com/dlclark/regexp2"
+	"github.com/spf13/cast"
+	"os"
 	"strings"
 	"superadmin/common"
 	"superadmin/model"
@@ -35,8 +39,6 @@ func Login(c *contextPlus.Context) *response.Response {
 
 	var admin model.Admin
 
-	//hash,err:=common.Ch
-
 	if err != nil {
 
 		return response.Resp().Api(2, err.Error(), "")
@@ -59,6 +61,29 @@ func Login(c *contextPlus.Context) *response.Response {
 	}
 
 	c.Session().Set("admin", admin)
+
+	//单点登录模式
+	if os.Getenv("LOGIN_MODE") == "single" {
+
+		//获取该id下的所有session key
+		list, err := redis.GetClient().LRange(context.Background(), "_id:"+cast.ToString(admin.Id), 0, 10).Result()
+
+		if err != nil {
+
+			goto SUCCESS
+		}
+
+		//删除所有该id下的所有session
+		redis.GetClient().Del(context.Background(), list...)
+
+		//删除id记录
+		redis.GetClient().Del(context.Background(), "_id:"+cast.ToString(admin.Id))
+
+		//记录id的session key
+		redis.GetClient().LPush(context.Background(), "_id:"+cast.ToString(admin.Id), c.Session().Key())
+	}
+
+SUCCESS:
 
 	return response.Resp().Api(1, "success", "")
 }
