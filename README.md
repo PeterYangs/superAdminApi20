@@ -383,7 +383,7 @@ func NewTask(ip string, url string, params string, adminId float64) *TaskAccess 
 	}
 }
 
-func (t *TaskAccess) Run() {
+func (t *TaskAccess) Run() error {
 
 	database.GetDb().Create(&model.Access{
 		Ip:      t.Parameters.Ip,
@@ -391,6 +391,8 @@ func (t *TaskAccess) Run() {
 		Params:  t.Parameters.Params,
 		AdminId: t.Parameters.AdminId,
 	})
+	
+	return nil
 
 }
 
@@ -447,6 +449,30 @@ func Task(c *contextPlus.Context) *response.Response {
 
 }
 ```
+
+
+重试次数
+```go
+package controller
+
+import (
+	"gin-web/contextPlus"
+	"gin-web/queue"
+	"gin-web/response"
+	"gin-web/task/email"
+	"gin-web/task/sms"
+)
+
+func Task(c *contextPlus.Context) *response.Response {
+
+	queue.Dispatch(email.NewTask("904801074@qq.com", "title", "content")).SetTryTime(3).Run()
+
+	return response.Resp().Api(1, "123", "")
+
+}
+```
+
+
 **任务调度**
 
 crontab/crontabs.go

@@ -35,7 +35,7 @@ func NewAccessTask(ip string, url string, params string, adminId float64) *TaskA
 	}
 }
 
-func (t *TaskAccess) Run() {
+func (t *TaskAccess) Run() error {
 
 	database.GetDb().Create(&model.Access{
 		Ip:      t.Parameters.Ip,
@@ -44,6 +44,7 @@ func (t *TaskAccess) Run() {
 		AdminId: t.Parameters.AdminId,
 	})
 
+	return nil
 }
 
 func (t *TaskAccess) BindParameters(p map[string]interface{}) {

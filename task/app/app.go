@@ -24,8 +24,9 @@ func NewAppTask() *AppTask {
 	}
 }
 
-func (t *AppTask) Run() {
+func (t *AppTask) Run() error {
 
+	return nil
 }
 
 func (t *AppTask) BindParameters(p map[string]interface{}) {
