@@ -607,6 +607,14 @@ func Cache(c *contextPlus.Context) *response.Response {
 
 ```
 
+**管理员登录模式**
+
+在.env文件中设置
+```dotenv
+#登录模式，single(单点登录),multi(多点登录)
+LOGIN_MODE=single|multi
+```
+
 
 
 
