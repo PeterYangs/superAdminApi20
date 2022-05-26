@@ -1,7 +1,7 @@
-github.com/PeterYangs/gcmd2 v0.0.5 h1:c9jFjWPkb8MCWL9dTi9R0+50SffVJcdibXX/+Xvb1tM=
-github.com/PeterYangs/gcmd2 v0.0.5/go.mod h1:xuuql5mIrLbEJ3iiF0qNRy5lJj1C16xR+ENylaMTv24=
-github.com/PeterYangs/superAdminCore v0.0.32 h1:GUoC+CJswVVa7h0rxiOdNoGD/TVbhLV9NSkRLxR1mUg=
-github.com/PeterYangs/superAdminCore v0.0.32/go.mod h1:2dQaBtJJQ1Rh+ynng9jBOwdFlb5y9KCut8r59s67hfo=
+github.com/PeterYangs/gcmd2 v0.0.8 h1:FUmhqsT4qsU4dION+whwRo932b0kswo7gOPunA3jZ2Y=
+github.com/PeterYangs/gcmd2 v0.0.8/go.mod h1:xuuql5mIrLbEJ3iiF0qNRy5lJj1C16xR+ENylaMTv24=
+github.com/PeterYangs/superAdminCore v0.0.35 h1:C6cvPfcZ9KJxj9stS+F4SQ8JJHzJR6v14CUcGegWR1M=
+github.com/PeterYangs/superAdminCore v0.0.35/go.mod h1:gDpJTK2Jkm8JI5y7GExADsP0uv/AsOTwSX5F9M2Ksuc=
 github.com/PeterYangs/tools v0.2.38 h1:KoNgoHyrbOU8DDBd22oSCuooAHIS5FXbx/oPRFDlD5o=
 github.com/PeterYangs/tools v0.2.38/go.mod h1:DyUXMnXUCN5PUgroBmKnbr11ZC8kYqY60WdnOoMnc+o=
 github.com/PeterYangs/waitTree v0.0.6 h1:r9DQqKqA5jooI0mMKMQu2Q32aOMhAJqrZoG//i2sZ3o=
