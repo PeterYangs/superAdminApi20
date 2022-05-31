@@ -52,10 +52,7 @@ go build main.go
 ./main stop
 ```
 
-平滑重启
-```
-./main restart
-```
+
 
 运行内置命令
 ```shell
