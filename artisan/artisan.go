@@ -1,7 +1,7 @@
 package artisan
 
 import (
-	"github.com/PeterYangs/superAdminCore/artisan"
+	"github.com/PeterYangs/superAdminCore/v2/artisan"
 	"superadmin/artisan/seeds"
 )
 

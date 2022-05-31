@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"github.com/PeterYangs/superAdminCore/contextPlus"
-	"github.com/PeterYangs/superAdminCore/middleware/session"
+	"github.com/PeterYangs/superAdminCore/v2/contextPlus"
+	"github.com/PeterYangs/superAdminCore/v2/middleware/session"
 	"superadmin/middleware/accessLog"
 )
 

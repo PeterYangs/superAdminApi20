@@ -2,7 +2,7 @@ package seeds
 
 import (
 	"fmt"
-	"github.com/PeterYangs/superAdminCore/database"
+	"github.com/PeterYangs/superAdminCore/v2/database"
 	"github.com/PeterYangs/tools"
 	"github.com/manifoldco/promptui"
 	"gorm.io/gorm"

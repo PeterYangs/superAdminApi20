@@ -1,7 +1,8 @@
 package main
 
 import (
-	"github.com/PeterYangs/superAdminCore/core"
+	"context"
+	"github.com/PeterYangs/superAdminCore/v2/core"
 	"superadmin/artisan"
 	"superadmin/conf"
 	"superadmin/crontab"
@@ -12,7 +13,7 @@ import (
 
 func main() {
 
-	c := core.NewCore()
+	c := core.NewCore(context.Background())
 
 	//加载配置
 	c.LoadConf(conf.Conf)

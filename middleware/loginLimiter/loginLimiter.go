@@ -1,8 +1,8 @@
 package loginLimiter
 
 import (
-	"github.com/PeterYangs/superAdminCore/component/limiter"
-	"github.com/PeterYangs/superAdminCore/contextPlus"
+	"github.com/PeterYangs/superAdminCore/v2/component/limiter"
+	"github.com/PeterYangs/superAdminCore/v2/contextPlus"
 	"golang.org/x/time/rate"
 	"time"
 )

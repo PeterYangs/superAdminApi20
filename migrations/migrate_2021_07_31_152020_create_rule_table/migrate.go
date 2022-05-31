@@ -1,6 +1,6 @@
 package migrate_2021_07_31_152020_create_rule_table
 
-import "github.com/PeterYangs/superAdminCore/migrate"
+import "github.com/PeterYangs/superAdminCore/v2/migrate"
 
 func Up() {
 

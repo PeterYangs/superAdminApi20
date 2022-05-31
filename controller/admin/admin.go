@@ -2,10 +2,10 @@ package admin
 
 import (
 	"encoding/json"
-	"github.com/PeterYangs/superAdminCore/contextPlus"
-	"github.com/PeterYangs/superAdminCore/database"
-	"github.com/PeterYangs/superAdminCore/response"
-	"github.com/PeterYangs/superAdminCore/route/allUrl"
+	"github.com/PeterYangs/superAdminCore/v2/contextPlus"
+	"github.com/PeterYangs/superAdminCore/v2/database"
+	"github.com/PeterYangs/superAdminCore/v2/response"
+	"github.com/PeterYangs/superAdminCore/v2/route/allUrl"
 	"github.com/PeterYangs/tools"
 	"github.com/spf13/cast"
 	"superadmin/common"

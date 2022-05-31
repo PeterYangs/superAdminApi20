@@ -1,9 +1,9 @@
 package menu
 
 import (
-	"github.com/PeterYangs/superAdminCore/contextPlus"
-	"github.com/PeterYangs/superAdminCore/database"
-	"github.com/PeterYangs/superAdminCore/response"
+	"github.com/PeterYangs/superAdminCore/v2/contextPlus"
+	"github.com/PeterYangs/superAdminCore/v2/database"
+	"github.com/PeterYangs/superAdminCore/v2/response"
 	"gorm.io/gorm"
 	"superadmin/common"
 	"superadmin/model"

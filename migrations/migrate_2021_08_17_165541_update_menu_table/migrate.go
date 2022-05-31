@@ -1,6 +1,6 @@
 package migrate_2021_08_17_165541_update_menu_table
 
-import "github.com/PeterYangs/superAdminCore/migrate"
+import "github.com/PeterYangs/superAdminCore/v2/migrate"
 
 func Up() {
 

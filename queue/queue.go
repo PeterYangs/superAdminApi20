@@ -1,7 +1,7 @@
 package queue
 
 import (
-	"github.com/PeterYangs/superAdminCore/queue/template"
+	"github.com/PeterYangs/superAdminCore/v2/queue/template"
 	"superadmin/task/access"
 	"superadmin/task/app"
 	//namespace

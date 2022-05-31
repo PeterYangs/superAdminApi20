@@ -1,6 +1,6 @@
 package migrate_2021_08_18_155238_update_access_table
 
-import "github.com/PeterYangs/superAdminCore/migrate"
+import "github.com/PeterYangs/superAdminCore/v2/migrate"
 
 func Up() {
 

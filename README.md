@@ -73,8 +73,8 @@ go build main.go
 package controller
 
 import (
-	"github.com/PeterYangs/superAdminCore/contextPlus"
-	"github.com/PeterYangs/superAdminCore/response"
+	"github.com/PeterYangs/superAdminCore/v2/contextPlus"
+	"github.com/PeterYangs/superAdminCore/v2/response"
 )
 
 func Index(c *contextPlus.Context) *response.Response {
@@ -122,8 +122,8 @@ middleware/global.go
 package middleware
 
 import (
-	"github.com/PeterYangs/superAdminCore/contextPlus"
-	"github.com/PeterYangs/superAdminCore/middleware/session"
+	"github.com/PeterYangs/superAdminCore/v2/contextPlus"
+	"github.com/PeterYangs/superAdminCore/v2/middleware/session"
 	"superadmin/middleware/accessLog"
 )
 
@@ -563,7 +563,7 @@ type Artisan interface {
 ```go
 package demo
 
-import "github.com/PeterYangs/superAdminCore/component/logs"
+import "github.com/PeterYangs/superAdminCore/v2/component/logs"
 
 type Demo struct {
 }
@@ -591,9 +591,9 @@ package test
 
 import (
 	"fmt"
-	"github.com/PeterYangs/superAdminCore/cache"
-	"github.com/PeterYangs/superAdminCore/contextPlus"
-	"github.com/PeterYangs/superAdminCore/response"
+	"github.com/PeterYangs/superAdminCore/v2/cache"
+	"github.com/PeterYangs/superAdminCore/v2/contextPlus"
+	"github.com/PeterYangs/superAdminCore/v2/response"
 )
 
 func Cache(c *contextPlus.Context) *response.Response {

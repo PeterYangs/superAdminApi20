@@ -1,8 +1,8 @@
 package access
 
 import (
-	"github.com/PeterYangs/superAdminCore/database"
-	"github.com/PeterYangs/superAdminCore/queue/task"
+	"github.com/PeterYangs/superAdminCore/v2/database"
+	"github.com/PeterYangs/superAdminCore/v2/queue/task"
 	"superadmin/model"
 )
 

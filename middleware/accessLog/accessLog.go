@@ -2,8 +2,8 @@ package accessLog
 
 import (
 	"bytes"
-	"github.com/PeterYangs/superAdminCore/contextPlus"
-	"github.com/PeterYangs/superAdminCore/queue"
+	"github.com/PeterYangs/superAdminCore/v2/contextPlus"
+	"github.com/PeterYangs/superAdminCore/v2/queue"
 	"superadmin/task/access"
 
 	"io/ioutil"

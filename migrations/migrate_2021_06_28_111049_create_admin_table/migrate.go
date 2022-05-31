@@ -1,6 +1,6 @@
 package migrate_2021_06_28_111049_create_admin_table
 
-import "github.com/PeterYangs/superAdminCore/migrate"
+import "github.com/PeterYangs/superAdminCore/v2/migrate"
 
 func Up() {
 

@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"github.com/PeterYangs/superAdminCore/route"
+	"github.com/PeterYangs/superAdminCore/v2/route"
 	"superadmin/controller"
 	"superadmin/controller/access"
 	"superadmin/controller/admin"

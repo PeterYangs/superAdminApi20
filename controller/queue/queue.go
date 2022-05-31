@@ -3,9 +3,9 @@ package queue
 import (
 	"context"
 	"encoding/json"
-	"github.com/PeterYangs/superAdminCore/contextPlus"
-	"github.com/PeterYangs/superAdminCore/redis"
-	"github.com/PeterYangs/superAdminCore/response"
+	"github.com/PeterYangs/superAdminCore/v2/contextPlus"
+	"github.com/PeterYangs/superAdminCore/v2/redis"
+	"github.com/PeterYangs/superAdminCore/v2/response"
 	"github.com/spf13/cast"
 	"os"
 )

@@ -2,10 +2,10 @@ package login
 
 import (
 	"context"
-	"github.com/PeterYangs/superAdminCore/contextPlus"
-	"github.com/PeterYangs/superAdminCore/database"
-	"github.com/PeterYangs/superAdminCore/redis"
-	"github.com/PeterYangs/superAdminCore/response"
+	"github.com/PeterYangs/superAdminCore/v2/contextPlus"
+	"github.com/PeterYangs/superAdminCore/v2/database"
+	"github.com/PeterYangs/superAdminCore/v2/redis"
+	"github.com/PeterYangs/superAdminCore/v2/response"
 	regexp "github.com/dlclark/regexp2"
 	"github.com/spf13/cast"
 	"os"

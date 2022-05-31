@@ -1,6 +1,6 @@
 package migrate_2021_09_09_094754_create_file_table
 
-import "github.com/PeterYangs/superAdminCore/migrate"
+import "github.com/PeterYangs/superAdminCore/v2/migrate"
 
 func Up() {
 

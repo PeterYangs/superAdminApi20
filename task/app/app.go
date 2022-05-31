@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/PeterYangs/superAdminCore/queue/task"
+	"github.com/PeterYangs/superAdminCore/v2/queue/task"
 )
 
 type AppTask struct {

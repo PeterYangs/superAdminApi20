@@ -2,8 +2,8 @@ package broadcast
 
 import (
 	"fmt"
-	"github.com/PeterYangs/superAdminCore/contextPlus"
-	"github.com/PeterYangs/superAdminCore/response"
+	"github.com/PeterYangs/superAdminCore/v2/contextPlus"
+	"github.com/PeterYangs/superAdminCore/v2/response"
 	"github.com/gorilla/websocket"
 	"net/http"
 	"superadmin/util/online"

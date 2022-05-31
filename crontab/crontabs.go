@@ -1,7 +1,7 @@
 package crontab
 
 import (
-	crontab2 "github.com/PeterYangs/superAdminCore/crontab"
+	crontab2 "github.com/PeterYangs/superAdminCore/v2/crontab"
 )
 
 func Crontab(crontab *crontab2.Crontab) {
