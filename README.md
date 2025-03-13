@@ -4,6 +4,8 @@
 
 [中文文档](https://www.kancloud.cn/peter_yang/v001/2401726)
 
+[相关博客](https://www.zhihu.com/column/c_1394224785514082304)
+
 ### 在线demo
 
 https://www.peterdemo.net
